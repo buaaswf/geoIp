@@ -51,27 +51,13 @@ ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,double sigmaD, double sigmaR){
 
 	
 }
-//Raw & ThreeDim_Bilateral::runFilter(Raw &src){
-//
-//
-//	//for(int i=0;i<src.getXsize();i++){
-//	//	for (int j=0;j<src.getYsize();j++){
-//
-//			apply(src);
-//
-//	//	}
-//	//}
-//
-//	return src;
-//
-//}
 
 double ThreeDim_Bilateral::getSpatialWeight(int m, int n,int l, int i, int j, int k){
 	return kernelD[(int)(i-m + kernelRadius)][(int)(j-n + kernelRadius)][(int)(k-l + kernelRadius)];
 }
 
 
-void ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x 
+Raw ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x 
 	Raw temp(src);
 	for (int i=0;i<src.getZsize();i++)
 	{
@@ -100,10 +86,6 @@ void ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x
 								{
 									int intensityKernelPos = src.get(m,n,l);
 									weight = getSpatialWeight(m,n,l,i,j,k) * similarity(intensityKernelPos,intensityCenter);
-									//if (weight!=0)
-									//{
-									//	cout<<weight<<endl;
-									//}
 									totalWeight += weight;
 									sum += (weight * intensityKernelPos);
 								}
@@ -111,28 +93,13 @@ void ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x
 
 						}
 					}
-					//int newvalue=(int)floor(sum / totalWeight);
+					int newvalue=(int)floor(sum / totalWeight);
 					if (sum!=0)
 					{
 						int newvalue=(int)(sum / totalWeight);
 						temp.put(i,j,k,newvalue);
 
-
-						//if (newvalue!=src.get(i,j))
-						//{
-						//	if (newvalue-src.get(i,j)!=-1)
-						//	{
-						//		cout<<newvalue-src.get(i,j)<<endl;
-						//	}
-
-						//}
 					}
-					//RawArray pixel[3];
-					//pixel[0]= newvalue;
-					//pixel[1]=newvalue;
-					//pixel[2]=newvalue;
-					//src.put(i,j,pixel);
-
 
 				}
 			}
@@ -141,7 +108,7 @@ void ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x
 
 	}
 
-	src=temp;
+	return temp;
 
 
 }

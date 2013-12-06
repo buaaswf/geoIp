@@ -7,7 +7,7 @@
 
 //#include"vol_math_Raw3D_Independt.h"
 //#define u_char unsigned char
-#define PIXTYPE unsigned char
+#define PIXTYPE float
 using namespace std;
 /************************************************************************/
 /* RawImage :three data types to be changed to double 
@@ -50,9 +50,9 @@ private:   			//-----------------DATA-----------------
 	PIXTYPE *data;		// 1D array of PIXTYPE that are accessed as a 2D array.
 	bool is_shared;
 public:				//---------------init fcns-------------
-	Raw(int,int,int,PIXTYPE*,bool=false);	
+	Raw(int,int,int,PIXTYPE*);	
 	Raw(const Raw& src,bool=false);
-	Raw(int,int,int,bool=false);
+	Raw(int,int,int);
 	Raw(void);// constructor for 'empty' Raws
 	~Raw(void);		// destructor; releases memory
 

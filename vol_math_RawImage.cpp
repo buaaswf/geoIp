@@ -41,7 +41,7 @@ void RawImage::readImage(unsigned char * buf,char const *file ,int size)
 		printf("open fail");
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
-	//fseek(op,281*481*500L,SEEK_SET);
+	fseek(op,281*481*500L,SEEK_SET);
 	fread(buf,sizeof(unsigned char),size,op);
 
 	fclose(op);
@@ -55,7 +55,7 @@ void RawImage::readImage2(float * buf,char const *file ,int size)
 		printf("open fail");
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
-	//fseek(op,281*481*500L,SEEK_SET);
+	fseek(op,281*481*500L,SEEK_SET);
 	fread(buf,sizeof(float),size,op);
 
 	fclose(op);
@@ -141,38 +141,7 @@ void RawImage::writeImagecolon(Raw &destImg)
 void RawImage::writeImage(Raw &destImg)
 {
 	FILE *p=fopen("F:\\3Dlevel.raw","wb");
-	//char* data = double2char(destImg.getdata(), destImg.size());
 	PIXTYPE *data=(PIXTYPE *)destImg.getdata();
-	//for (int i=0;i<destImg.getXsize()*destImg.getYsize()*destImg.getZsize();i++)
-	//{
-
-	//	if (data[i]<1)
-	//	{
-	//		data[i]=data[i];
-	//	}
-	//	else data[i]=0;
-
-	//}
-	/*for (int i=0;i<destImg.getZsize();i++)
-	{
-		for (int j=0;j<destImg.getYsize();j++)
-		{
-			for (int k=0;k<destImg.getXsize();k++)
-			{
-				PIXTYPE *val=&data[i*destImg.getXsize()*destImg.getYsize()+j*destImg.getXsize()+k];
-				if(k<451 &&k> 45 && j>162 &&j <391)
-				{
-					if (*val>1)
-					{
-						*val=0;
-
-					}
-					else *val=100;
-				}
-				else *val=0;
-			}
-		}
-	}*/
 	fwrite(data, sizeof(PIXTYPE), destImg.size(), p);
 	fclose(p);
 	fflush(stdout);
@@ -182,11 +151,16 @@ void RawImage::writeImage(Raw &destImg)
 }
 void RawImage::writeImagesesmic(Raw &destImg)
 {
-	FILE *p=fopen("F:\\3Dlevel.raw","wb");
+	FILE *p;
+	if((p=fopen("F:\\sesmic.raw","wb"))==NULL)
+	{
+		printf("cant open the file");
+		exit(0);
+	}
+	
+	PIXTYPE *data=(PIXTYPE *)destImg.getdata();
 
-	unsigned char *data=(unsigned char *)destImg.getdata();
-
-	fwrite(data, sizeof(unsigned char), destImg.size(), p);
+	fwrite(data, sizeof(PIXTYPE), destImg.size(), p);
 	fclose(p);
 	fflush(stdout);
 
@@ -224,21 +198,26 @@ Raw::Raw(void)
 	is_shared = false;
 	data=NULL;
 }
-Raw::Raw(int xsize,int ysize,int zsize,PIXTYPE *y,bool _is_shared)
+Raw::Raw(int xsize,int ysize,int zsize,PIXTYPE *y)
 {
 	//float i=0.0f;
 	this->xsize=xsize;
 	this->ysize=ysize;
 	this->zsize=zsize;
-	is_shared = _is_shared;
-	this->data=y;
+	data=new PIXTYPE[size()];
+	//	if (is_shared == true) {
+	//	this->data = data;
+	//} else {
+	//	this->data=new PIXTYPE[size()];
+		memcpy(this->data,y,sizeof(PIXTYPE)*size());
+	/*}*/
 }
-Raw::Raw(int xsize,int ysize,int zsize,bool _is_shared)
+Raw::Raw(int xsize,int ysize,int zsize)
 {
 	this->xsize=xsize;
 	this->ysize=ysize;
 	this->zsize=zsize;
-	this->is_shared = _is_shared;
+	//this->is_shared = _is_shared;
 	this->data=new PIXTYPE[size()];
 }
 

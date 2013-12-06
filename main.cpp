@@ -39,12 +39,12 @@ void test3dbilateralfilter(int argc,char **argv)
 {
 
 	char *pt="single_well";
-	int l=256,m=256,n=26,l1=0,l2=0,iter_outer=10;
+	int l=281,m=481,n=10;
 	RawImage test;
 	unsigned char * indata=new unsigned char [l*m*n];
 	Raw *initial=new Raw(l,m,n);
-
-	test.readImage(indata,"E:\\volume\\little\\little.raw",256*256*26*sizeof(unsigned char));
+	//float *indata1=(float*)indata;
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));
 
 	float *inputo=new float[l*m*n];
 	for (int i = 0; i < l*m*n; i++)
@@ -52,11 +52,13 @@ void test3dbilateralfilter(int argc,char **argv)
 		inputo[i]=(float) indata[i];
 	}
 
-	Raw *input=new Raw(l,m,n,inputo);
+	Raw *input=new Raw (l,m,n,inputo);
 	RawImage *write=new RawImage();
 	ThreeDim_Bilateral *b=new ThreeDim_Bilateral(input,6,3);
-	b->apply(*input);
-	IShowraw(*input,argc,argv);
+	Raw *ret=new Raw(b->apply(*input));
+	//IShowraw(*input,argc,argv);
+	write->writeImagesesmic(*ret);
+	//delete  ret;
 }
 int main(int argc,char **argv)
 {
