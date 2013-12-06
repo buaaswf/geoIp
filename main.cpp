@@ -3,6 +3,7 @@
 #include "vol_math_RawImage.h"
 #include "vol_math_trilateralfilter.h"
 #include "BilateralFilter.h"
+#include "ThreeDim_Bilateral.h"
 #include "CImg.h"
 #include "test.h"
 using namespace cimg_library;
@@ -34,13 +35,36 @@ void testbilateralfilter()
 	//}
 	IShowImg(*input);
 }
+void test3dbilateralfilter(int argc,char **argv)
+{
+
+	char *pt="single_well";
+	int l=256,m=256,n=26,l1=0,l2=0,iter_outer=10;
+	RawImage test;
+	unsigned char * indata=new unsigned char [l*m*n];
+	Raw *initial=new Raw(l,m,n);
+
+	test.readImage(indata,"E:\\volume\\little\\little.raw",256*256*26*sizeof(unsigned char));
+
+	float *inputo=new float[l*m*n];
+	for (int i = 0; i < l*m*n; i++)
+	{
+		inputo[i]=(float) indata[i];
+	}
+
+	Raw *input=new Raw(l,m,n,inputo);
+	RawImage *write=new RawImage();
+	ThreeDim_Bilateral *b=new ThreeDim_Bilateral(input,6,3);
+	b->apply(*input);
+	IShowraw(*input,argc,argv);
+}
 int main(int argc,char **argv)
 {
 	//RawImage *img=new RawImage(281,481,2501);
 	//img->readImage(img->buf,"F:\\lab\\VTKproj\\mig.raw",img->getlength());
 	//Trilateralfilter f(img);
 	//f.TrilateralFilter(1);
-	testbilateralfilter();
+	test3dbilateralfilter(argc,argv);
 	system("pause");
 	return 0;
 
