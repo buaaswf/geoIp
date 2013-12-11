@@ -6,7 +6,7 @@
 
 #include <iostream>
 using namespace std;
-#define PIXTYPE unsigned char
+#define PIXTYPE float
 //typedef unsigned char PIXTYPE;
 class Raw2DArray;
 class Raw2D
