@@ -189,7 +189,15 @@ RawImage::~RawImage(void)
 }
 
 //=====================================================================================================
+Raw::Raw(ImageVolume &src)
+{
+	this->xsize=src.Width;
+	this->ysize=src.Height;
+	this->zsize=src.Depth;
+	data=new PIXTYPE[size()];
+	memcpy(data,src.Data,sizeof(PIXTYPE)*size());
 
+}
 Raw::Raw(void)
 {
 	xsize=0;

@@ -8,6 +8,15 @@
 #include "CImg.h"
 #include "test.h"
 #include "Filter.h"
+#include "pthread.h"
+#include <assert.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include "semaphore.h"
+#include "ImageVolume.h"
+//#include <unistd.h>
+#include <stdio.h>
+#include <tchar.h>
 using namespace cimg_library;
 void testbilateralfilter()
 {
@@ -131,18 +140,113 @@ void testanistropic(int argc,char **argv)
 			test.writeImagesesmic(*output);
 }
 
+//
+//int main(int argc,char **argv)
+//{
+//	//RawImage *img=new RawImage(281,481,2501);
+//	//img->readImage(img->buf,"F:\\lab\\VTKproj\\mig.raw",img->getlength());
+//	//Trilateralfilter f(img);
+//	//f.TrilateralFilter(1);
+//	//test3dbilateralfilter(argc,argv);
+//	//test3dguass();
+//	testanistropic(argc,argv);
+//	system("pause");
+//	return 0;
+//
+//
+//}
 
-int main(int argc,char **argv)
+void* Function_t(void* Param)
 {
-	//RawImage *img=new RawImage(281,481,2501);
-	//img->readImage(img->buf,"F:\\lab\\VTKproj\\mig.raw",img->getlength());
-	//Trilateralfilter f(img);
-	//f.TrilateralFilter(1);
-	//test3dbilateralfilter(argc,argv);
-	//test3dguass();
-	testanistropic(argc,argv);
-	system("pause");
-	return 0;
+	printf("I am a thread! ");
+	pthread_t myid = pthread_self();
+	printf("thread ID=%d ", myid);
+	return NULL;
+}
+
+int myglobal;
+pthread_mutex_t mymutex=PTHREAD_MUTEX_INITIALIZER;
+void *thread_function(void *arg) {
+	int i,j;
+	for ( i=0; i<20; i++) {
+		pthread_mutex_lock(&mymutex);
+		j=myglobal;
+		j=j+1;
+		printf(".");
+		fflush(stdout);
+		//sleep(1);
+		myglobal=j;
+		pthread_mutex_unlock(&mymutex);
+	}
+	return NULL;
+}
+void * ImageP( void *arg)
+{
+	cout<<"ImageProcess"<<endl;
+	return NULL;
+}
+void testvolume()
+{
+	
+
+}
+
+int main(int argc, char* argv[])
+{
+	
+	pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;// = new pthread_mutex_t(); 
+	pthread_t pid[5];
+	//pthread_attr_init(&attr);
+	//pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS);
+	//pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	//pthread_create(&pid, &attr, Function_t, NULL);
+	//printf("======================================== ");
+	int ret=4;
+	for(int i=0;i<ret;i++)
+	{
+		pthread_attr_t *attr;
+		//pthread_mutex_lock(&mutex);
+		ret=pthread_create(&pid[i],NULL,ImageP,NULL);
+		//sleep(1);
+		cout <<i<<endl;
+		//pthread_mutex_unlock(&mutex);
+
+	}
+	//if ( pthread_join (pid[i], NULL ) ) {
+	//	printf("error joining thread.");
+	//	abort();
+	//}
+	//for ()
+	//{
+
+	//}
 
 
+//		pthread_t mythread;
+//		int i;
+//		if ( pthread_create( &mythread, NULL, thread_function, NULL) ) {
+//			printf("error creating thread.");
+//			abort();
+//		}
+//		for ( i=0; i<20; i++) {
+//			pthread_mutex_lock(&mymutex);
+//			myglobal=myglobal+1;
+//			pthread_mutex_unlock(&mymutex);
+//			printf("o");
+//			cout<<i<<endl;
+//			fflush(stdout);
+////			sleep(1);
+//		}
+//		if ( pthread_join ( mythread, NULL ) ) {
+//			printf("error joining thread.");
+//			abort();
+//		}
+//		printf("\nmyglobal equals %d\n",myglobal);
+//		//exit(0);
+//
+//
+	getchar();
+	//pthread_attr_destroy(attr);
+
+	return 1;
 }

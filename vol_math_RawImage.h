@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include<iostream>
 #include <fstream>
-
+#include "ImageVolume.h"
 //#include"vol_math_Raw3D_Independt.h"
 //#define u_char unsigned char
 #define PIXTYPE float
@@ -51,6 +51,7 @@ private:   			//-----------------DATA-----------------
 	bool is_shared;
 public:				//---------------init fcns-------------
 	Raw(int,int,int,PIXTYPE*);	
+	Raw(ImageVolume &src);
 	Raw(const Raw& src,bool=false);
 	Raw(int,int,int);
 	Raw(void);// constructor for 'empty' Raws
