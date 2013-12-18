@@ -1,20 +1,20 @@
-#include "WipeNioisePde.h"
+#include "vol_math_WipeNioisePde.h"
 
 
-WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE val, int method)
+WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE value, int method)
 {
 	raw=src;
-	time=time;
-	delt=val;
+	delt=time;
+	val=value;
 	way=method;
-	//if (way==0)
-	//{
-	//	Perona_Malik();
-	//} 
-	//else
-	//{
-	//	FourPDiff();
-	//}
+	if (way==0)
+	{
+		Perona_Malik(src);
+	} 
+	else
+	{
+		FourPDiff(src);
+	}
 }
 
 

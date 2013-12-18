@@ -1,7 +1,7 @@
 #pragma once
 #include"vol_math_RawImage.h"
-
-class WipeNioisePde
+#include "Wipe.h"
+class WipeNioisePde:virtual public Wipe
 {
 private:
 	Raw raw;

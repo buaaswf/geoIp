@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "vol_math_RawImage.h"
 #include "vol_math_trilateralfilter.h"
-#include "BilateralFilter.h"
-#include "ThreeDim_Bilateral.h"
-#include "WipeNioisePde.h"
+#include "vol_math_BilateralFilter.h"
+#include "vol_math_ThreeDim_Bilateral.h"
+#include "vol_math_WipeNioisePde.h"
 #include "CImg.h"
 #include "test.h"
 #include "Filter.h"
@@ -13,7 +13,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include "semaphore.h"
-#include "ImageVolume.h"
+#include "vol_math_ImageVolume.h"
 //#include <unistd.h>
 #include <stdio.h>
 #include <tchar.h>
@@ -187,8 +187,9 @@ void * ImageP( void *arg)
 }
 void testvolume()
 {
+	ImageVolume *iv=new ImageVolume();
+	Raw src(*iv);
 	
-
 }
 
 int main(int argc, char* argv[])

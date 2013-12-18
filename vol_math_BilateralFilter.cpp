@@ -1,4 +1,4 @@
-#include "BilateralFilter.h"
+#include "vol_math_BilateralFilter.h"
 void BilateralFilter_Struct_Oriented(Raw *raw,float sigmaC, float sigmaR, int filterSize)
 {
 	

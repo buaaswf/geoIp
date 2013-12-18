@@ -2,10 +2,10 @@
 
 static float lgtt=log10(2.0f);
 //=====================================================================================================
-Trilateralfilter::Trilateralfilter(RawImage* img)
+Trilateralfilter::Trilateralfilter(Raw* img)
 {
-	this->img=img;
-	this->raw=rawarray(img);
+	this->raw=img;
+	//this->raw=rawarray(img);
 }
 Trilateralfilter::~Trilateralfilter(void)
 {
@@ -13,6 +13,43 @@ Trilateralfilter::~Trilateralfilter(void)
 	delete raw;
 	//delete rawarray;
 }
+void * TrilateralFilter_single(void * para)
+{
+	Tri_para *p=(Tri_para *)para; 
+	Raw *ret = p->src;
+	PIXTYPE sigmaC= p->sigmaC;
+	Trilateralfilter *tf = new Trilateralfilter(ret);
+		tf->TrilateralFilter(sigmaC);
+		delete tf;
+	return NULL;
+}
+void Trilateralfilter::TrilateralFilter_Multi(PIXTYPE sigmaC,int threadcount)
+{
+	vector <Raw *>  raw;
+	std::vector<pthread_t> threads;threads.resize(threadcount);
+	std::vector<int> pids;pids.resize(threadcount);
+	std::vector<int> res;res.resize(threadcount);
+	std::vector<Tri_para> parms;parms.resize(threadcount);
+	for (int i = 0; i <= this->raw->getZsize()/threadcount; i++ )
+	{
+		
+		raw.push_back(new Raw(this->raw->getXsize(),this->raw->getYsize(),this->raw->getZsize()/threadcount));
+		memcpy(raw[i]->getdata(),this->raw->getdata()+i*this->raw->getZsize(),sizeof(PIXTYPE)*raw[i]->size());
+		int ret;
+		parms[i]=Tri_para(*raw[i],sigmaC);
+		pthread_attr_t *attr;
+		ret=pthread_create(&threads[i],NULL,TrilateralFilter_single,&parms[i]);
+		cout <<i<<endl;
+		
+
+	}
+	for(int i=0;i<threadcount;i++)
+	{
+		pthread_join(threads[i], NULL);
+	}
+
+}
+
 void Trilateralfilter::TrilateralFilter(PIXTYPE sigmaC)
 	//=====================================================================================================
 {	

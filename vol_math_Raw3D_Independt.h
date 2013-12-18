@@ -205,67 +205,36 @@ public:
 		else cout<<"out of size putxy"<<endl;
 
 	}
-	bool Raw2D::wipecopy(Raw2D* src);
+	
+	//---------------Trilateral Filter fcns-------------
+
+	//Trilateral filter consisting of gradient filter, adaptive neighborhood
+	//computation and detail filter
+	void TrilateralFilter(Raw2D* srcImg, PIXTYPE sigmaC); 
+
+	//Computes X and Y gradients of the input image
+	void ComputeGradients(Raw2D* pX, Raw2D* pY); 
+
+	//Bilaterally filters  gradients pX and pY 
+	void BilateralGradientFilter(Raw2D* pX, Raw2D* pY, Raw2D* pSmoothX, 
+		Raw2D* pSmoothY, PIXTYPE sigmaC, PIXTYPE sigmaS, int filterSize); 
+
+	//Builds the stack of min-max image gradients; returns the range variance
+	PIXTYPE buildMinMaxImageStack(Raw2D* pX, Raw2D* pY, Raw2DArray* pMinStack,
+		Raw2DArray* pMaxStack , int levelMax, PIXTYPE beta); 
+
+	//Finds the adaptive neighborhood size (stack level) 
+	//from the min-max gradient stack
+	void findAdaptiveRegion(Raw2DArray* pMinStack, Raw2DArray* pMaxStack, PIXTYPE R, int levelMax); 
+
+	//Filters the detail signal and computes the final output image	
+	void DetailBilateralFilter(Raw2D* srcImg, Raw2D* pSmoothX, Raw2D* pSmoothY, 
+		Raw2D* fTheta, PIXTYPE sigmaCTheta, PIXTYPE sigmaRTheta); 
+	bool wipecopy(Raw2D* src);
 
 };
-#endif  //Raw2D_H
 
-//class Raw  {
-//private:   			//-----------------DATA----------------- 
-//	int xsize;		// # of pixels per scanline,
-//	int ysize;		// # of scanlines in this Raw.
-//	int zsize;
-//	PIXTYPE *y;		// 1D array of PIXTYPE that are accessed as a 2D array.
-//
-//public:				//---------------init fcns-------------
-//	Raw(int,int,int,PIXTYPE *);	
-//	Raw(void);// constructor for 'empty' Raws
-//	~Raw(void);		// destructor; releases memory
-//	void sizer(int ixsize, int iysize,int izsize);		// get mem for rectangle of pixels
-//	void sizer(Raw* src);					// get same amt. of mem as 'src'
-//	int getXsize(void) {return xsize;};		// get # pixels per scanline
-//	int getYsize(void) {return ysize;};		// get # of scanlines.
-//	int getZsize(void) {return zsize;};		//get # of image numbers
-//	int wipecopy(Raw* src);			// copy, even with size mismatch change from bool swf 2013 4 16
-//	void put(int ix, int iy,int iz, PIXTYPE val) {	// write 'val' at location ix,iy,iz.
-//		y[ix + xsize*iy+xsize*ysize*iz] = val; 
-//	};
-//	inline PIXTYPE get(int ix, int iy,int iz) {	// read the value at ix,iy.
-//		int index=ix + xsize*iy+xsize*ysize*iz;
-//		return(y[index]); 
-//	};
-//	PIXTYPE getXYZ(int ixyz){		// read value at 1D address ixyz
-//		return y[ixyz];
-//	};
-//	void putXYZ(int ixyz,PIXTYPE val){// write value at 1D address ixy
-//		y[ixyz] = val;
-//	};
-//	//---------------Trilateral Filter fcns-------------
-//
-//	//Trilateral filter consisting of gradient filter, adaptive neighborhood
-//	//computation and detail filter
-//	void TrilateralFilter(Raw* srcImg, PIXTYPE sigmaC); 
-//
-//	//Computes X , Y and Z gradients of the input image
-//	void ComputeGradients(Raw* pX, Raw* pY,Raw *pZ); 
-//
-//	//Bilaterally filters  gradients pX and pY 
-//	void BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSmoothX, 
-//		Raw* pSmoothY,Raw * pSmoothZ,float sigmaC,float sigmaS, int filterSize); //sigmaC,sugmaS is change  from PIXTYPE to float
-//
-//	//Builds the stack of min-max image gradients; returns the range variance
-//	PIXTYPE buildMinMaxImageStack(Raw* pX, Raw* pY, Raw* pZ,Raw2DArray* pMinStack,
-//		Raw2DArray* pMaxStack , int levelMax, float beta);		// beta is changed from PIXTYPE to float
-//
-//	//Finds the adaptive neighborhood size (stack level) 
-//	//from the min-max gradient stack
-//	void findAdaptiveRegion(Raw2DArray* pMinStack, Raw2DArray* pMaxStack, PIXTYPE R, int levelMax); 
-//
-//	//Filters the detail signal and computes the final output image	
-//	void DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pSmoothY, Raw* pSmoothZ, 
-//		Raw* fTheta, float sigmaCTheta, float sigmaRTheta); // sigmaCTheta sigmaRTheta is changed from PIXTYPE to float
-//
-//};
+#endif  //Raw2D_H
 
 
 

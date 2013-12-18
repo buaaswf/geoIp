@@ -1,4 +1,4 @@
-#include "ThreeDim_Bilateral.h"
+#include "vol_math_ThreeDim_Bilateral.h"
 //int max(int num1, int num2){
 //	if(num1>num2)
 //		return num1;
