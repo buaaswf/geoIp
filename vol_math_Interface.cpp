@@ -38,6 +38,7 @@ void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 	MultiThread(1,para.threadcount,indata,(void *)&para);
 	return & indata;
 }
+
 extern void * doMultiOstuI (ImageVolume &src,MultiOstuI &para)
 {
 	Raw indata =*(Raw *)ImageVolume2Raw(src);

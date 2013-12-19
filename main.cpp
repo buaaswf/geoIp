@@ -181,14 +181,15 @@ void *thread_function(void *arg) {
 	}
 	return NULL;
 }
-void testinterface(ImageVolume &src)
+Raw * testinterface(ImageVolume &src)
 {
-	AnistropicI anis(1,1,1,5);
-	//TrilateralfilterI tril(5,1);
+	//AnistropicI anis(1,1,1,5);
+	TrilateralfilterI tril(5,1);
 	//BilateralFilterI bil(1,1,5);
-	//doBilateralI(src,bil);
-	doAnistropicI(src,anis);
-	//doTrilateralfilterI(src,tril);
+	//Raw * ret=(Raw *)doBilateralI(src,bil);
+	//Raw *ret=(Raw *)doAnistropicI(src,anis);
+	Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
+	return ret;
 
 }
 int main(int argc, char* argv[])
@@ -196,13 +197,11 @@ int main(int argc, char* argv[])
 	int l=281,m=481,n=20;
 	RawImage test;
 	unsigned char * indata=new unsigned char [l*m*n];
-	//Raw *initial=new Raw(l,m,n);
 	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));
 	ImageVolume *imagevol=new ImageVolume(l,m,n,1,indata);
-	//Raw *ret=(Raw  *)ImageVolume2Raw(imagevol);
-	testinterface(*imagevol);
-	//getchar();
-	//pthread_attr_destroy(attr);
+	Raw *ret;
+	ret=testinterface(*imagevol);
+	test.writeImagesesmic(*ret);
 	system("pause");
 	return 1;
 }
