@@ -42,194 +42,36 @@ public:
 	float * buf2float(unsigned char *buf);
 	void save();
 };
-Raw  ImageVolume2Raw(ImageVolume &src)
-{
-	PIXTYPE *data= new PIXTYPE[src.GetLength()];
-	if (src.PixelType==1)
-	{
-		unsigned char* datSrc = (unsigned char*)(src.Data);
-		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.GetLength();i++)
-		{
-			data[i]=datSrc[i];
-		}
-	}
-	else if (src.PixelType == 2)
-	{
-
-			unsigned short * datSrc = (unsigned short *)(src.Data);
-			//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-			for (int i=0;i<src.GetLength();i++)
-			{
-				data[i]=datSrc[i];
-			}
-
-	}
-	else if (src.PixelType == 3 )
-	{
 
 
-		float* datSrc = (float*)(src.Data);
-		
-		for (int i=0;i<src.GetLength();i++)
-		{
-			data[i]=datSrc[i];
-		}
-		
-	}
-	
-
-	//src.Data=data;
-	Raw *ret=new Raw(src.Width,src.Height,src.Depth,data);
-	return *ret;
-	
-}
-void *  Raw2ImageVolume(Raw  &src,int type)
-{
-	PIXTYPE *datSrc = (PIXTYPE *)(src.getdata());
-	
-	if (type == 1)
-	{
-		unsigned char *data= new unsigned char[src.size()];
-		
-		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
-		{
-			data[i]=datSrc[i];
-		}
-		void * ret=(void *)data;
-		return ret;
-	}
-	else if (type == 2 )
-	{
-		unsigned short *data =new unsigned short[src.size()];
-		PIXTYPE  * datSrc = (src.getdata());
-		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
-		{
-			data[i]=datSrc[i];
-		}
-		void * ret= (void *)data;
-		return ret;
-	}
-	else return (void *)src.getdata();
-
-}
-Raw2D Image2D2Raw2D(Image2D &src)
-{
-	PIXTYPE *data= new PIXTYPE[src.GetLength()];
-	if (src.PixelType==1)
-	{
-		unsigned char* datSrc = (unsigned char*)(src.data);
-		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.GetLength();i++)
-		{
-			data[i]=datSrc[i];
-		}
-	}
-	else if (src.PixelType == 2)
-	{
-
-		unsigned short * datSrc = (unsigned short *)(src.data);
-		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.GetLength();i++)
-		{
-			data[i]=datSrc[i];
-		}
-
-	}
-	else if (src.PixelType == 3 )
-	{
-
-
-		short* datSrc = (short*)(src.data);
-
-		for (int i=0;i<src.GetLength();i++)
-		{
-			data[i]=datSrc[i];
-		}
-
-	}
-
-
-	//src.Data=data;
-	Raw2D *ret=new Raw2D(src.width,src.height,data);
-	return *ret;
-}
-void * Raw2D2Image2D(Raw2D &src,int type)
-{
-	PIXTYPE *data= new PIXTYPE[src.size()];
-	if (type==1)
-	{
-		unsigned char* datSrc = new unsigned char [src.size()];//(unsigned char*)(src.data);
-		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
-		{
-			datSrc[i]=(unsigned char)src.getXY(i);
-		}
-		void * ret= (void *)datSrc;
-		return datSrc;
-	}
-	else if (type == 2)
-	{
-
-		unsigned short * datSrc = new unsigned short [src.size()];//(unsigned short *)(src.data);
-		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
-		{
-			datSrc[i]=src.getXY(i);
-		}
-		void * ret=(void *)datSrc;
-		return datSrc;
-	}
-	else if (type == 3 )
-	{
-
-
-		float* datSrc = new float [src.size()]; //(short*)(src.data);
-
-		for (int i=0;i<src.size();i++)
-		{
-			datSrc[i]=src.getXY(i);
-		}
-		void *ret =(void *)datSrc;
-		return datSrc;
-
-	}
-
-
-	//src.Data=data;
-	
-	//return *ret;
-}
-class Raw3D {
-public:
-	Raw2D *z;	// dynam. allocated space for a set of Raw2D objects.
-	int zsize;	// # of Raw2D objects stored.
-
-public:							
-	Raw3D(void);// 'empty' Raw3D constructor.
-	Raw3D(int zsize,Raw2D *src);//swf add for read data 
-	~Raw3D(void);	// destructor.
-	void sizer(int ixsize, int iysize, int izsize); // reserve memory
-	void sizer(Raw3D* src);			// get same amt. of mem as 'src
-	int getZsize(void) {				// return # of Raw2D's we hold;
-		return(zsize); 
-	};
-	int getYsize() {					// # of Raw1D's in zval-th Raw2D;
-		return(z[0].getYsize()); 
-	};
-	int getXsize(){						// # of pixels on yval,zval-th line
-		return(z[0].getXsize()); 
-	};
-	PIXTYPE get(int ix, int iy, int iz) {
-		return(z[iz].get(ix,iy));	// write 'val' at location ix,iy,iz. 
-	};
-	void put(int ix, int iy, int iz, PIXTYPE val) { 
-		z[iz].put(ix,iy,val);		//write 'val' at location ix,iy,iz.
-	};
-	void wipecopy(Raw3D& src);			// copy, resize as needed.
-};
+//class Raw3D {
+//public:
+//	Raw2D *z;	// dynam. allocated space for a set of Raw2D objects.
+//	int zsize;	// # of Raw2D objects stored.
+//
+//public:							
+//	Raw3D(void);// 'empty' Raw3D constructor.
+//	Raw3D(int zsize,Raw2D *src);//swf add for read data 
+//	~Raw3D(void);	// destructor.
+//	void sizer(int ixsize, int iysize, int izsize); // reserve memory
+//	void sizer(Raw3D* src);			// get same amt. of mem as 'src
+//	int getZsize(void) {				// return # of Raw2D's we hold;
+//		return(zsize); 
+//	};
+//	int getYsize() {					// # of Raw1D's in zval-th Raw2D;
+//		return(z[0].getYsize()); 
+//	};
+//	int getXsize(){						// # of pixels on yval,zval-th line
+//		return(z[0].getXsize()); 
+//	};
+//	PIXTYPE get(int ix, int iy, int iz) {
+//		return(z[iz].get(ix,iy));	// write 'val' at location ix,iy,iz. 
+//	};
+//	void put(int ix, int iy, int iz, PIXTYPE val) { 
+//		z[iz].put(ix,iy,val);		//write 'val' at location ix,iy,iz.
+//	};
+//	void wipecopy(Raw3D& src);			// copy, resize as needed.
+//};
 class Raw  {
 private:   			//-----------------DATA----------------- 
 	int xsize;		// # of pixels per scanline,
@@ -630,4 +472,16 @@ public:				//---------------init fcns-------------
 
 
 };
+
+void *  ImageVolume2Raw(ImageVolume &src);
+
+void *  Raw2ImageVolume(Raw  &src,int type);
+
+Raw2D Image2D2Raw2D(Image2D &src);
+
+void * Raw2D2Image2D(Raw2D &src,int type);
+
+
+
+
 #endif

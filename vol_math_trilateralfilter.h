@@ -17,7 +17,7 @@ struct Tri_para
 	{
 
 	}
-	Tri_para(Raw src, PIXTYPE sigmaC)
+	Tri_para(Raw *src, PIXTYPE sigmaC)
 	{
 		this->src = src;
 		this->sigmaC = sigmaC;

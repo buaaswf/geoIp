@@ -387,27 +387,27 @@ void Raw2D::DetailBilateralFilter(Raw2D* srcImg, Raw2D* pSmoothX, Raw2D* pSmooth
 	Memory allocator for a rectangular 2D object. Takes an 'empty' Raw2D
 	object and reserves a rectangular field of ixsize by iysize pixels.
 **/
-void Raw2D::sizer(int ixsize, int iysize) {
-	if(y!=NULL)
-		delete [] this->y;
-		y=NULL;
-		this->y = new PIXTYPE[ixsize*iysize];	// & allocate memory.
-    	xsize = ixsize;				// set new image size,
-    	ysize = iysize;
-}
+//void Raw2D::sizer(int ixsize, int iysize) {
+//	if(data!=NULL)
+//		delete [] this->data;
+//		data=NULL;
+//		this->data = new PIXTYPE[ixsize*iysize];	// & allocate memory.
+//    	xsize = ixsize;				// set new image size,
+//    	ysize = iysize;
+//}
 
 /**
 	Memory allocator for a 2D object.  Allocates space for an object of
 	same size as 'src'.
 **/
-void Raw2D::sizer(Raw2D* src) {
-    	int ix, iy;
-	
-    	ix = src->getXsize();
-    	iy = src->getYsize();
-    	sizer(ix,iy);
-}
-
+//void Raw2D::sizer(Raw2D* src) {
+//    	int ix, iy;
+//	
+//    	ix = src->getXsize();
+//    	iy = src->getYsize();
+//    	sizer(ix,iy);
+//}
+//
 
 
 /**
@@ -415,62 +415,62 @@ void Raw2D::sizer(Raw2D* src) {
 	us, 'wipe' out our current pixels, and change our size to match 'src'.
 	If a 'wipe' was necessary, return 'FALSE', else return 'TRUE'.
 **/
-
- bool Raw2D::wipecopy(Raw2D* src) {
-	bool out=true;
-	int i,imax;	
-    
-	if(getYsize() != src->getYsize() || getXsize()!=src->getXsize()) { // resize to fit 'src'.
-		sizer(src);
-		out=FALSE;
-    	}
-    	imax = getXsize()*getYsize();
-    	for(i=0; i<imax; i++) {
-		putXY(i,src->getXY(i));
-    	}
-		
-		return(out);
-}
-
+//
+// bool Raw2D::wipecopy(Raw2D* src) {
+//	bool out=true;
+//	int i,imax;	
+//    
+//	if(getYsize() != src->getYsize() || getXsize()!=src->getXsize()) { // resize to fit 'src'.
+//		sizer(src);
+//		out=FALSE;
+//    	}
+//    	imax = getXsize()*getYsize();
+//    	for(i=0; i<imax; i++) {
+//		putXY(i,src->getXY(i));
+//    	}
+//		
+//		return(out);
+//}
+//
 
 
 /**
 	Sets the size and allocates memory. Discards any existing contents if
 	the 3D object is not already 'empty'
 **/
-void Raw3D::sizer(int ixsize, int iysize, int izsize) {
-	int i;
-		if(z!=NULL)
-			delete[]this->z;
-    	z = new Raw2D[izsize];			// make room for the 2D objects,
-    	zsize = izsize;
-    	for(i=0; i< zsize; i++) 
-		z[i].sizer(ixsize,iysize);	// use the Raw2D sizer.	
-}
-
-void Raw3D::sizer(Raw3D* src)
-{
-	z=src->z;
-	zsize=src->zsize;
-
-}
-/**
-	Copy all the pixels from 'src', resizing as needed. Do not change
-	name of this object.
-**/ 
-void Raw3D::wipecopy(Raw3D& src) {
-int k,kmax;
-
-	if(&src==NULL)return;
-	if(src.zsize==0) return;		// ignore empty inputs.
-    	if(src.getZsize() != zsize || src.getYsize() != z[0].getYsize() ||
-		src.getXsize() != getXsize()) {
-		sizer(&src);
-	}
-	kmax = getZsize();
-    	for(k=0; k< kmax; k++) {		// copy each field;
-		z[k].wipecopy(&(src.z[k]));
-	}
-}
+//void Raw3D::sizer(int ixsize, int iysize, int izsize) {
+//	int i;
+//		if(z!=NULL)
+//			delete[]this->z;
+//    	z = new Raw2D[izsize];			// make room for the 2D objects,
+//    	zsize = izsize;
+//    	for(i=0; i< zsize; i++) 
+//		z[i].sizer(ixsize,iysize);	// use the Raw2D sizer.	
+//}
+//
+//void Raw3D::sizer(Raw3D* src)
+//{
+//	z=src->z;
+//	zsize=src->zsize;
+//
+//}
+///**
+//	Copy all the pixels from 'src', resizing as needed. Do not change
+//	name of this object.
+//**/ 
+//void Raw3D::wipecopy(Raw3D& src) {
+//int k,kmax;
+//
+//	if(&src==NULL)return;
+//	if(src.zsize==0) return;		// ignore empty inputs.
+//    	if(src.getZsize() != zsize || src.getYsize() != z[0].getYsize() ||
+//		src.getXsize() != getXsize()) {
+//		sizer(&src);
+//	}
+//	kmax = getZsize();
+//    	for(k=0; k< kmax; k++) {		// copy each field;
+//		z[k].wipecopy(&(src.z[k]));
+//	}
+//}
 
 

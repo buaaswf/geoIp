@@ -33,6 +33,33 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,bool crea
 		Data=NULL;
 	}
 }
+ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data)
+{
+	this->Width=width;
+	this->Height=height;
+	this->Depth=depth;
+	this->PixelType=pixelType;
+	
+		if(PixelType==1)
+		{
+			unsigned char  * cData=new unsigned char[GetLength()];
+			Data = (void *)cData;
+			memcpy(Data,data,sizeof(unsigned char)*GetLength());
+		}
+		if(PixelType==2)
+		{
+			unsigned short * sData=new unsigned short[GetLength()];
+			Data = (void *)sData;
+			memcpy(Data,data,sizeof(unsigned short)*GetLength());
+		}
+		if(PixelType==3)
+		{
+			float * fData=new float[GetLength()];
+			Data = (void *)fData;
+			memcpy(Data,data,sizeof(float)*GetLength());
+		}
+
+}
 ImageVolume::~ImageVolume()
 {
 	if(PixelType==1)

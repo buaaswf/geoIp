@@ -10,7 +10,7 @@ Trilateralfilter::Trilateralfilter(Raw* img)
 Trilateralfilter::~Trilateralfilter(void)
 {
 	img=NULL;
-	delete raw;
+	//delete this->raw;
 	//delete rawarray;
 }
 void * TrilateralFilter_single(void * para)
@@ -23,32 +23,32 @@ void * TrilateralFilter_single(void * para)
 		delete tf;
 	return NULL;
 }
-void Trilateralfilter::TrilateralFilter_Multi(PIXTYPE sigmaC,int threadcount)
-{
-	vector <Raw *>  raw;
-	std::vector<pthread_t> threads;threads.resize(threadcount);
-	std::vector<int> pids;pids.resize(threadcount);
-	std::vector<int> res;res.resize(threadcount);
-	std::vector<Tri_para> parms;parms.resize(threadcount);
-	for (int i = 0; i <= this->raw->getZsize()/threadcount; i++ )
-	{
-		
-		raw.push_back(new Raw(this->raw->getXsize(),this->raw->getYsize(),this->raw->getZsize()/threadcount));
-		memcpy(raw[i]->getdata(),this->raw->getdata()+i*this->raw->getZsize(),sizeof(PIXTYPE)*raw[i]->size());
-		int ret;
-		parms[i]=Tri_para(*raw[i],sigmaC);
-		pthread_attr_t *attr;
-		ret=pthread_create(&threads[i],NULL,TrilateralFilter_single,&parms[i]);
-		cout <<i<<endl;
-		
-
-	}
-	for(int i=0;i<threadcount;i++)
-	{
-		pthread_join(threads[i], NULL);
-	}
-
-}
+//void Trilateralfilter::TrilateralFilter_Multi(PIXTYPE sigmaC,int threadcount)
+//{
+//	vector <Raw *>  raw;
+//	std::vector<pthread_t> threads;threads.resize(threadcount);
+//	std::vector<int> pids;pids.resize(threadcount);
+//	std::vector<int> res;res.resize(threadcount);
+//	std::vector<Tri_para> parms;parms.resize(threadcount);
+//	for (int i = 0; i <= this->raw->getZsize()/threadcount; i++ )
+//	{
+//		
+//		raw.push_back(new Raw(this->raw->getXsize(),this->raw->getYsize(),this->raw->getZsize()/threadcount));
+//		memcpy(raw[i]->getdata(),this->raw->getdata()+i*this->raw->getZsize(),sizeof(PIXTYPE)*raw[i]->size());
+//		int ret;
+//		parms[i]=Tri_para(*raw[i],sigmaC);
+//		pthread_attr_t *attr;
+//		ret=pthread_create(&threads[i],NULL,TrilateralFilter_single,&parms[i]);
+//		cout <<i<<endl;
+//		
+//
+//	}
+//	for(int i=0;i<threadcount;i++)
+//	{
+//		pthread_join(threads[i], NULL);
+//	}
+//
+//}
 
 void Trilateralfilter::TrilateralFilter(PIXTYPE sigmaC)
 	//=====================================================================================================

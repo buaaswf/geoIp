@@ -16,6 +16,7 @@ public:
 	int Depth;
 	int PixelType;
 	ImageVolume(int width,int height, int depth,int pixelType=1,bool createSpace=true);
+	ImageVolume(int width,int height, int depth,int pixelType,void *data);
 	ImageVolume();
 	~ImageVolume();
 	IMAGE_INDEXTYPE GetLength();

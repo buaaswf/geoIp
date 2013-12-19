@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "semaphore.h"
 #include "vol_math_ImageVolume.h"
+#include "vol_math_Interface.h"
 //#include <unistd.h>
 #include <stdio.h>
 #include <tchar.h>
@@ -180,74 +181,28 @@ void *thread_function(void *arg) {
 	}
 	return NULL;
 }
-void * ImageP( void *arg)
+void testinterface(ImageVolume &src)
 {
-	cout<<"ImageProcess"<<endl;
-	return NULL;
-}
-void testvolume()
-{
-	ImageVolume *iv=new ImageVolume();
-	Raw src(*iv);
-	
-}
+	AnistropicI anis(1,1,1,5);
+	//TrilateralfilterI tril(5,1);
+	//BilateralFilterI bil(1,1,5);
+	//doBilateralI(src,bil);
+	doAnistropicI(src,anis);
+	//doTrilateralfilterI(src,tril);
 
+}
 int main(int argc, char* argv[])
 {
-	
-	pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;// = new pthread_mutex_t(); 
-	pthread_t pid[5];
-	//pthread_attr_init(&attr);
-	//pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS);
-	//pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-	//pthread_create(&pid, &attr, Function_t, NULL);
-	//printf("======================================== ");
-	int ret=4;
-	for(int i=0;i<ret;i++)
-	{
-		pthread_attr_t *attr;
-		//pthread_mutex_lock(&mutex);
-		ret=pthread_create(&pid[i],NULL,ImageP,NULL);
-		//sleep(1);
-		cout <<i<<endl;
-		//pthread_mutex_unlock(&mutex);
-
-	}
-	//if ( pthread_join (pid[i], NULL ) ) {
-	//	printf("error joining thread.");
-	//	abort();
-	//}
-	//for ()
-	//{
-
-	//}
-
-
-//		pthread_t mythread;
-//		int i;
-//		if ( pthread_create( &mythread, NULL, thread_function, NULL) ) {
-//			printf("error creating thread.");
-//			abort();
-//		}
-//		for ( i=0; i<20; i++) {
-//			pthread_mutex_lock(&mymutex);
-//			myglobal=myglobal+1;
-//			pthread_mutex_unlock(&mymutex);
-//			printf("o");
-//			cout<<i<<endl;
-//			fflush(stdout);
-////			sleep(1);
-//		}
-//		if ( pthread_join ( mythread, NULL ) ) {
-//			printf("error joining thread.");
-//			abort();
-//		}
-//		printf("\nmyglobal equals %d\n",myglobal);
-//		//exit(0);
-//
-//
-	getchar();
+	int l=281,m=481,n=20;
+	RawImage test;
+	unsigned char * indata=new unsigned char [l*m*n];
+	//Raw *initial=new Raw(l,m,n);
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));
+	ImageVolume *imagevol=new ImageVolume(l,m,n,1,indata);
+	//Raw *ret=(Raw  *)ImageVolume2Raw(imagevol);
+	testinterface(*imagevol);
+	//getchar();
 	//pthread_attr_destroy(attr);
-
+	system("pause");
 	return 1;
 }

@@ -1,3 +1,7 @@
+#ifndef INTERFACE_SWF
+#define INTERFACE_SWF
+
+
 #include "vol_math_ImageVolume.h"
 #include "vol_math_RawImage.h"
 #include "vol_math_WipeNioisePde.h" //3d ansitropic filter
@@ -7,7 +11,7 @@
 #include "vol_math_trilateralfilter.h"//3d trilaterfilter
 #include "vol_math_Anistropic2D.h"
 #include "vol_math_2Dtrilateralfilter.h"
-#include "MultiThread.h"
+
 
 
 struct  AnistropicI
@@ -35,7 +39,7 @@ struct  TrilateralfilterI
 {
 	float sigmaC;//sigmaC=1
 	int threadcount;
-	TrilateralfilterI(float sigmaC =1)
+	TrilateralfilterI(int threadcount,float sigmaC =1)
 	{
 		this->sigmaC = sigmaC;
 		this->threadcount=threadcount;
@@ -101,3 +105,5 @@ extern void *dolowPassI2D (Image2D &src,lowPassI &);
 11
 12
 */
+
+#endif

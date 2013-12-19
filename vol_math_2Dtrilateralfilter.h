@@ -1,6 +1,9 @@
 #pragma once
+
 #include <stdlib.h>
 #include "vol_math_RawImage.h"
+
+
 #include "vol_math_Raw3D_Independt.h"
 #define BOOL int
 #define TRUE 1
@@ -20,8 +23,4 @@ public:
 
 };
 
-class Trilateral2d
-{
-	Trilateral2d();
-	~Trilateral2d();
-};
+

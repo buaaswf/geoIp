@@ -1,5 +1,9 @@
+#ifndef THREEDIM_BILATERAL
+#define THREEDIM_BILATERAL
+
 #include "vol_math_Raw3D_Independt.h"
 #include "vol_math_RawImage.h"
+
 class ThreeDim_Bilateral
 {
 	
@@ -17,3 +21,4 @@ public:
 	double gauss(double sigma,int x, int y,int z);
 	double ThreeDim_Bilateral::getSpatialWeight(int m, int n,int l,int i,int j,int k);
 };
+#endif

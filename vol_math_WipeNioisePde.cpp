@@ -9,11 +9,11 @@ WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE value, int method)
 	way=method;
 	if (way==0)
 	{
-		Perona_Malik(src);
+		src=Perona_Malik(src);
 	} 
 	else
 	{
-		FourPDiff(src);
+		src=FourPDiff(src);
 	}
 }
 
