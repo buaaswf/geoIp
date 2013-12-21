@@ -7,7 +7,7 @@
 #include "vol_math_ImageVolume.h"
 #include"vol_math_Raw3D_Independt.h"
 //#define u_char unsigned char
-#define PIXTYPE float
+//#define PIXTYPE unsigned char
 using namespace std;
 /************************************************************************/
 /* RawImage :three data types to be changed to double 
@@ -40,6 +40,7 @@ public:
 	void writeImagesesmic(Raw &destImg);
 	void readImage2(float * buf,char const *file ,int size);
 	float * buf2float(unsigned char *buf);
+	void writeImagesesmicarray(void * src, int l ,int m, int n);
 	void save();
 };
 

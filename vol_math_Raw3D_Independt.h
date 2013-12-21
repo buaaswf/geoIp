@@ -3,10 +3,9 @@
 
 #ifndef Raw2D_H
 #define Raw2D_H
-
 #include <iostream>
 using namespace std;
-#define PIXTYPE float
+#define PIXTYPE unsigned char
 //typedef unsigned char PIXTYPE;
 class Raw2DArray;
 class Raw2D
@@ -217,11 +216,11 @@ public:
 
 	//Bilaterally filters  gradients pX and pY 
 	void BilateralGradientFilter(Raw2D* pX, Raw2D* pY, Raw2D* pSmoothX, 
-		Raw2D* pSmoothY, PIXTYPE sigmaC, PIXTYPE sigmaS, int filterSize); 
+		Raw2D* pSmoothY, float sigmaC, float sigmaS, int filterSize); 
 
 	//Builds the stack of min-max image gradients; returns the range variance
 	PIXTYPE buildMinMaxImageStack(Raw2D* pX, Raw2D* pY, Raw2DArray* pMinStack,
-		Raw2DArray* pMaxStack , int levelMax, PIXTYPE beta); 
+		Raw2DArray* pMaxStack , int levelMax, float beta); 
 
 	//Finds the adaptive neighborhood size (stack level) 
 	//from the min-max gradient stack

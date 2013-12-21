@@ -22,7 +22,7 @@ void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
 }
 void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
 {
-	Raw indata=*(Raw *)ImageVolume2Raw(src);
+	Raw &indata=*(Raw *)ImageVolume2Raw(src);
 	//Filter *guass = new Filter();
 	//Raw *ret=guass->guass3DFilter(&indata,para.halfsize);
 	//return Raw2ImageVolume(*ret,src.PixelType);
@@ -31,17 +31,14 @@ void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
 }
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 {
-	Raw indata =*(Raw*)ImageVolume2Raw(src);
-	//Trilateralfilter f(&indata);
-	//f.TrilateralFilter(para.sigmaC);
-	//return Raw2ImageVolume(indata,src.PixelType);
+	Raw &indata =*(Raw*)ImageVolume2Raw(src);
 	MultiThread(1,para.threadcount,indata,(void *)&para);
 	return & indata;
 }
 
 extern void * doMultiOstuI (ImageVolume &src,MultiOstuI &para)
 {
-	Raw indata =*(Raw *)ImageVolume2Raw(src);
+	Raw &indata =*(Raw *)ImageVolume2Raw(src);
 	return NULL;
 
 }
@@ -58,21 +55,21 @@ extern void *dolowPassI (ImageVolume &src,lowPassI &para)
 }
 extern void *doBilateralI2D (Image2D & src, BilateralFilterI &para)
 {
-	Raw2D indata=Image2D2Raw2D(src);
+	Raw2D &indata=Image2D2Raw2D(src);
 	BilateralFilter *b=new BilateralFilter(&indata,6,3);
 	b->apply(indata);
 	return Raw2D2Image2D(indata,src.PixelType);
 }
 extern void * doGuassFilterI2D (Image2D &src, GuassFilterI &para)
 {
-	Raw2D indata = Image2D2Raw2D(src);
+	Raw2D &indata = Image2D2Raw2D(src);
 	Filter *guass = new Filter(); 
 	Raw2D ret=guass->guassFilter(&indata,para.halfsize);
 	return Raw2D2Image2D(ret,src.PixelType);
 }
 extern void * doTrilateralfilterI2D ( Image2D &src, TrilateralfilterI &para)
 {
-	Raw2D indata = Image2D2Raw2D(src);
+	Raw2D &indata = Image2D2Raw2D(src);
 	Trilateralfilter2D * tf=new Trilateralfilter2D();
 	Raw2D *ret=tf->TrilateralFilter2D(&indata,para.sigmaC);
 	return Raw2D2Image2D(*ret,src.PixelType);
@@ -196,6 +193,7 @@ void * singleTrilateralfilter(void *para)
 	Raw &indata=p->src;
 	Trilateralfilter f(&indata);
 	f.TrilateralFilter(p->sigmaC);
+	
 	return &indata;
 }
 void * singleAnistropicFilter(void *para)
@@ -211,7 +209,7 @@ void * singleAnistropicFilter(void *para)
 
 void MultiThread(int method,int threadcount,Raw &src,void *para)
 {
-	//fen
+	//divide into slices
 	//create+join
 	//single
 	if (threadcount>=1)
@@ -225,10 +223,11 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 		case 1 :
 			{
 				vector<TrilateralfilterP>parms;parms.resize(threadcount);
-				for (int i = 0; i < src.getZsize()/threadcount; i++ )
+				int znewsize = src.getZsize()/threadcount;
+				for (int i = 0; i < threadcount; i++ )
 				{
-					PIXTYPE *data=src.getdata()+src.getZsize()/threadcount*i*src.getXsize()*src.getYsize();
-					raw.push_back(new Raw(src.getXsize(),src.getYsize(),src.getZsize()/threadcount,data));
+					PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
+					raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
 					int ret;
 					TrilateralfilterI *p=(TrilateralfilterI*)para;
 					parms[i]=TrilateralfilterP(*raw[i],p->sigmaC);

@@ -156,7 +156,7 @@ void Raw2D::ComputeGradients(Raw2D* pX, Raw2D *pY)
 ***/
 
 PIXTYPE Raw2D::buildMinMaxImageStack(Raw2D* pX, Raw2D* pY, Raw2DArray* pMinStack,
-									 Raw2DArray* pMaxStack , int levelMax, PIXTYPE beta)
+									 Raw2DArray* pMaxStack , int levelMax, float beta)
 {
 	int imax, jmax, i, j, lev, m, n;
 	PIXTYPE min, max, minGrad = 1000000.0, maxGrad = -1000000.0, tmp, tmpMin, tmpMax, rangeVariance;
@@ -224,7 +224,7 @@ PIXTYPE Raw2D::buildMinMaxImageStack(Raw2D* pX, Raw2D* pY, Raw2DArray* pMinStack
 	
 **/
 void Raw2D::BilateralGradientFilter(Raw2D* pX, Raw2D* pY, Raw2D* pSmoothX, Raw2D* pSmoothY, 
-				PIXTYPE sigmaC, PIXTYPE sigmaR, int filterSize)
+				float sigmaC, float sigmaR, int filterSize)
 {
 	int i,j,m,n,imax,jmax,halfSize;
 	PIXTYPE tmpX, tmpY, posDiff, gradDiff, domainWeight, rangeWeight, normFactor, g1, g2;
