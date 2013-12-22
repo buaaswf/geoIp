@@ -5,19 +5,12 @@
 #include <stdio.h>
 #include "Filter.h"
 using namespace std;
-static float lgtt=log10(2.0f);
-//#define PIXTYPE double
 #define M_EXP 2.7182818284590452353602874713527
-Raw3D_Independt::Raw3D_Independt(void)
-{
-}
 
 
-Raw3D_Independt::~Raw3D_Independt(void)
-{
-}
 
 
+static float lgtt=log10(2.0f);
 
 Raw2D::Raw2D()
 {
@@ -59,11 +52,11 @@ Raw2D::Raw2D(const Raw2D& r)
 {
 	//if (this->xsize != r.getXsize() && this->ysize != r.getYsize())
 	//{
-		this->xsize=r.xsize;
-		this->ysize=r.ysize;
+	this->xsize=r.xsize;
+	this->ysize=r.ysize;
 	//	//if (this->data != NULL)
 	//	//	delete[] this->data;
-		this->data=new PIXTYPE[xsize*ysize];
+	this->data=new PIXTYPE[xsize*ysize];
 	//}
 	memcpy(this->data, r.data, sizeof(PIXTYPE)*xsize*ysize);
 }
@@ -259,4 +252,3 @@ void Raw2DArray::wipecopy(Raw2DArray& src) {
 		z[k].wipecopy(&(src.z[k]));
 	}
 }
-

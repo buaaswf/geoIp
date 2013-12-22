@@ -245,10 +245,11 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 			{
 				{
 					vector<AnistropicP>parms;parms.resize(threadcount);
-					for (int i = 0; i < src.getZsize()/threadcount; i++ )
+					int znewsize = src.getZsize()/threadcount;
+					for (int i = 0; i < threadcount; i++ )
 					{
-						PIXTYPE *data=src.getdata()+threadcount*i*src.getXsize()*src.getYsize();
-						raw.push_back(new Raw(src.getXsize(),src.getYsize(),src.getZsize()/threadcount,data));
+						PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
 						int ret;
 						AnistropicI *p=(AnistropicI*)para;
 						parms[i]=AnistropicP(*raw[i],p->time,p->val,p->method);
@@ -268,10 +269,11 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 			{
 				{
 					vector<BilateralFilterP>parms;parms.resize(threadcount);
-					for (int i = 0; i < src.getZsize()/threadcount; i++ )
+					int znewsize = src.getZsize()/threadcount;
+					for (int i = 0; i < threadcount; i++ )
 					{
-						PIXTYPE *data=src.getdata()+threadcount*i;
-						raw.push_back(new Raw(src.getXsize(),src.getYsize(),src.getZsize()/threadcount,data));
+						PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
 						int ret;
 						BilateralFilterI *p=(BilateralFilterI*)para;
 						parms[i]=BilateralFilterP(*raw[i],p->sigmaD,p->sigmaR);
@@ -291,10 +293,11 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 			{
 				{
 					vector<GuassFilterP>parms;parms.resize(threadcount);
-					for (int i = 0; i < src.getZsize()/threadcount; i++ )
+					int znewsize = src.getZsize()/threadcount;
+					for (int i = 0; i < threadcount; i++ )
 					{
-						PIXTYPE *data=src.getdata()+threadcount*i;
-						raw.push_back(new Raw(src.getXsize(),src.getYsize(),src.getZsize()/threadcount,data));
+						PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
 						int ret;
 						GuassFilterI *p=(GuassFilterI*)para;
 						parms[i]=GuassFilterP(*raw[i],p->halfsize);

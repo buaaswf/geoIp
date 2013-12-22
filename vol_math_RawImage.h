@@ -16,7 +16,12 @@ Raw2D:slices
 RawArray:raw array or raw2D array
 */
 /************************************************************************/
+
+
+
+
 class Raw;
+//for test ,int algrithms is not usefull///
 class RawImage
 {
 public:
@@ -45,34 +50,7 @@ public:
 };
 
 
-//class Raw3D {
-//public:
-//	Raw2D *z;	// dynam. allocated space for a set of Raw2D objects.
-//	int zsize;	// # of Raw2D objects stored.
-//
-//public:							
-//	Raw3D(void);// 'empty' Raw3D constructor.
-//	Raw3D(int zsize,Raw2D *src);//swf add for read data 
-//	~Raw3D(void);	// destructor.
-//	void sizer(int ixsize, int iysize, int izsize); // reserve memory
-//	void sizer(Raw3D* src);			// get same amt. of mem as 'src
-//	int getZsize(void) {				// return # of Raw2D's we hold;
-//		return(zsize); 
-//	};
-//	int getYsize() {					// # of Raw1D's in zval-th Raw2D;
-//		return(z[0].getYsize()); 
-//	};
-//	int getXsize(){						// # of pixels on yval,zval-th line
-//		return(z[0].getXsize()); 
-//	};
-//	PIXTYPE get(int ix, int iy, int iz) {
-//		return(z[iz].get(ix,iy));	// write 'val' at location ix,iy,iz. 
-//	};
-//	void put(int ix, int iy, int iz, PIXTYPE val) { 
-//		z[iz].put(ix,iy,val);		//write 'val' at location ix,iy,iz.
-//	};
-//	void wipecopy(Raw3D& src);			// copy, resize as needed.
-//};
+
 class Raw  {
 private:   			//-----------------DATA----------------- 
 	int xsize;		// # of pixels per scanline,
@@ -232,7 +210,7 @@ public:				//---------------init fcns-------------
 };
 
 
-
+//raw data slices used for trilaterfilter//
 class RawArray {
 public:
 	Raw *z;	// dynam. allocated space for a set of Raw objects.
@@ -264,13 +242,14 @@ public:
 	};
 	void wipecopy(RawArray& src);			// copy, resize as needed.
 };
-//==============================RawND
+//==============================RawND reserved to be extended for dimesions >3
 class RawND
 {
 private:   			//-----------------DATA----------------- 
 	unsigned int xsize, ysize, zsize, _spectrum;
 	bool _is_shared;
-	PIXTYPE *data;	
+	//vector <PIXTYPE> *data;	
+	
 	//vector<bool> *data2;
 	// 1D array of PIXTYPE that are accessed as a 2D array.
 public:				//---------------init fcns-------------
@@ -280,200 +259,12 @@ public:				//---------------init fcns-------------
 	RawND(void);// constructor for 'empty' Raws
 	~RawND(void);		// destructor; releases memory
 	RawND& set_shared(bool);
-	int getXsize(void) {return xsize;};		// get # pixels per scanline
-	int getYsize(void) {return ysize;};		// get # of scanlines.
-	int getZsize(void) {return zsize;};		//get # of RawImage numbers
-	int size(){return xsize*ysize*zsize;};
-
-	void put(int ix, int iy,int iz, PIXTYPE val) {	// write 'val' at location ix,iy.iz.
-		data[ix + xsize*iy+xsize*ysize*iz] = val; 
-	};
-	inline PIXTYPE get(int ix, int iy,int iz) {	// read the value at ix,iy.
-		int index=ix + xsize*iy+xsize*ysize*iz;
-		return(data[index]); 
-	};
-	PIXTYPE *getdata(){return data;};
-	PIXTYPE getXYZ(int ixyz){		// read value at 1D address ixyz
-		return data[ixyz];
-	};
-	void putXYZ(int ixyz,PIXTYPE val){// write value at 1D address ixy
-		data[ixyz] = val;
-	};
-
-	inline void swap(RawND & volume)
-	{
-		std::swap(this->xsize,volume.xsize);
-		std::swap(this->ysize,volume.ysize);
-		std::swap(this->zsize,volume.zsize);
-		std::swap(this->data,volume.data);
-	}
-
-	inline RawND& operator = (RawND volume)
-	{
-		volume.swap(*this);
-		return *this;
-	}
-
-	RawND& operator+=(const RawND &volume)
-	{
-		for (int i = 0; i<size(); ++i)
-		{
-			this->data[i] += volume.data[i];
-		}
-		return *this;
-	}
-
-	RawND& operator+=(const PIXTYPE val)
-	{
-		for (int i = 0; i < size(); ++i)
-		{
-			this->data[i] += val;
-		}
-		return *this;
-	}
-
-	RawND operator+(const RawND &volume)
-	{
-		return RawND(*this, true) += volume;
-	}
-	RawND operator+(const PIXTYPE val)
-	{
-		return RawND(*this, true) += val;
-
-	}
-	RawND& operator-=(const RawND &volume)
-	{
-		for (int i = 0; i < size(); ++i)
-		{
-			this->data[i] -= volume.data[i];
-		}
-		return *this;
-	}
-	RawND& operator-=(const PIXTYPE val)
-	{
-		for (int i = 0; i< size(); ++i)
-		{
-			this->data[i] -= val;
-		}
-		return *this;
-	}
-	RawND operator -(const RawND &volume)
-	{
-		return RawND(*this, true) -= volume;
-
-	}
-	RawND operator -(const PIXTYPE val)
-	{
-		return RawND(*this, true) -= val;
-
-	}
-	RawND& operator *=(const RawND& img)
-	{
-		for (int i = 0; i < size(); ++i)
-			this->data[i] *= img.data[i];
-		return *this;
-	}
-
-	RawND& operator *=(const PIXTYPE val)
-	{
-		for (int i = 0; i < size(); ++i)
-			this->data[i] *= val;
-		return *this;
-	}
-
-	RawND operator *(const RawND& img)
-	{
-		return  RawND(*this, true) *= img;
-	}
-
-	RawND operator *(const PIXTYPE val)
-	{
-		return RawND(*this, true) *= val;
-	}
-
-	RawND& operator /=(const RawND& img)
-	{
-		for (int i = 0; i < size(); ++i)
-			this->data[i] /= img.data[i];
-		return *this;
-	}
-
-	RawND& operator/=(const PIXTYPE val)
-	{
-		for (int i = 0; i < size(); ++i)
-			this->data[i] /= val;
-		return *this;
-	}
-
-	RawND operator /(const RawND& img)
-	{
-		return RawND(*this, true) /= img;
-	}
-
-	RawND operator/(const PIXTYPE val)
-	{
-		return RawND(*this, true) /= val;
-	}
-
-	friend RawND operator/(const PIXTYPE val, const RawND& volume);
-	PIXTYPE& operator()(const unsigned int x) {
-		return data[x];
-	}
-
-	const PIXTYPE& operator()(const unsigned int x) const {
-		return data[x];
-	}
-
-	PIXTYPE& operator()(const unsigned int x, const unsigned int y) {
-		return data[x + y*xsize];
-	}
-
-	const PIXTYPE& operator()(const unsigned int x, const unsigned int y) const {
-		return data[x + y*xsize];
-	}
-
-	PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z) {
-		return data[x + y*(unsigned long)xsize + z*(unsigned long)xsize*ysize];
-	}
-
-	const PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z) const {
-		return data[x + y*(unsigned long)xsize + z*(unsigned long)xsize*ysize];
-	}
-
-	PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z, const unsigned int c) {
-		return data[x + y*(unsigned long)xsize + z*(unsigned long)xsize*ysize + c*(unsigned long)xsize*ysize*zsize];
-	}
-
-	const PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z, const unsigned int c) const {
-		return data[x + y*(unsigned long)xsize + z*(unsigned long)xsize*ysize + c*(unsigned long)xsize*ysize*zsize];
-	}
-
-	PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z, const unsigned int,
-		const unsigned long wh) {
-			return data[x + y*x + z*wh];
-	}
-
-	const PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z, const unsigned int,
-		const unsigned long wh) const {
-			return data[x + y*xsize + z*wh];
-	}
-
-	PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z, const unsigned int c,
-		const unsigned long wh, const unsigned long whd) {
-			return data[x + y*xsize + z*wh + c*whd];
-	}
-
-	const PIXTYPE& operator()(const unsigned int x, const unsigned int y, const unsigned int z, const unsigned int c,
-		const unsigned long wh, const unsigned long whd) const {
-			return data[x + y*xsize + z*wh + c*whd];
-	}
-
-
-
-
 
 };
 
+
+
+//global functions to change data type//
 void *  ImageVolume2Raw(ImageVolume &src);
 
 void *  Raw2ImageVolume(Raw  &src,int type);

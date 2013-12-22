@@ -7,7 +7,7 @@
 #include "vol_math_WipeNioisePde.h" //3d ansitropic filter
 #include "vol_math_BilateralFilter.h" //2d bilateralfilter
 #include "vol_math_ThreeDim_Bilateral.h"//3d bilateralfilter
-#include "vol_math_Filter.h"//2d \3d guass filter
+#include "vol_math_GuassFilter.h"//2d \3d guass filter
 #include "vol_math_trilateralfilter.h"//3d trilaterfilter
 #include "vol_math_Anistropic2D.h"
 #include "vol_math_2Dtrilateralfilter.h"
@@ -39,7 +39,7 @@ struct  TrilateralfilterI
 {
 	float sigmaC;//sigmaC=1
 	int threadcount;
-	TrilateralfilterI(int threadcount,float sigmaC =1)
+	TrilateralfilterI(int threadcount,float sigmaC =3)
 	{
 		this->sigmaC = sigmaC;
 		this->threadcount=threadcount;
@@ -48,8 +48,8 @@ struct  TrilateralfilterI
 
 struct BilateralFilterI
 {
-	double sigmaD;
-	double sigmaR;
+	double sigmaD;//guass fliter cooper std for space 
+	double sigmaR;//guass filter cooper std for pixel
 	int threadcount;
 	BilateralFilterI(double sigmaD,double sigmaR,int threadcount)
 	{

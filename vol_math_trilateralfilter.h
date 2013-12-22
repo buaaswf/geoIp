@@ -26,12 +26,15 @@ struct Tri_para
 class Trilateralfilter
 {
 public:
-	Trilateralfilter(Raw* RawImage);
+	Trilateralfilter(Raw* src);
 	~Trilateralfilter(void);
-	void TrilateralFilter(PIXTYPE sigmaC); 
-	void TrilateralFilter_Multi(PIXTYPE sigmaC,int threadcount);
+	void TrilateralFilter(float sigmaC); 
+	void TrilateralFilter_Multi(float sigmaC,int threadcount);
 	
 private:
+	RawImage* img;
+	Raw* raw;
+	RawArray* rawarraydata;
 	//Computes X , Y and Z gradients of the input RawImage
 	void ComputeGradients(Raw* pX, Raw* pY,Raw *pZ); 
 
@@ -45,15 +48,13 @@ private:
 
 	//Finds the adaptive neighborhood size (stack level) 
 	//from the min-max gradient stack
-	void findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxStack, PIXTYPE R, int levelMax); 
+	void findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxStack, float R, int levelMax); 
 
 	//Filters the detail signal and computes the final output RawImage	
 	void DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pSmoothY, Raw* pSmoothZ, 
 		Raw* fTheta, float sigmaCTheta, float sigmaRTheta); // sigmaCTheta sigmaRTheta is changed from PIXTYPE to float
 
-	RawImage* img;
-	Raw* raw;
-	RawArray* rawarraydata;
+
 	/*Raw* rawarray(RawImage* img)
 	{
 		int xsize=img->width;

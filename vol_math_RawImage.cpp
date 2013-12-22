@@ -41,7 +41,7 @@ void RawImage::readImage(unsigned char * buf,char const *file ,int size)
 		printf("open fail");
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
-	//fseek(op,281*481*500L,SEEK_SET);
+	fseek(op,281*481*650L,SEEK_SET);
 	fread(buf,sizeof(unsigned char),size,op);
 
 	fclose(op);
@@ -170,7 +170,7 @@ void RawImage::writeImagesesmic(Raw &destImg)
 void RawImage::writeImagesesmicarray(void * src, int l ,int m, int n)
 {
 	FILE *p;
-	if((p=fopen("F:\\sesmic.raw","wb"))==NULL)
+	if((p=fopen("F:\\sesmic.raw","ab+"))==NULL)
 	{
 		printf("cant open the file");
 		exit(0);
@@ -531,3 +531,6 @@ void * Raw2D2Image2D(Raw2D &src,int type)
 
 	//return *ret;
 }
+
+
+

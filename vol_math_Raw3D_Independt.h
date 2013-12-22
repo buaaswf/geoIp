@@ -1,6 +1,5 @@
 #ifndef _VOL_MATH_RAW3D_INDEPENDT_H_
 #define _VOL_MATH_RAW3D_INDEPENDT_H_
-
 #ifndef Raw2D_H
 #define Raw2D_H
 #include <iostream>
@@ -204,7 +203,7 @@ public:
 		else cout<<"out of size putxy"<<endl;
 
 	}
-	
+
 	//---------------Trilateral Filter fcns-------------
 
 	//Trilateral filter consisting of gradient filter, adaptive neighborhood

@@ -7,7 +7,7 @@ WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE value, int method)
 	delt=time;
 	val=value;
 	way=method;
-	if (way==0)
+	if (way==1)
 	{
 		src=Perona_Malik(src);
 	} 

@@ -50,19 +50,19 @@ void * TrilateralFilter_single(void * para)
 //
 //}
 
-void Trilateralfilter::TrilateralFilter(PIXTYPE sigmaC)
+void Trilateralfilter::TrilateralFilter(float sigmaC)
 	//=====================================================================================================
 {	
-	Raw* pSrcImg=this->raw;
+	Raw* pSrcImg=new Raw(*raw);
 	Raw destImg; 			
 	Raw fTheta; 			//stores Adaptive neighborhood size for each pixel
 	RawArray minGradientStack;	
 	RawArray maxGradientStack; 
 	Raw xGradient, yGradient,zGradient; 	//X and Y gradients of the input RawImage
-	Raw xSmoothGradient, ySmoothGradient,zSmoothGradient; 	//Bilaterally filtered X and Y gradients of the input RawImage
+	Raw xSmoothGradient, ySmoothGradient, zSmoothGradient; 	//Bilaterally filtered X and Y gradients of the input RawImage
 	int levX, levY,levZ, levelMax, filterSize;  //level = log2(xsize) or log2(ysize)
 	float sigmaR, sigmaCTheta, sigmaRTheta,beta;
-	PIXTYPE  R;
+	float  R;
 	//domain variance for the two filters: sigmaC, sigmaCTheta
 	//range variance of the two filters: sigmaR, sigmaRTheta
 	//R -- threshold to compute adaptive region (see paper for details)
@@ -170,7 +170,7 @@ void Trilateralfilter::ComputeGradients(Raw* pX, Raw *pY,Raw* pZ)
 	int i, j,k, imax, jmax,kmax, jN, iE,kU;
 	PIXTYPE Cval, Eval, Nval,Uval, gE, gN,gU;
 
-	imax = raw->getXsize();		// get RawImage size,
+	imax =  raw->getXsize();		// get RawImage size,
 	jmax =  raw->getYsize();
 	kmax =  raw->getZsize();
 	for(k=0; k<kmax; k++)
@@ -221,7 +221,7 @@ RawArray* pMaxStack , int levelMax, float beta)
 				for(i=0; i < imax; i++) 
 				{
 					if( lev == 0) { //stack level 0 is the magnitude of the gradients of original RawImage
-						tmp = (PIXTYPE) sqrt((float) pX->get(i,j,k)*pX->get(i,j,k) + pY->get(i,j,k)*pY->get(i,j,k) +pZ->get(i,j,k)*pZ->get(i,j,k));
+						tmp = (float) sqrt((float) pX->get(i,j,k)*pX->get(i,j,k) + pY->get(i,j,k)*pY->get(i,j,k) +pZ->get(i,j,k)*pZ->get(i,j,k));
 						if(maxGrad < tmp)
 							maxGrad = tmp;
 						if(minGrad > tmp)
@@ -272,9 +272,9 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 	float sigmaC, float sigmaR, int filterSize)
 {
 	int i,j,k,m,n,l,imax,jmax,kmax,halfSize;
-	PIXTYPE tmpX, tmpY, tmpZ,posDiff, gradDiff, domainWeight, rangeWeight,g1, g2;
+	float tmpX, tmpY, tmpZ,posDiff, gradDiff, domainWeight, rangeWeight,g1, g2;
 	float  normFactor;
-	imax = raw-> getXsize(); //get RawImage size
+	imax =	raw->getXsize(); //get RawImage size
 	jmax =  raw->getYsize(); 
 	kmax =  raw->getZsize();
 	halfSize = (int) (filterSize-1)/2; //size of the filter kernel
@@ -300,17 +300,24 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 							posDiff=(PIXTYPE) (m*m+n*n+l*l); 
 							//Compute the weight for the domain filter (domainWeight). The domain filter
 							//is a Gaussian low pass filter
-							domainWeight = (PIXTYPE) pow(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC*sigmaC)));
-							if( (i+m) >= 0 && (i+m) <imax && (j+n) >=0 &&(j+n) < jmax &&(k+l)>=0&&(k+l)<kmax) {
-								g1 = (PIXTYPE) (pow( float (pX->get(i+m,j+n,k+l)),2.0f) + pow(float(pY->get(i+m,j+n,k+l)),2.0f) );
-								g2 = (PIXTYPE) (pow( float(pX->get(i,j,k)),2.0f) + pow(float(pY->get(i,j,k)),2.0f)+pow(float(pZ->get(i,j,k)),2.0f) );
+							domainWeight = (float) pow(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC)));
+							if( (i+m) >= 0 && (i+m) < imax && (j+n) >=0 && (j+n) < jmax && (k+l) >= 0 && (k+l) < kmax ) {
+								g1 = (float) (pow( float (pX->get(i+m,j+n,k+l)),2.0f) + pow(float(pY->get(i+m,j+n,k+l)),2.0f)+pow(float(pZ->get(i+m,j+n,k+l)),2.0f) );
+								g2 = (float) (pow( float(pX->get(i,j,k)),2.0f) + pow(float(pY->get(i,j,k)),2.0f)+pow(float(pZ->get(i,j,k)),2.0f) );
 								//g3 = (PIXTYPE) (pow( float(pX->get(i,j)),2.0f) + pow(float(pY->get(i,j)),2.0f) );
 								//Compute the gradient difference between a pixel and its neighborhood pixel 
-								gradDiff = (PIXTYPE) (sqrt(double(g1)) - sqrt(double(g2)));
+								gradDiff = (float) (sqrt(double(g1)) - sqrt(double(g2)));
+								//if (gradDiff !=0)
+								//{
+								//	cout << gradDiff << endl;
+								//}
 								//Compute the weight for the range filter (rangeWeight). The range filter
 								//is a Gaussian filter defined by the difference in gradient magnitude.
-								if(sigmaR==0){sigmaR=0.1;}
-								rangeWeight = (PIXTYPE) pow(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR*sigmaR)));	
+								if(sigmaR==0)
+								{
+									sigmaR=0.1;
+								}
+								rangeWeight = (float) pow(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR)));	
 								tmpX += pX->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
 								tmpY += pY->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
 								tmpZ += pZ->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
@@ -338,7 +345,7 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 	}
 
 }
-void Trilateralfilter::findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxStack, PIXTYPE R, int levelMax)
+void Trilateralfilter::findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxStack, float R, int levelMax)
 {
 	int imax, jmax,kmax,i,j,k,lev;
 	imax= raw->getXsize();	//get RawImage size
@@ -366,9 +373,9 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 
 	int i,j,k,m,n,l,imax,jmax,kmax,halfSize;
 	int countvar=0;
-	PIXTYPE tmp, diff, detail;
+	float tmp, diff, detail;
 	float  domainWeight, rangeWeight, normFactor;
-	PIXTYPE coeffA, coeffB, coeffC,coeffD; //Plane Equation is z = coeffA.x + coeffB.y + coeffC.z+coeffD
+	float coeffA, coeffB, coeffC,coeffD; //Plane Equation is z = coeffA.x + coeffB.y + coeffC.z+coeffD
 	//coeffA = dI/dx, coeffB = dI/dy, coeffC = I at center pixel of the filter kernel
 
 	imax= raw->getXsize();	//get RawImage size
@@ -382,7 +389,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 			//filter window width is calculated from fTheta
 			//halfsize is half of the filter window width
 			halfSize=(int) fTheta->get(i,j,k); 
-			halfSize = (int) (pow(2.0f,halfSize)/2);
+			//halfSize = (int) (pow(2.0f,halfSize)/2);
 			//halfSize=halfSize*halfSize;
 			//halfSize=1.5;
 			if(halfSize>2){halfSize=2;}//halfsize=5
@@ -397,22 +404,24 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 			for(m = -halfSize; m<=halfSize; m++) {
 				for (n = -halfSize; n<=halfSize; n++) {
 					for(l= -halfSize; l<=halfSize; l++)
-					diff = (PIXTYPE) (m*m+n*n+l*l);
+					{
+
+					
+					diff = (float) (m*m+n*n+l*l);
 					//Compute the weight for the domain filter (domainWeight). The domain filter
 					//is a Gaussian lowpass filter
-					domainWeight = (PIXTYPE) pow(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
+					domainWeight = (double) pow(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
 					if( (i+m) >= 0 && (i+m) <imax && (j+n) >=0 && (j+n) < jmax && (k+l) >=0&& (k+l)< kmax) {
 						//Compute the detail signal (detail) based on the difference between a 
 						//neighborhood pixel and the centerplane passing through the center-pixel 
 						//of the filter window. See equation 7, section 3.1 for details
-						detail=(PIXTYPE) (srcImg->get(i+m,j+n,k+l) - coeffA*m - coeffB*n - coeffC*l-coeffD);	
-						if(detail!=0)//printf("detail!=0%d",detail); 
-						//printf("detail====>>%d ",detail);
+						detail=(float) (srcImg->get(i+m,j+n,k+l) - coeffA*m - coeffB*n - coeffC*l-coeffD);	
+						if(detail!=0)						
 						countvar++;
 						//Compute the weight for the range filter (rangeWeight). The range filter
 						//is a Gaussian filter defined by the detail signal.
 						if(sigmaRTheta==0){sigmaRTheta=0.1;}// 1===>0.1
-						rangeWeight = (PIXTYPE) pow(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
+						rangeWeight = (double) pow(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
 						if(rangeWeight==0)rangeWeight=0.1;
 						if(domainWeight==0)domainWeight=0.1;
 						//tmp+=detail*domainWeight*rangeWeight;
@@ -420,9 +429,10 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 						
 						//Detail Bilateral filter normalized by normFactor (eq. 9, Section 3.1)
 						normFactor+= domainWeight*rangeWeight;
-					}
 				}
 			}
+		}
+	}
 			if(normFactor==0) normFactor=0.1;
 			tmp = tmp/normFactor;
 			if(tmp!=0)
@@ -434,7 +444,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 			
 
 			}
-			else tmp= coeffD;
+			else tmp= coeffD;//not changed
 			//if(tmp!=0){if(tmp==coeffC)printf("tmp==get(i,j)");}
 			 raw->put(i,j,k,tmp);//copy to the output
 
