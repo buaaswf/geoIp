@@ -15,8 +15,12 @@ public:
 	int Height;
 	int Depth;
 	int PixelType;
+
+    //qym 2013-12-4
+    bool CreateSpace;
+
 	ImageVolume(int width,int height, int depth,int pixelType=1,bool createSpace=true);
-	ImageVolume(int width,int height, int depth,int pixelType,void *data);
+	//ImageVolume(int width,int height, int depth,int pixelType,void *data);
 	ImageVolume();
 	~ImageVolume();
 	IMAGE_INDEXTYPE GetLength();
@@ -37,5 +41,6 @@ public:
 	void ReadImage(const char* fileName);
 	void SaveImage(const char* fileName);
 };
+
 #endif
 

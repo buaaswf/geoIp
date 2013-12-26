@@ -10,6 +10,11 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,bool crea
 	this->Height=height;
 	this->Depth=depth;
 	this->PixelType=pixelType;
+
+    //qym 2013-12-4
+    this->CreateSpace = createSpace;
+
+
 	if(createSpace)
 	{
 		if(PixelType==1)
@@ -33,6 +38,7 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,bool crea
 		Data=NULL;
 	}
 }
+/*
 ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data)
 {
 	this->Width=width;
@@ -60,8 +66,13 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *dat
 		}
 
 }
+*/
 ImageVolume::~ImageVolume()
 {
+	//qym 2013-12-4
+    if(!CreateSpace)
+        return;
+
 	if(PixelType==1)
 	{
 		unsigned char * image_8 = (unsigned char * )Data;
