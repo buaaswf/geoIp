@@ -9,7 +9,7 @@
 
 Raw * testinterface(ImageVolume &src)
 {
-	AnistropicI anis(1,1,1,5);
+	AnistropicI anis(5,10,1,5);
 	//TrilateralfilterI tril(1,3);
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
 	//BilateralFilterI bil(1,1,5);

@@ -223,19 +223,21 @@ Raw::Raw(void)
 	is_shared = false;
 	data=NULL;
 }
-Raw::Raw(int xsize,int ysize,int zsize,PIXTYPE *y)
+Raw::Raw(int xsize,int ysize,int zsize,PIXTYPE *y,bool share)
 {
 	//float i=0.0f;
 	this->xsize=xsize;
 	this->ysize=ysize;
 	this->zsize=zsize;
-	data=new PIXTYPE[size()];
-	//	if (is_shared == true) {
-	//	this->data = data;
-	//} else {
-	//	this->data=new PIXTYPE[size()];
+	this->is_shared = share;
+	//data=new PIXTYPE[size()];
+		if (is_shared == true) {
+		this->data = y;
+	} else 
+	{
+		this->data=new PIXTYPE[size()];
 		memcpy(this->data,y,sizeof(PIXTYPE)*size());
-	/*}*/
+	}
 }
 Raw::Raw(int xsize,int ysize,int zsize)
 {

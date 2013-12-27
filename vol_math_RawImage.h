@@ -59,7 +59,7 @@ private:   			//-----------------DATA-----------------
 	PIXTYPE *data;		// 1D array of PIXTYPE that are accessed as a 2D array.
 	bool is_shared;
 public:				//---------------init fcns-------------
-	Raw(int,int,int,PIXTYPE*);	
+	Raw(int,int,int,PIXTYPE*,bool=false);	
 	Raw(ImageVolume &src);
 	Raw(const Raw& src,bool=false);
 	Raw(int,int,int);

@@ -3,16 +3,16 @@
 //qym
 #include "vol_math_RawImage.h"
 
-void MultiThread(int method,int threadcount,Raw &src,void *para);
+Raw& MultiThread(int method,int threadcount,Raw &src,void *para);
 void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 {
 	//int method,int threadcount,Raw &src,void *para
 	Raw &indata=*(Raw *)ImageVolume2Raw(src);
-	MultiThread(2,para.threadcount,indata,(void *)&para); 
+	Raw *ret =new Raw( MultiThread(2,para.threadcount,indata,(void *)&para)); 
 	//WipeNioisePde * pde=new WipeNioisePde(indata,para.time,para.val,para.method);
 	//delete pde;
 	//return Raw2ImageVolume(indata,src.PixelType);
-	return &indata;
+	return ret;
 }
 
 void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
@@ -110,7 +110,7 @@ extern void * dolowPassI2D (Image2D &src,lowPassI &)
 ///=========================================================================================================////
 struct  AnistropicP
 {
-	Raw src;
+	Raw *src;
 	int time;
 	int val; //val=1
 	int method; 
@@ -120,7 +120,7 @@ struct  AnistropicP
 	1:Perona_Malik();
 	2:four_diff
 	*/
-	AnistropicP(Raw data,int time,int val,int method)
+	AnistropicP(Raw *data,int time,int val,int method)
 	{
 		this->src=data;
 		this->time=time;
@@ -137,8 +137,8 @@ struct  AnistropicP
 struct  TrilateralfilterP
 {
 	float sigmaC;//sigmaC=1
-	Raw src;
-	TrilateralfilterP(Raw &src, float sigmaC )
+	Raw *src;
+	TrilateralfilterP(Raw *src, float sigmaC )
 	{
 		this->src=src;
 		this->sigmaC = sigmaC;
@@ -214,28 +214,30 @@ void * singleGuassFilter(void * para)
 void * singleTrilateralfilter(void *para)
 {
 	TrilateralfilterP *p=(TrilateralfilterP*) para; 
-	Raw &indata=p->src;
-	Trilateralfilter f(&indata);
+	Raw *indata=p->src;
+	Trilateralfilter f(indata);
 	f.TrilateralFilter(p->sigmaC);
 	
 	return &indata;
 }
-void * singleAnistropicFilter(void *para)
+void * singleAnistropicFilter(void * para)
 {
 	AnistropicP *p=(AnistropicP*) para; 
-	Raw &indata=p->src;
-	WipeNioisePde * pde=new WipeNioisePde(indata,p->time,p->val,p->method);
+	Raw *indata=(p->src);
+	WipeNioisePde * pde=new WipeNioisePde(*indata,p->time,p->val,p->method);
 	delete pde;
-	return &indata;
+	return NULL;
 }
 
 
 
-void MultiThread(int method,int threadcount,Raw &src,void *para)
+Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 {
 	//divide into slices
 	//create+join
 	//single
+	Raw  *ret = new Raw(src);
+	int countvar=0;
 	if (threadcount>=1)
 	{
 		vector <Raw *> raw;
@@ -254,7 +256,7 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 					raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
 					int ret;
 					TrilateralfilterI *p=(TrilateralfilterI*)para;
-					parms[i]=TrilateralfilterP(*raw[i],p->sigmaC);
+					parms[i]=TrilateralfilterP(raw[i],p->sigmaC);
 					pthread_attr_t *attr;
 					ret=pthread_create(&threads[i],NULL,singleTrilateralfilter,&parms[i]);
 					cout <<i<<endl;
@@ -263,29 +265,36 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 				{
 					pthread_join(threads[i], NULL);
 				}
+				
+
 			}
 			break;
 		case 2:
 			{
 				{
-					vector<AnistropicP>parms;parms.resize(threadcount);
+					
+					vector<AnistropicP> parms; 
+					parms.resize(threadcount);
 					int znewsize = src.getZsize()/threadcount;
 					for (int i = 0; i < threadcount; i++ )
 					{
-						PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						PIXTYPE *data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
 						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
-						int ret;
+						int pret;
 						AnistropicI *p=(AnistropicI*)para;
-						parms[i]=AnistropicP(*raw[i],p->time,p->val,p->method);
+						parms[i]=AnistropicP(raw[i],p->time,p->val,p->method);
 						pthread_attr_t *attr;
-						ret=pthread_create(&threads[i],NULL,singleAnistropicFilter,&parms[i]);
+						pret=pthread_create(&threads[i],NULL,singleAnistropicFilter,(void *)&parms[i]);
+						//singleAnistropicFilter(&parms[i]);
+						//raw[i]=parms[i].src;
+
+						
 						cout <<i<<endl;
 					}
 					for(int i=0;i<threadcount;i++)
 					{
 						pthread_join(threads[i], NULL);
 					}
-
 				}
 				break;
 			}
@@ -303,6 +312,7 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 						parms[i]=BilateralFilterP(*raw[i],p->sigmaD,p->sigmaR);
 						pthread_attr_t *attr;
 						ret=pthread_create(&threads[i],NULL,singleBilateral,&parms[i]);
+
 						cout <<i<<endl;
 					}
 					for(int i=0;i<threadcount;i++)
@@ -321,7 +331,7 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 					for (int i = 0; i < threadcount; i++ )
 					{
 						PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
-						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
+						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
 						int ret;
 						GuassFilterI *p=(GuassFilterI*)para;
 						parms[i]=GuassFilterP(*raw[i],p->halfsize);
@@ -343,8 +353,8 @@ void MultiThread(int method,int threadcount,Raw &src,void *para)
 	{
 		cout << "threadcount is too few"<<endl;
 	}
-
-
+	cout << countvar <<endl;
+	return *ret;
 
 	/*
 	1\trilaterfilter

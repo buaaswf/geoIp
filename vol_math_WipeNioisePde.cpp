@@ -9,7 +9,8 @@ WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE value, int method)
 	way=method;
 	if (way==1)
 	{
-		src=Perona_Malik(src);
+		Perona_Malik(src);
+		//cout <<"aaa"<<endl;
 	} 
 	else
 	{
@@ -22,21 +23,21 @@ WipeNioisePde::~WipeNioisePde(void)
 {
 }
 
-Raw  WipeNioisePde::Perona_Malik(Raw &src)
+void  WipeNioisePde::Perona_Malik(Raw &src)
 {
 	//P-M function  2nd-order PDE denoise
-	PIXTYPE a=1,sum;
+	PIXTYPE a=2,sum;
 	int z,y,x,K,j,i;
 	Raw d(src);
 	Raw s(raw);
 	PIXTYPE *around=new PIXTYPE[6];
-	for (i=0;i<delt;i++)
+	for (i = 0 ;i < delt; i++)
 	{
-		for (z=1;z< raw.getZsize()-1;z++)
+		for (z = 1; z < raw.getZsize()-1;z++)
 		{
-			for (y=1;y<raw.getYsize()-1;y++)
+			for ( y = 1; y < raw.getYsize()-1; y++)
 			{
-				for (x=1;x<raw.getXsize()-1;x++)
+				for ( x = 1; x < raw.getXsize()-1; x++)
 				{
 					around[0]=d.get(x-1,y,z)-d.get(x,y,z);
 					around[1]=d.get(x,y-1,z)-d.get(x,y,z);
@@ -45,19 +46,23 @@ Raw  WipeNioisePde::Perona_Malik(Raw &src)
 					around[4]=d.get(x,y+1,z)-d.get(x,y,z);
 					around[5]=d.get(x,y,z+1)-d.get(x,y,z);
 					sum=0;
-					for (i=0;i<6;i++)
+					for (int k=0; k < 6; k++)
 					{
 						//implementation sum(g(i)*f(i))
-						sum+=around[i]/(1+around[i]*around[i]/(val*val));
+						sum+=around[k]/(1+around[k]*around[k]/(val*val));
 
 					}
 					s.put(x,y,z,d.get(x,y,z)+a*sum/double(6));
+					
 				}
 			}
+			//cout << "times = :" << i << endl;
 		}
+		//d += s*(-1);
 		d=s;
 	}
-	return  d;
+	src += s *(-1);
+	//return  d;
 }
 Raw gradientlaplace(Raw &src)
 {

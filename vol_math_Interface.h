@@ -17,7 +17,7 @@
 struct  AnistropicI
 {
 	int time;
-	int val; //val=1
+	int val; //val=10-50
 	int method; 
 	int threadcount;
 	/*

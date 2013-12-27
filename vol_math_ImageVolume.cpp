@@ -38,7 +38,7 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,bool crea
 		Data=NULL;
 	}
 }
-/*
+
 ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data)
 {
 	this->Width=width;
@@ -66,7 +66,7 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *dat
 		}
 
 }
-*/
+
 ImageVolume::~ImageVolume()
 {
 	//qym 2013-12-4
