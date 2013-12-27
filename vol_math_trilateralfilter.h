@@ -55,43 +55,7 @@ private:
 		Raw* fTheta, float sigmaCTheta, float sigmaRTheta); // sigmaCTheta sigmaRTheta is changed from PIXTYPE to float
 
 
-	/*Raw* rawarray(RawImage* img)
-	{
-		int xsize=img->width;
-		int ysize=img->height;
-		int zsize=img->length;
-		PIXTYPE *yy=img->buf;
 
-		int i=0,j=0,k=0,kk=0;
-		int thread=100;
-		for(kk=0;kk<(zsize/thread);kk++)
-		{
-			try
-			{
-				PIXTYPE *p=new PIXTYPE[xsize*ysize*thread];
-				for(i=0;i<xsize*ysize*thread;i++)
-				{
-					*(p+i)=*(yy+i+kk*(xsize*ysize*thread));
-				}	
-				try
-				{
-					Raw *rawData=new Raw(xsize,ysize,thread,p);
-					return rawData;
-				}
-				catch(std::bad_alloc)
-				{
-					delete [] p;
-					p=NULL;
-					i--;
-				}
-				printf("no  %d\n" ,i+1);
-			}
-			catch (const std::bad_alloc& e)
-			{
-				printf("p alloc failed");
-			}
-		}
-	}*/
 };
 #endif 
 

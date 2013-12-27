@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <stdio.h>
-#include "Filter.h"
+//qym
+//#include "Filter.h"
 using namespace std;
 #define M_EXP 2.7182818284590452353602874713527
 

@@ -1,4 +1,9 @@
 #include "vol_math_BilateralFilter.h"
+//qym
+#include <math.h>
+#include "vol_math_RawImage.h"
+
+
 void BilateralFilter_Struct_Oriented(Raw *raw,float sigmaC, float sigmaR, int filterSize)
 {
 	

@@ -170,7 +170,7 @@ void RawImage::writeImagesesmic(Raw &destImg)
 void RawImage::writeImagesesmicarray(void * src, int l ,int m, int n)
 {
 	FILE *p;
-	if((p=fopen("F:\\sesmic.raw","ab+"))==NULL)
+	if((p=fopen("F:\\sesmic.raw","wb"))==NULL)  //"ab+"append
 	{
 		printf("cant open the file");
 		exit(0);

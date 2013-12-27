@@ -2,7 +2,7 @@
 #define _VOL_MATH_LEVELSET_H_
 
 #include "vol_math_Raw3D_Independt.h"
-#include "test.h"
+//#include "test.h"
 
 #include<string>
 using  std::string;
@@ -17,6 +17,11 @@ public:
 	void testout(Raw2D *ret);
 };
 
-Raw2D regFunction(Raw2D &s,double m,double n);
+//qym
+extern Raw2D regFunction(Raw2D &s,double m,double n);
+
+//qym
+extern Raw2D cos(Raw2D &x);
+extern Raw2D* sin(Raw2D *s);
 
 #endif  //_VOL_MATH_LEVELSET_H_

@@ -65,7 +65,7 @@ void Trilateralfilter::TrilateralFilter(float sigmaC)
 	float  R;
 	//domain variance for the two filters: sigmaC, sigmaCTheta
 	//range variance of the two filters: sigmaR, sigmaRTheta
-	//R -- threshold to compute adaptive region (see paper for details)
+	//R -- threshold to compute adaptive region 
 
 	//Default internal Parameters
 	sigmaCTheta = sigmaC; //Variance of the Domain Filter, the only user set parameter
@@ -73,9 +73,7 @@ void Trilateralfilter::TrilateralFilter(float sigmaC)
 	filterSize = (int) sigmaC; 
 
 	//Compute the RawImage stack height
-	/*levX=(int) (log10(float (pSrcImg->getXsize()))/log10(2.0f));
-	levY=(int) (log10(float (pSrcImg->getYsize()))/log10(2.0f));
-	*/
+
 
 	levX=(int) (log10(float (pSrcImg->getXsize()))/lgtt);
 	levY=(int) (log10(float (pSrcImg->getYsize()))/lgtt);
@@ -108,12 +106,7 @@ void Trilateralfilter::TrilateralFilter(float sigmaC)
 
 	/**
 	Builds the Min-Max Image Stack consisting of Image Gradients (Step 2).
-	Also computes sigmaR, the range variance, (see equation 11 in the paper for further details).
-	min and max gradients are stored in two separate stacks.
-	Range variance sigmaR is calculated from equation 11 in the paper.
-	Large ssq improves noise reduction, but also reduces outlier
-	rejection, and may blur weaker boundaries of slight intensity
-	changes.
+
 	**/
 	sigmaR = buildMinMaxImageStack(&xGradient,&yGradient,&zGradient,&minGradientStack,&maxGradientStack,levelMax,beta);
 
@@ -129,14 +122,13 @@ void Trilateralfilter::TrilateralFilter(float sigmaC)
 	/**
 	Find the adaptive neighborhood fTheta for each pixel location (Step 4). fTheta size is
 	given by stack level. The min-max gradient stacks and range threshold "R" are used for this calculation
-	(see equation 10 in the paper for details).
+	
 	**/
 	findAdaptiveRegion(&minGradientStack, &maxGradientStack, R, levelMax);
 
 	/**
 	Performs bilateral filter on the detail signal (Step 5).
-	See Equation 6, 7, 8 and 9.
-	Output is stored in destimg (end result of equation 8, Section 3.1)
+
 	**/
 	DetailBilateralFilter(pSrcImg, &xSmoothGradient, &ySmoothGradient,&zSmoothGradient,&fTheta, sigmaCTheta, sigmaRTheta);
 
@@ -357,7 +349,7 @@ void Trilateralfilter::findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxSta
 		for(i=0; i<imax;i++) {
 			for(lev=0; lev < levelMax; lev++) {
 				//Compute the adaptive neighboirhood based on the similarity of
-				//the neighborhood gradients, equation 10, Section 3.2.
+				//the neighborhood gradients
 				if ( pMaxStack->get(i,j,k,lev) > (pMaxStack->get(i,j,k,0) + R) ||
 					pMinStack->get(i,j,k,lev) < (pMaxStack->get(i,j,k,0) - R) )
 					break;
@@ -393,7 +385,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 			//halfSize=halfSize*halfSize;
 			//halfSize=1.5;
 			if(halfSize>2){halfSize=2;}//halfsize=5
-			//Coefficients defining the centerplane (equation6, section 3.1) is calculated
+			//Coefficients defining the centerplane 
 			//from the smoothed RawImage gradients
 			coeffA=pSmoothX->get(i,j,k); 
 			assert(coeffA==pSmoothX->get(i,j,k));
@@ -414,7 +406,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 					if( (i+m) >= 0 && (i+m) <imax && (j+n) >=0 && (j+n) < jmax && (k+l) >=0&& (k+l)< kmax) {
 						//Compute the detail signal (detail) based on the difference between a 
 						//neighborhood pixel and the centerplane passing through the center-pixel 
-						//of the filter window. See equation 7, section 3.1 for details
+		
 						detail=(float) (srcImg->get(i+m,j+n,k+l) - coeffA*m - coeffB*n - coeffC*l-coeffD);	
 						if(detail!=0)						
 						countvar++;
@@ -427,7 +419,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 						//tmp+=detail*domainWeight*rangeWeight;
 						tmp+=detail*domainWeight*rangeWeight;
 						
-						//Detail Bilateral filter normalized by normFactor (eq. 9, Section 3.1)
+						//Detail Bilateral filter normalized by normFactor 
 						normFactor+= domainWeight*rangeWeight;
 				}
 			}

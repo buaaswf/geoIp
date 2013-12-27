@@ -19,11 +19,12 @@ Raw * testinterface(ImageVolume &src)
 	//Raw * ret = (Raw *)doGuassFilterI(src , gs);
 	
 	return ret;
+	
 
 }
 int main(int argc, char* argv[])
 {
-	int l=281,m=481,n=50;
+	int l=281,m=481,n=20;
 	RawImage test;
 	unsigned char * indata=new unsigned char [l*m*n];
 	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));

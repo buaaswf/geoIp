@@ -3,6 +3,8 @@
 
 #include "vol_math_Raw3D_Independt.h"
 #include "vol_math_RawImage.h"
+//qym
+#include <math.h>
 class Filter
 {
 	Raw2D *src;

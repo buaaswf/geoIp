@@ -1,6 +1,6 @@
 #pragma once
 #include"vol_math_RawImage.h"
-#include "Wipe.h"
+//#include "Wipe.h"
 class WipeNioisePde
 {
 private:
