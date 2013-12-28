@@ -60,8 +60,8 @@ double ThreeDim_Bilateral::getSpatialWeight(int m, int n,int l, int i, int j, in
 }
 
 
-Raw ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x 
-	Raw temp(src);
+void ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x 
+	Raw * temp = new Raw(src);
 	for (int i=0;i<src.getZsize();i++)
 	{
 		for (int j=0;j<src.getYsize();j++)
@@ -71,7 +71,7 @@ Raw ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x
 				if(i>0 && j>0 && k>0 && i<src.getXsize() && j< src.getYsize() && k< src.getZsize()){
 					double sum = 0;
 					double totalWeight = 0;
-					int intensityCenter =src.get(i,j,k);
+					int intensityCenter =temp->get(i,j,k);
 
 
 					int mMax = i + kernelRadius;
@@ -87,7 +87,7 @@ Raw ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x
 							{
 								if (this->isInsideBoundaries(m, n, l)) 
 								{
-									int intensityKernelPos = src.get(m,n,l);
+									int intensityKernelPos = temp->get(m,n,l);
 									weight = getSpatialWeight(m,n,l,i,j,k) * similarity(intensityKernelPos,intensityCenter);
 									totalWeight += weight;
 									sum += (weight * intensityKernelPos);
@@ -100,18 +100,18 @@ Raw ThreeDim_Bilateral::apply(Raw &src) {// ~i=y j=x
 					if (sum!=0)
 					{
 						int newvalue=(int)(sum / totalWeight);
-						temp.put(i,j,k,newvalue);
+						src.put(i,j,k,newvalue);
 
 					}
 
-				}
-			}
+				}//if..
+			}//i..
 
-		}
+		}//k..
 
-	}
-
-	return temp;
+	}//j..
+	//src = *temp;
+	//return *temp;
 
 
 }

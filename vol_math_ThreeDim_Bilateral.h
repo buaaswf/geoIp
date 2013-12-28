@@ -15,7 +15,7 @@ private:
 public:
 	ThreeDim_Bilateral(Raw *image,double sigmaD, double sigmaR);
 	~ThreeDim_Bilateral(void);
-	Raw apply(Raw &src);
+	void apply(Raw &src);
 	bool isInsideBoundaries(int m,int n,int l);
 	double similarity(int p,int s);
 	double gauss(double sigma,int x, int y,int z);

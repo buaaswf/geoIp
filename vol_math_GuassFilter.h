@@ -54,7 +54,7 @@ public:
 		return guass;
 	}
 
-	static Raw* guass3DFilter(Raw* src, int halfsize)
+	static void guass3DFilter(Raw* src, int halfsize)
 	{
 		int i=0,j=0,k=0,m=0,n=0,l=0,width=0,depth=0,length=0,index=0;
 		float sum = 0;
@@ -82,7 +82,7 @@ public:
 								{
 									//weight=1.0f/((m-i)*(m-i)+(n-i)*(n-i)+1);
 									weight=1.0f/exp((float)((m-k)*(m-k)+(n-j)*(n-j) + (l-i)*(l-i) ));
-									sum += weight*(src->get(m, n, l));
+									sum += weight*(guass->get(m, n, l));
 									total += weight;
 								}
 							}
@@ -92,7 +92,7 @@ public:
 					if(total!=0)
 					{	
 						sum /= total;//total is 1,regulation
-						guass->put(k, j,i , (PIXTYPE)sum);		
+						src->put(k, j,i , (PIXTYPE)sum);		
 					}
 					else  //should never come here
 					{
@@ -103,7 +103,7 @@ public:
 			}
 		}
 
-		return guass;
+		//return guass;
 	}
 };
 

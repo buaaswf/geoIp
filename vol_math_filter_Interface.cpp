@@ -152,10 +152,10 @@ struct  TrilateralfilterP
 
 struct BilateralFilterP
 {
-	Raw src;
+	Raw *src;
 	double sigmaD;
 	double sigmaR;
-	BilateralFilterP(Raw &src,double sigmaD,double sigmaR)
+	BilateralFilterP(Raw *src,double sigmaD,double sigmaR)
 	{
 		this->src=src;
 		this->sigmaD=sigmaD;
@@ -171,9 +171,9 @@ struct BilateralFilterP
 
 struct GuassFilterP
 {
-	Raw src;
+	Raw *src;
 	int halfsize;
-	GuassFilterP(Raw src,int halfsize)
+	GuassFilterP(Raw *src,int halfsize)
 	{
 		this->src=src;
 		this->halfsize=halfsize;
@@ -197,19 +197,19 @@ struct MultiOstuP
 void * singleBilateral( void *para)
 {
 	BilateralFilterP *p= (BilateralFilterP *) para;
-	Raw &indata = p->src;
-	ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(&indata,p->sigmaD,p->sigmaR);
-	indata=bila->apply(indata);
-	return &indata;//Raw2ImageVolume(indata,src.PixelType);
+	Raw *indata = p->src;
+	ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(indata,p->sigmaD,p->sigmaR);
+	bila->apply(*indata);
+	return NULL;//Raw2ImageVolume(indata,src.PixelType);
 
 }
 void * singleGuassFilter(void * para)
 {
 	GuassFilterP *p=(GuassFilterP*) para;
-	Raw indata = p->src;
+	Raw *indata = p->src;
 	Filter *guass=new Filter();
-	Raw *ret=guass->guass3DFilter(&indata,p->halfsize);
-	return ret;
+	guass->guass3DFilter(indata,p->halfsize);
+	return NULL;
 }
 void * singleTrilateralfilter(void *para)
 {
@@ -252,8 +252,10 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 				int znewsize = src.getZsize()/threadcount;
 				for (int i = 0; i < threadcount; i++ )
 				{
-					PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
-					raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
+					
+					PIXTYPE *data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
+					Raw * d=new Raw(src.getXsize(),src.getYsize(),znewsize,data,true);
+					raw.push_back(d);
 					int ret;
 					TrilateralfilterI *p=(TrilateralfilterI*)para;
 					parms[i]=TrilateralfilterP(raw[i],p->sigmaC);
@@ -275,21 +277,20 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 					
 					vector<AnistropicP> parms; 
 					parms.resize(threadcount);
+					PIXTYPE *data;
 					int znewsize = src.getZsize()/threadcount;
 					for (int i = 0; i < threadcount; i++ )
 					{
-						PIXTYPE *data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
-						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
+						data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						Raw * d= new Raw(src.getXsize(),src.getYsize(),znewsize,data,true);
+						raw.push_back(d);
 						int pret;
-						AnistropicI *p=(AnistropicI*)para;
-						parms[i]=AnistropicP(raw[i],p->time,p->val,p->method);
+						AnistropicI *p = (AnistropicI*)para;
+						parms[i] = AnistropicP(raw[i],p->time,p->val,p->method);
 						pthread_attr_t *attr;
 						pret=pthread_create(&threads[i],NULL,singleAnistropicFilter,(void *)&parms[i]);
-						//singleAnistropicFilter(&parms[i]);
-						//raw[i]=parms[i].src;
-
-						
 						cout <<i<<endl;
+			
 					}
 					for(int i=0;i<threadcount;i++)
 					{
@@ -303,15 +304,16 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 				{
 					vector<BilateralFilterP>parms;parms.resize(threadcount);
 					int znewsize = src.getZsize()/threadcount;
+					PIXTYPE *data;
 					for (int i = 0; i < threadcount; i++ )
 					{
-						PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
-						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data));
-						int ret;
+						data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
+						int retid;
 						BilateralFilterI *p=(BilateralFilterI*)para;
-						parms[i]=BilateralFilterP(*raw[i],p->sigmaD,p->sigmaR);
+						parms[i]=BilateralFilterP(raw[i],p->sigmaD,p->sigmaR);
 						pthread_attr_t *attr;
-						ret=pthread_create(&threads[i],NULL,singleBilateral,&parms[i]);
+						retid=pthread_create(&threads[i],NULL,singleBilateral,&parms[i]);
 
 						cout <<i<<endl;
 					}
@@ -328,13 +330,14 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 				{
 					vector<GuassFilterP>parms;parms.resize(threadcount);
 					int znewsize = src.getZsize()/threadcount;
+					PIXTYPE *data;
 					for (int i = 0; i < threadcount; i++ )
 					{
-						PIXTYPE *data=src.getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
 						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
 						int ret;
 						GuassFilterI *p=(GuassFilterI*)para;
-						parms[i]=GuassFilterP(*raw[i],p->halfsize);
+						parms[i]=GuassFilterP(raw[i],p->halfsize);
 						pthread_attr_t *attr;
 						ret=pthread_create(&threads[i],NULL,singleGuassFilter,&parms[i]);
 						cout <<i<<endl;
@@ -347,13 +350,16 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 				}
 				break;
 			}
-		}
-	}
+		}//switch... 
+		//ret=new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),out);
+			//ret = ret1;
+	}//if...
 	else
 	{
 		cout << "threadcount is too few"<<endl;
 	}
 	cout << countvar <<endl;
+
 	return *ret;
 
 	/*
