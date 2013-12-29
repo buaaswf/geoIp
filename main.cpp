@@ -15,10 +15,10 @@ Raw * testinterface(ImageVolume &src)
 	//BilateralFilterI bil(3,3,5);
 	//Raw * ret=(Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicI(src,anis);
-	GuassFilterI gs(3,5);
-	Raw * ret = (Raw *)doGuassFilterI(src , gs);
+	//GuassFilterI gs(3,5);
+	//Raw * ret = (Raw *)doGuassFilterI(src , gs);
 	
-	return ret;
+	//return ret;
 	
 
 }

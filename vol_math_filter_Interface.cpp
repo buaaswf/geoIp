@@ -358,8 +358,16 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 	{
 		cout << "threadcount is too few"<<endl;
 	}
+	for (int i = 0; i < src.size(); i++ )
+	{
+		if (src.getXYZ(i)!= ret->getXYZ(i))
+		{
+			countvar ++;
+		}
+		
+	}
+	
 	cout << countvar <<endl;
-
 	return *ret;
 
 	/*
