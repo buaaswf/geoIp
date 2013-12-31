@@ -9,8 +9,10 @@ private:
 	PIXTYPE val;
 	int way;
 public:
+	WipeNioisePde(Raw &raw ,Raw &ret,int iter,int time,PIXTYPE value,int method);
 	WipeNioisePde(Raw &raw ,int time,PIXTYPE value,int method);
 	~WipeNioisePde(void);
+	void  Perona_MalikSipl( Raw &src,Raw & ret,int iter);
 	void  Perona_Malik( Raw &src);
 	Raw FourPDiff(Raw &src);
 	double funcg(PIXTYPE *array,int dz,int dy,int dx);

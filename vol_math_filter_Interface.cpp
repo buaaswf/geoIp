@@ -4,11 +4,12 @@
 #include "vol_math_RawImage.h"
 
 Raw& MultiThread(int method,int threadcount,Raw &src,void *para);
+Raw& MultiThreadsipl(int method,int threadcount,Raw &src,void *para);
 void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 {
 	//int method,int threadcount,Raw &src,void *para
 	Raw &indata=*(Raw *)ImageVolume2Raw(src);
-	Raw *ret =new Raw( MultiThread(2,para.threadcount,indata,(void *)&para)); 
+	Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para)); 
 	//WipeNioisePde * pde=new WipeNioisePde(indata,para.time,para.val,para.method);
 	//delete pde;
 	//return Raw2ImageVolume(indata,src.PixelType);
@@ -21,7 +22,7 @@ void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
 	//ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(&indata,para.sigmaD,para.sigmaR);
 	//indata=bila->apply(indata);
 	//return Raw2ImageVolume(indata,src.PixelType);
-	MultiThread(3,para.threadcount,indata,(void *)&para);
+	MultiThreadsipl(3,para.threadcount,indata,(void *)&para);
 	return &indata;
 }
 void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
@@ -134,13 +135,45 @@ struct  AnistropicP
 
 
 };
+struct  AnistropicPsipl
+{
+	Raw *src;
+	Raw *ret;
+	int iter;
+	int time;
+	int val; //val=1
+	int method; 
+
+	/*
+	method:
+	1:Perona_Malik();
+	2:four_diff
+	*/
+	AnistropicPsipl(Raw *data,Raw *ret,int iter,int time,int val,int method)
+	{
+		this->src=data;
+		this->ret=ret;
+		this->iter= iter;
+		this->time=time;
+		this->val=val;
+		this->method=method;
+	}
+	AnistropicPsipl()
+	{
+
+	}
+
+
+};
 struct  TrilateralfilterP
 {
 	float sigmaC;//sigmaC=1
 	Raw *src;
-	TrilateralfilterP(Raw *src, float sigmaC )
+	//Raw * ret;
+	TrilateralfilterP( Raw *src, float sigmaC )
 	{
-		this->src=src;
+		this->src = src;
+		//this->ret = ret;
 		this->sigmaC = sigmaC;
 
 	}
@@ -149,7 +182,23 @@ struct  TrilateralfilterP
 
 	}
 };
+struct  TrilateralfilterPSipl
+{
+	float sigmaC;//sigmaC=1
+	Raw *src;
+	Raw * ret;
+	TrilateralfilterPSipl( Raw *src, Raw *ret, float sigmaC )
+	{
+		this->src = src;
+		this->ret = ret;
+		this->sigmaC = sigmaC;
 
+	}
+	TrilateralfilterPSipl()
+	{
+
+	}
+};
 struct BilateralFilterP
 {
 	Raw *src;
@@ -166,6 +215,28 @@ struct BilateralFilterP
 		//this->src=NULL;
 		this->sigmaD=0;
 		this->sigmaR=0;
+	}
+};
+struct BilateralFilterPSipl
+{
+	Raw *src;
+	Raw *ret;
+	int iter;
+	double sigmaD;
+	double sigmaR;
+	BilateralFilterPSipl(Raw *src,Raw *ret,int iter,double sigmaD,double sigmaR)
+	{
+		this->src = src;
+		this->ret = ret;
+		this->iter = iter;
+		this->sigmaD = sigmaD;
+		this->sigmaR = sigmaR;
+	}
+	BilateralFilterPSipl()
+	{
+		//this->src=NULL;
+		this->sigmaD = 0;
+		this->sigmaR = 0;
 	}
 };
 
@@ -200,7 +271,17 @@ void * singleBilateral( void *para)
 	Raw *indata = p->src;
 	ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(indata,p->sigmaD,p->sigmaR);
 	bila->apply(*indata);
-	return NULL;//Raw2ImageVolume(indata,src.PixelType);
+	return NULL;
+
+}
+void * singleBilateralSipl( void *para)
+{
+	BilateralFilterPSipl *p= (BilateralFilterPSipl *) para;
+	Raw *indata = p->src;
+	Raw *outdata = p->ret;
+	ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(indata,*outdata,p->sigmaD,p->sigmaR);
+	bila->applySipl(p->iter);
+	return NULL;
 
 }
 void * singleGuassFilter(void * para)
@@ -220,6 +301,16 @@ void * singleTrilateralfilter(void *para)
 	
 	return &indata;
 }
+void * singleTrilateralfilterSipl(void *para)
+{
+	TrilateralfilterPSipl *p=(TrilateralfilterPSipl*) para; 
+	Raw *indata = p->src;
+	Raw *outdata = p->ret;
+	Trilateralfilter f(outdata);
+	f.TrilateralFilter(*indata,p->sigmaC);
+
+	return &indata;
+}
 void * singleAnistropicFilter(void * para)
 {
 	AnistropicP *p=(AnistropicP*) para; 
@@ -229,7 +320,15 @@ void * singleAnistropicFilter(void * para)
 	return NULL;
 }
 
-
+void * singleAnistropicFilterSipl(void * para)
+{
+	AnistropicPsipl *p=(AnistropicPsipl*) para; 
+	Raw *indata=(p->src);
+	Raw *outdata=(p->ret);
+	WipeNioisePde * pde=new WipeNioisePde(*indata,*outdata,p->iter,p->time,p->val,p->method);//two pointers,one in,one out
+	delete pde;
+	return NULL;
+}
 
 Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 {
@@ -314,6 +413,153 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 						parms[i]=BilateralFilterP(raw[i],p->sigmaD,p->sigmaR);
 						pthread_attr_t *attr;
 						retid=pthread_create(&threads[i],NULL,singleBilateral,&parms[i]);
+
+						cout <<i<<endl;
+					}
+					for(int i=0;i<threadcount;i++)
+					{
+						pthread_join(threads[i], NULL);
+					}
+
+				}
+				break;
+			}
+		case 4:
+			{
+				{
+					vector<GuassFilterP>parms;parms.resize(threadcount);
+					int znewsize = src.getZsize()/threadcount;
+					PIXTYPE *data;
+					for (int i = 0; i < threadcount; i++ )
+					{
+						data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
+						int ret;
+						GuassFilterI *p=(GuassFilterI*)para;
+						parms[i]=GuassFilterP(raw[i],p->halfsize);
+						pthread_attr_t *attr;
+						ret=pthread_create(&threads[i],NULL,singleGuassFilter,&parms[i]);
+						cout <<i<<endl;
+					}
+					for(int i=0;i<threadcount;i++)
+					{
+						pthread_join(threads[i], NULL);
+					}
+
+				}
+				break;
+			}
+		}//switch... 
+		//ret=new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),out);
+			//ret = ret1;
+	}//if...
+	else
+	{
+		cout << "threadcount is too few"<<endl;
+	}
+	for (int i = 0; i < src.size(); i++ )
+	{
+		if (src.getXYZ(i)!= ret->getXYZ(i))
+		{
+			countvar ++;
+		}
+		
+	}
+	
+	cout << countvar <<endl;
+	return *ret;
+
+	/*
+	1\trilaterfilter
+	2\anistropic
+	3\bilateralfilter
+	4\guass
+
+	*/
+}
+Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
+{
+	//divide into slices
+	//create+join
+	//single
+	Raw  *ret = new Raw(src);
+	int countvar=0;
+	if (threadcount>=1)
+	{
+		vector <Raw *> raw;
+		std::vector<pthread_t>threads;threads.resize(threadcount);
+		std::vector<int>pids;pids.resize(threadcount);
+		std::vector<int> res;res.resize(threadcount);
+		switch (method)
+		{
+		case 1 :
+			{
+				vector<TrilateralfilterPSipl>parms;parms.resize(threadcount);
+				int znewsize = src.getZsize()/threadcount;
+				for (int i = 0; i < threadcount; i++ )
+				{
+					
+					PIXTYPE *data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
+					Raw * d=new Raw(src.getXsize(),src.getYsize(),znewsize,data,true);
+					raw.push_back(d);
+					int ret;
+					TrilateralfilterI *p=(TrilateralfilterI*)para;
+					parms[i]=TrilateralfilterPSipl(&src,raw[i],p->sigmaC);
+					pthread_attr_t *attr;
+					ret=pthread_create(&threads[i],NULL,singleTrilateralfilterSipl,&parms[i]);
+					cout <<i<<endl;
+				}
+				for(int i=0;i<threadcount;i++)
+				{
+					pthread_join(threads[i], NULL);
+				}
+				
+
+			}
+			break;
+		case 2:
+			{
+				{
+					
+					vector<AnistropicPsipl> parms; 
+					parms.resize(threadcount);
+					PIXTYPE *data;
+					int znewsize = src.getZsize()/threadcount;
+					for (int i = 0; i < threadcount; i++ )
+					{
+						data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						Raw * d= new Raw(src.getXsize(),src.getYsize(),znewsize,data,true);
+						raw.push_back(d);
+						int pret;
+						AnistropicI *p = (AnistropicI*)para;
+						parms[i] = AnistropicPsipl(&src,raw[i],i,p->time,p->val,p->method);
+						pthread_attr_t *attr;
+						pret=pthread_create(&threads[i],NULL,singleAnistropicFilterSipl,(void *)&parms[i]);
+						cout <<i<<endl;
+			
+					}
+					for(int i=0;i<threadcount;i++)
+					{
+						pthread_join(threads[i], NULL);
+					}
+				}
+				break;
+			}
+		case 3:
+			{
+				{
+					vector<BilateralFilterPSipl>parms;parms.resize(threadcount);
+					int znewsize = src.getZsize()/threadcount;
+					PIXTYPE *data;
+					for (int i = 0; i < threadcount; i++ )
+					{
+						data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
+						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
+						int retid;
+						BilateralFilterI *p=(BilateralFilterI*)para;
+						parms[i]=BilateralFilterPSipl(&src,raw[i],i,p->sigmaD,p->sigmaR);
+						pthread_attr_t *attr;
+						retid=pthread_create(&threads[i],NULL,singleBilateralSipl,&parms[i]);
 
 						cout <<i<<endl;
 					}
