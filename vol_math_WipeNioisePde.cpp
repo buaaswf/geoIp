@@ -217,7 +217,23 @@ Raw gradientlaplace(Raw &src)
 
 	return val;
 }
+Raw gradientlaplaceSipl(Raw &src,Raw &ret,int iter)
+{
+	Raw *temp = new Raw (src.getXsize(),src.getYsize(),ret.getZsize() + 4,src.getdata() + src.getXsize()*src.getYsize()*(ret.getZsize()-2),true );
+	for (int i=2;i < temp->getXsize()-2; i++)
+	{
+		for (int j=2; j < temp->getYsize()-2; j++)
+		{
+			for (int k=2;k < temp->getZsize()-2; k++)
+			{
+				ret.put(i,j,k-2,(src.get(i+1,j,k)+src.get(i-1,k,k)+src.get(i,j+1,k)+src.get(i,j-1,k)+src.get(i,j,k+1)+src.get(i,j,k-1)-6*src.get(i,j,k)));
 
+			}
+		}
+	}
+
+	return ret;
+}
 Raw WipeNioisePde::FourPDiff(Raw &src)			//based on Y-K model
 {
 	PIXTYPE sum;
@@ -235,6 +251,21 @@ Raw WipeNioisePde::FourPDiff(Raw &src)			//based on Y-K model
 
 }
 
+Raw WipeNioisePde::FourPDiffSipl(Raw &src,Raw &ret,int iter)			//based on Y-K model
+{
+	PIXTYPE sum;
+	int x,y,z,j;
+	Raw s;
+	//Raw d(src);
+	for (int j=0;j<delt;j++)
+	{
+		ret=gradientlaplaceSipl(src, ret, iter);
+		ret=ret/(ret*ret+1);
+		ret=gradientlaplaceSipl(ret);
+		ret=src-ret/double(6);
+	}
+	return ret;
 
+}
 
 
