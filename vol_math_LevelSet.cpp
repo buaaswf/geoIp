@@ -12,7 +12,7 @@ int i,j;
 
 LevelSet::~LevelSet(void)
 {
-    cout<<"Destructor called"<<endl;
+    cout<<"Destructor called"<<endl; 
 }
 
 //*ImageF Dirac(ImageF x,float sigma);*/

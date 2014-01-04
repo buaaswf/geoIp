@@ -15,7 +15,7 @@ public:
 	void  Perona_MalikSipl( Raw &src,Raw & ret,int iter);
 	void  Perona_Malik( Raw &src);
 	Raw FourPDiff(Raw &src);
-	Raw FourPDiffSipl(Raw &src,Raw &ret,int iter);	
+	void FourPDiffSipl(Raw &src,Raw &ret,int iter);	
 	double funcg(PIXTYPE *array,int dz,int dy,int dx);
 
 	

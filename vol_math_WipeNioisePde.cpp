@@ -14,7 +14,7 @@ WipeNioisePde::WipeNioisePde(Raw &src,Raw &ret,int iter,int time,PIXTYPE value, 
 	} 
 	else
 	{
-		src=FourPDiff(src);
+		FourPDiffSipl(src,ret,iter);
 	}
 }
 WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE value, int method)
@@ -115,7 +115,8 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 							sum += around[k]/(1+around[k]*around[k]/(val*val));
 
 						}
-						ret.put(x,y,z-1,s->get(x,y,z)+a*sum/double(6));
+						//ret.put(x,y,z-1,s->get(x,y,z)+a*sum/double(6));
+						ret.put(x,y,z-1,s->get(x,y,z));
 
 					}//for
 				}//for
@@ -127,9 +128,9 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 	} 
 	else
 	{
-		if (iter == 0 || (iter+1)*ret.getZsize() ==  src.getZsize())
+		if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
 		{
-			Raw *s = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1),true);
+			Raw *s = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1));
 			PIXTYPE *around=new PIXTYPE[6];
 			for (i = 0 ;i < delt; i++)
 			{
@@ -162,6 +163,49 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 			}//for
 			delete s;
 		}//if
+		else// if ()
+		{
+			//P-M function  2nd-order PDE denoise
+			PIXTYPE a=1,sum;
+			int z,y,x,K,j,i;
+			//Raw *d=new Raw(src.getXsize(),src.getYsize(),src.getZsize(),src.getdata());
+			Raw *d=new Raw(src.getXsize(),src.getYsize(),src.getZsize(),src.getdata());
+			//Raw s=Raw(src);
+			PIXTYPE *around=new PIXTYPE[6];
+			for (i = 0 ;i < delt; i++)
+			{
+				for (z = 1; z < src.getZsize()-1;z++)
+				{
+					for ( y = 1; y < src.getYsize()-1; y++)
+					{
+						for ( x = 1; x < src.getXsize()-1; x++)
+						{
+							around[0]=d->get(x-1,y,z)-d->get(x,y,z);
+							around[1]=d->get(x,y-1,z)-d->get(x,y,z);
+							around[2]=d->get(x,y,z-1)-d->get(x,y,z);
+							around[3]=d->get(x+1,y,z-1)-d->get(x,y,z);
+							around[4]=d->get(x,y+1,z)-d->get(x,y,z);
+							around[5]=d->get(x,y,z+1)-d->get(x,y,z);
+							sum=0;
+							for (int k=0; k < 6; k++)
+							{
+								//implementation sum(g(i)*f(i))
+								sum+=around[k]/(1+around[k]*around[k]/(val*val));
+
+							}
+							ret.put(x,y,z,d->get(x,y,z)+a*sum/double(6));
+
+						}//for
+					}//for
+					//cout << "times = :" << i << endl;
+				}//for
+				//d += s*(-1);
+				d=&ret;
+			}//for delte
+			delete d;
+			//src = s;
+			//return  d;
+		}
 		//if ((iter+1)*ret.getZsize() ==  src.getZsize())
 		//{
 		//	Raw *s = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1),true);
@@ -217,54 +261,113 @@ Raw gradientlaplace(Raw &src)
 
 	return val;
 }
-Raw gradientlaplaceSipl(Raw &src,Raw &ret,int iter)
+void  gradientlaplaceSipl(Raw &src,Raw &_ret,int iter)
 {
-	Raw *temp = new Raw (src.getXsize(),src.getYsize(),ret.getZsize() + 4,src.getdata() + src.getXsize()*src.getYsize()*(ret.getZsize()-2),true );
-	for (int i=2;i < temp->getXsize()-2; i++)
+	if (iter > 0 && (iter+1) *_ret.getZsize() != src.getZsize())
 	{
-		for (int j=2; j < temp->getYsize()-2; j++)
+		Raw *temp = new Raw (src.getXsize(),src.getYsize(),_ret.getZsize() + 2, src.getdata() + src.getXsize()*src.getYsize()*(_ret.getZsize()-1) );
+		for (int i = 1; i < temp->getXsize()-1; i++)
 		{
-			for (int k=2;k < temp->getZsize()-2; k++)
+			for (int j = 1; j < temp->getYsize()-1; j++)
 			{
-				ret.put(i,j,k-2,(src.get(i+1,j,k)+src.get(i-1,k,k)+src.get(i,j+1,k)+src.get(i,j-1,k)+src.get(i,j,k+1)+src.get(i,j,k-1)-6*src.get(i,j,k)));
+				for (int k = 1; k < temp->getZsize()-1; k++)
+				{
+					_ret.put(i, j, k-1, (temp->get(i+1,j,k)+temp->get(i-1,k,k)+temp->get(i,j+1,k)+temp->get(i,j-1,k)+temp->get(i,j,k+1)+temp->get(i,j,k-1)-6*temp->get(i,j,k)));
 
+				}
+			}
+		}
+
+	}
+	else if ( iter == 0 && (iter+1) *_ret.getZsize() != src.getZsize() || iter != 0 && (iter+1) *_ret.getZsize() == src.getZsize())
+	{
+		Raw *temp = new Raw(_ret.getXsize(),_ret.getYsize(),_ret.getZsize()+1,src.getdata()+iter*_ret.getXsize()*_ret.getYsize()*(_ret.getZsize()-1));
+		for (int i = 1; i < temp->getXsize()-1; i++)
+		{
+			for (int j = 1; j < temp->getYsize()-1; j++)
+			{
+				for (int k = 1; k < temp->getZsize()-1; k++)
+				{
+					_ret.put(i, j, k-1, (temp->get(i+1,j,k) + temp->get(i-1,k,k) + temp->get(i,j+1,k) + temp->get(i,j-1,k)+temp->get(i,j,k+1)+temp->get(i,j,k-1)-6*temp->get(i,j,k)));
+
+				}
 			}
 		}
 	}
+	else 
+	{
+		Raw *temp = new Raw(_ret.getXsize(),_ret.getYsize(),_ret.getZsize(),src.getdata());
+		for (int i = 1; i < temp->getXsize()-1; i++)
+		{
+			for (int j = 1; j < temp->getYsize()-1; j++)
+			{
+				for (int k = 1; k < temp->getZsize()-1; k++)
+				{
+					_ret.put(i, j, k-1, (temp->get(i+1,j,k) + temp->get(i-1,k,k) + temp->get(i,j+1,k) + temp->get(i,j-1,k)+temp->get(i,j,k+1)+temp->get(i,j,k-1)-6*temp->get(i,j,k)));
 
-	return ret;
+				}
+			}
+		}
+		delete temp;
+	}
+	
+	
+	
 }
 Raw WipeNioisePde::FourPDiff(Raw &src)			//based on Y-K model
 {
+	
 	PIXTYPE sum;
 	int x,y,z,j;
 	Raw s;
 	Raw d(src);
 	for (int j=0;j<delt;j++)
 	{
-		s=gradientlaplace(src);
-		s=s/(s*s+1);
-		s=gradientlaplace(s);
+		s = gradientlaplace(src);
+		s = s/(s*s+1);
+		s = gradientlaplace(s);
 		s=d-s/double(6);
 	}
 	return s;
 
 }
 
-Raw WipeNioisePde::FourPDiffSipl(Raw &src,Raw &ret,int iter)			//based on Y-K model
+void  WipeNioisePde::FourPDiffSipl(Raw &src,Raw &ret,int iter)			//based on Y-K model
 {
 	PIXTYPE sum;
 	int x,y,z,j;
-	Raw s;
+	Raw *s = new Raw (ret.getXsize(), ret.getYsize(), ret.getZsize(), ret.getdata()) ;
+		//s2(ret);
 	//Raw d(src);
-	for (int j=0;j<delt;j++)
-	{
-		ret=gradientlaplaceSipl(src, ret, iter);
-		ret=ret/(ret*ret+1);
-		ret=gradientlaplaceSipl(ret);
-		ret=src-ret/double(6);
-	}
-	return ret;
+	//if (iter > 0 && (iter+1) *ret.getZsize() != src.getZsize())
+	//{
+		for (int j=0;j < delt; j++)
+		{
+			gradientlaplaceSipl(src, *s, iter);
+			*s = *s/(*s**s+1);
+			gradientlaplaceSipl(src, *s, iter);
+			*s = *s - *s/double(6);
+		}
+//} 
+	//else if (iter == 0 && (iter+1) *ret.getZsize() == src.getZsize() || iter != 0 && (iter+1) *ret.getZsize() == src.getZsize())
+	//{
+		//for (int j=0;j < delt; j++)
+		//{
+		//	ret=gradientlaplaceSipl(src, ret, iter);
+		//	ret=ret/(ret*ret+1);
+		//	ret=gradientlaplaceSipl(src, ret, iter);
+		//	ret=src-ret/double(6);
+		//}
+	//}
+
+		for ( int i =0; i < s->size() ;i++)
+		{
+			ret.putXYZ(i,s->getXYZ(i));
+		}
+		//ret = *s;
+		delete s;
+	
+	//return ret;
 
 }
 

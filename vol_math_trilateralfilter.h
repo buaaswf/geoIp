@@ -26,16 +26,18 @@ struct Tri_para
 class Trilateralfilter
 {
 public:
+	Trilateralfilter(Raw* src,Raw *ret,int iter);
 	Trilateralfilter(Raw* src);
 	~Trilateralfilter(void);
-	void TrilateralFilter(float sigmaC); 
-	void TrilateralFilter(Raw &ret,float sigmaC); 
+	//void TrilateralFilter(float sigmaC); 
+	void TrilateralFilter(Raw &src,Raw &ret,float sigmaC); 
 	void TrilateralFilter_Multi(float sigmaC,int threadcount);
 	
 private:
 	RawImage* img;
-	Raw* raw;
+	Raw* src;
 	Raw *ret;
+	Raw *temp;
 	int iter;
 	RawArray* rawarraydata;
 	//Computes X , Y and Z gradients of the input RawImage
@@ -51,11 +53,11 @@ private:
 
 	//Finds the adaptive neighborhood size (stack level) 
 	//from the min-max gradient stack
-	void findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxStack, float R, int levelMax); 
+	void findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxStack, Raw *ftheta,float R, int levelMax); 
 
 	//Filters the detail signal and computes the final output RawImage	
 	void DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pSmoothY, Raw* pSmoothZ, 
-		Raw* fTheta, float sigmaCTheta, float sigmaRTheta); // sigmaCTheta sigmaRTheta is changed from PIXTYPE to float
+		Raw* fTheta, Raw *dest,float sigmaCTheta, float sigmaRTheta); // sigmaCTheta sigmaRTheta is changed from PIXTYPE to float
 	void ComputeGradientsSipl(Raw* pX, Raw *pY, Raw* pZ);
 	//Bilaterally filters  gradients pX and pY 
 	void BilateralGradientFilterSipl(Raw* pX, Raw* pY,Raw*pZ, Raw* pSmoothX, 

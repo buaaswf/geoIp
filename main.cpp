@@ -9,12 +9,12 @@
 
 Raw * testinterface(ImageVolume &src)
 {
-	AnistropicI anis(5,10,1,5);
-	//TrilateralfilterI tril(5,3);
-	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
+	//AnistropicI anis(2,10,1,2);
+	TrilateralfilterI tril(5,3);
+	Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
 	//BilateralFilterI bil(3,3,5);
 	//Raw * ret=(Raw *)doBilateralI(src,bil);
-	Raw *ret=(Raw *)doAnistropicI(src,anis);
+	//Raw *ret=(Raw *)doAnistropicI(src,anis);
 	//GuassFilterI gs(3,5);
 	//Raw * ret = (Raw *)doGuassFilterI(src , gs);
 	

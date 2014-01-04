@@ -76,7 +76,8 @@ public:				//---------------init fcns-------------
 	int wipecopy(Raw* src);			// copy, even with size mismatch change from bool swf 2013 4 16
 	int size(){return xsize*ysize*zsize;};
 
-	void put(int ix, int iy,int iz, PIXTYPE val) {	// write 'val' at location ix,iy.iz.
+	void put(int ix, int iy,int iz, PIXTYPE val)
+	{	// write 'val' at location ix,iy.iz.
 		data[ix + xsize*iy+xsize*ysize*iz] = val; 
 	};
 	inline PIXTYPE get(int ix, int iy,int iz) {	// read the value at ix,iy.

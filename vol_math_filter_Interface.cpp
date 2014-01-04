@@ -31,13 +31,13 @@ void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
 	//Filter *guass = new Filter();
 	//Raw *ret=guass->guass3DFilter(&indata,para.halfsize);
 	//return Raw2ImageVolume(*ret,src.PixelType);
-	MultiThread(4,para.threadcount,indata,(void *) &para);
+	MultiThreadsipl(4,para.threadcount,indata,(void *) &para);
 	return & indata;
 }
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 {
 	Raw &indata =*(Raw*)ImageVolume2Raw(src);
-	MultiThread(1,para.threadcount,indata,(void *)&para);
+	MultiThreadsipl(1,para.threadcount,indata,(void *)&para);
 	return & indata;
 }
 
@@ -187,11 +187,13 @@ struct  TrilateralfilterPSipl
 	float sigmaC;//sigmaC=1
 	Raw *src;
 	Raw * ret;
-	TrilateralfilterPSipl( Raw *src, Raw *ret, float sigmaC )
+	int iter;
+	TrilateralfilterPSipl( Raw *src, Raw *ret, float sigmaC,int iter )
 	{
 		this->src = src;
 		this->ret = ret;
 		this->sigmaC = sigmaC;
+		this->iter = iter;
 
 	}
 	TrilateralfilterPSipl()
@@ -255,6 +257,23 @@ struct GuassFilterP
 	}
 };
 
+struct GuassFilterPSipl
+{
+	Raw *src;
+	Raw *ret;
+	int halfsize;
+	GuassFilterPSipl(Raw *src,Raw *ret,int halfsize)
+	{
+		this->src = src;
+		this->ret = ret;
+		this->halfsize = halfsize;
+	}
+	GuassFilterPSipl()
+	{
+
+	}
+};
+
 struct lowPassP
 {
 
@@ -292,13 +311,22 @@ void * singleGuassFilter(void * para)
 	guass->guass3DFilter(indata,p->halfsize);
 	return NULL;
 }
+void * singleGuassFilterSipl(void * para)
+{
+	GuassFilterP *p=(GuassFilterP*) para;
+	Raw *indata = p->src;
+	Filter *guass=new Filter();
+	guass->guass3DFilter(indata,p->halfsize);
+	return NULL;
+}
+
 void * singleTrilateralfilter(void *para)
 {
 	TrilateralfilterP *p=(TrilateralfilterP*) para; 
 	Raw *indata=p->src;
 	Trilateralfilter f(indata);
-	f.TrilateralFilter(p->sigmaC);
-	
+	//f.TrilateralFilter(p->sigmaC);
+
 	return &indata;
 }
 void * singleTrilateralfilterSipl(void *para)
@@ -306,8 +334,8 @@ void * singleTrilateralfilterSipl(void *para)
 	TrilateralfilterPSipl *p=(TrilateralfilterPSipl*) para; 
 	Raw *indata = p->src;
 	Raw *outdata = p->ret;
-	Trilateralfilter f(outdata);
-	f.TrilateralFilter(*indata,p->sigmaC);
+	Trilateralfilter f(indata,outdata,p->iter);
+	f.TrilateralFilter(*indata,*outdata,p->sigmaC);
 
 	return &indata;
 }
@@ -504,7 +532,7 @@ Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 					raw.push_back(d);
 					int ret;
 					TrilateralfilterI *p=(TrilateralfilterI*)para;
-					parms[i]=TrilateralfilterPSipl(&src,raw[i],p->sigmaC);
+					parms[i]=TrilateralfilterPSipl(&src,raw[i],p->sigmaC,i);
 					pthread_attr_t *attr;
 					ret=pthread_create(&threads[i],NULL,singleTrilateralfilterSipl,&parms[i]);
 					cout <<i<<endl;
@@ -574,7 +602,7 @@ Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 		case 4:
 			{
 				{
-					vector<GuassFilterP>parms;parms.resize(threadcount);
+					vector<GuassFilterPSipl>parms;parms.resize(threadcount);
 					int znewsize = src.getZsize()/threadcount;
 					PIXTYPE *data;
 					for (int i = 0; i < threadcount; i++ )
@@ -583,9 +611,9 @@ Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
 						int ret;
 						GuassFilterI *p=(GuassFilterI*)para;
-						parms[i]=GuassFilterP(raw[i],p->halfsize);
+						parms[i]=GuassFilterPSipl(&src,raw[i],p->halfsize);
 						pthread_attr_t *attr;
-						ret=pthread_create(&threads[i],NULL,singleGuassFilter,&parms[i]);
+						ret=pthread_create(&threads[i],NULL,singleGuassFilterSipl,&parms[i]);
 						cout <<i<<endl;
 					}
 					for(int i=0;i<threadcount;i++)
