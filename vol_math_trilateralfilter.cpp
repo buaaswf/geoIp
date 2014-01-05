@@ -182,18 +182,18 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	Raw *pSrcImg;
 	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
 	{
-		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*(iter-1));
+		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*(iter-1),true);
 	} 
-	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ) )
+	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
 	{
-		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1));
+		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1),true);
 	}
 	else 
 	{
-		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize(),src.getdata());
+		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize(),src.getdata(),true);
 	}
 	pSrcImg = temp;
-	Raw destImg; 			
+	Raw destImg;//= new Raw(ret,true); 			
 	Raw fTheta; 			//stores Adaptive neighborhood size for each pixel
 	RawArray minGradientStack;	
 	RawArray maxGradientStack; 
@@ -221,7 +221,10 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 		levelMax = levX+1;
 	else
 		levelMax = levY+1;
-
+	if (levelMax > levZ +1 )
+	{
+		levelMax = levZ + 1;
+	}
 	//Allocate memory for the Min-Max Image Stack
 	minGradientStack.sizer(pSrcImg->getXsize(),pSrcImg->getYsize(),pSrcImg->getZsize(),levelMax);
 	maxGradientStack.sizer(pSrcImg->getXsize(),pSrcImg->getYsize(),pSrcImg->getZsize(),levelMax);
@@ -245,7 +248,6 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 
 	/**
 	Builds the Min-Max Image Stack consisting of Image Gradients (Step 2).//compute the six neighbors M-m
-
 	**/
 	sigmaR = buildMinMaxImageStack(&xGradient,&yGradient,&zGradient,&minGradientStack,&maxGradientStack,levelMax,beta);
 	
@@ -451,6 +453,7 @@ RawArray* pMaxStack , int levelMax, float beta)
 							maxGrad = tmp;
 						if(minGrad > tmp)
 							minGrad = tmp;
+						/*use to compute the variance*/
 						max = min = tmp;
 						pMinStack->put(i,j,k,0,min);
 						pMaxStack->put(i,j,k,0,max);
@@ -809,7 +812,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 				//Coefficients defining the centerplane 
 				//from the smoothed RawImage gradients
 				coeffA=pSmoothX->get(i,j,k); 
-				assert(coeffA==pSmoothX->get(i,j,k));
+				//assert(coeffA==pSmoothX->get(i,j,k));
 				coeffB=pSmoothY->get(i,j,k);
 				coeffC=pSmoothZ->get(i,j,k);
 				coeffD=srcImg->get(i,j,k);

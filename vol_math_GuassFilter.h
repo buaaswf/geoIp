@@ -110,20 +110,24 @@ public:
 		int i=0,j=0,k=0,m=0,n=0,l=0,width=0,depth=0,length=0,index=0;
 		float sum = 0;
 		int delta=1;
-		//if ()
-		//{
-		//} 
-		//else if ()
-		//{
-		//}
-		//else 
-		//{
-
-		//}
-		width=src->getXsize();
-		length=src->getYsize();
-		depth = src->getZsize();
-		Raw *guass = new Raw(*src);	///< The result of guass filter. 
+		Raw *temp;
+		if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
+		{
+			temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2*halfsize,src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*(iter-1*halfsize),true);
+		} 
+		else if ( (iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize())|| ((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 ))
+		{
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1*halfsize,src->getdata()+iter*ret->getXsize()*ret->getYsize()*(ret->getZsize()-1*halfsize),true);
+		}
+		else 
+		{
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),true);
+		}
+		//Raw * _ret =new Raw(*temp);
+		width=temp->getXsize();
+		length=temp->getYsize();
+		depth = temp->getZsize();
+		Raw *guass = new Raw(*temp);	///< The result of guass filter. 
 
 		for (i = 0; i < depth; i++)
 		{
@@ -143,7 +147,7 @@ public:
 								{
 									//weight=1.0f/((m-i)*(m-i)+(n-i)*(n-i)+1);
 									weight=1.0f/exp((float)((m-k)*(m-k)+(n-j)*(n-j) + (l-i)*(l-i) ));
-									sum += weight*(guass->get(m, n, l));
+									sum += weight*(temp->get(m, n, l));
 									total += weight;
 								}
 							}
@@ -153,15 +157,41 @@ public:
 					if(total!=0)
 					{	
 						sum /= total;//total is 1,regulation
-						src->put(k, j,i , (PIXTYPE)sum);		
+						guass->put(k, j,i , (PIXTYPE)sum);
+						
+								
 					}
 					else  //should never come here
 					{
 						//cout << "total==0" << endl;
 					}
-				}
+				}//k...
 
+			}//j...
+		}//i...
+		if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
+		{
+			for (int i = 0; i < ret->size();i++ )
+			{
+				ret->putXYZ( i, guass->getXYZ(i + ret->getXsize()*ret->getYsize()) );
 			}
+
+		} 
+		else if ((iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize())|| ((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 ))
+		{
+			for (int i =0; i < ret->size(); i++)
+			{
+				ret->putXYZ(i ,  guass->getXYZ(i + ret->getXsize()*ret->getYsize()));
+			}
+			
+		} 
+		else
+		{
+			for ( int i = 0; i < ret->size(); i ++)
+			{
+				ret->putXYZ(i , guass->getXYZ(ret->getXsize()*ret->getYsize()));
+			}
+			
 		}
 
 		//return guass;

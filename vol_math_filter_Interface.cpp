@@ -262,10 +262,12 @@ struct GuassFilterPSipl
 	Raw *src;
 	Raw *ret;
 	int halfsize;
-	GuassFilterPSipl(Raw *src,Raw *ret,int halfsize)
+	int iter;
+	GuassFilterPSipl(Raw *src,Raw *ret,int iter,int halfsize)
 	{
 		this->src = src;
 		this->ret = ret;
+		this->iter = iter;
 		this->halfsize = halfsize;
 	}
 	GuassFilterPSipl()
@@ -313,10 +315,11 @@ void * singleGuassFilter(void * para)
 }
 void * singleGuassFilterSipl(void * para)
 {
-	GuassFilterP *p=(GuassFilterP*) para;
+	GuassFilterPSipl *p=(GuassFilterPSipl*) para;
 	Raw *indata = p->src;
+	Raw *outdata = p->ret;
 	Filter *guass=new Filter();
-	guass->guass3DFilter(indata,p->halfsize);
+	guass->guass3DFilterSipl(indata,outdata,p->iter,p->halfsize);
 	return NULL;
 }
 
@@ -337,7 +340,7 @@ void * singleTrilateralfilterSipl(void *para)
 	Trilateralfilter f(indata,outdata,p->iter);
 	f.TrilateralFilter(*indata,*outdata,p->sigmaC);
 
-	return &indata;
+	return NULL;
 }
 void * singleAnistropicFilter(void * para)
 {
@@ -611,7 +614,7 @@ Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
 						int ret;
 						GuassFilterI *p=(GuassFilterI*)para;
-						parms[i]=GuassFilterPSipl(&src,raw[i],p->halfsize);
+						parms[i]=GuassFilterPSipl(&src,raw[i],i,p->halfsize);
 						pthread_attr_t *attr;
 						ret=pthread_create(&threads[i],NULL,singleGuassFilterSipl,&parms[i]);
 						cout <<i<<endl;

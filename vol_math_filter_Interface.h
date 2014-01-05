@@ -67,10 +67,16 @@ struct GeoBodyDataStruct
 };
 struct Points
 {
-	long long x;
-	long long y;
-	long long z;
-	void * pixel;
+	short x;
+	short y;
+	short z;
+	//void * pixel;
+	Points(short x,short y,short z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
 };
 struct  AnistropicI
 {
