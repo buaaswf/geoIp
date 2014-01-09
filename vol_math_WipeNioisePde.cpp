@@ -88,10 +88,11 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 	//Raw *d=new Raw(src.getXsize(),src.getYsize(),src.getZsize(),src.getdata());
 	//Raw *d=new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize(),ret.getdata());
 	//Raw s=Raw(src);
+	 Raw * temp;
 	if (iter > 0 && ( iter+1 )*ret.getZsize() < src.getZsize())
 	{
-		Raw *s = new Raw(ret.getXsize(), ret.getYsize(), ret.getZsize()+2, src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1));
-
+		Raw *s = new Raw(ret.getXsize(), ret.getYsize(), ret.getZsize() + 2, src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize())-ret.getXsize()*ret.getYsize());
+		temp = new Raw(*s); 
 
 		PIXTYPE *around =new PIXTYPE[6];
 		for (i = 0 ;i < delt; i++)
@@ -109,28 +110,46 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 						around[4] = s->get(x,y+1,z)-s->get(x,y,z);
 						around[5] = s->get(x,y,z+1)-s->get(x,y,z);
 						sum=0;
+						//swf 2014-1-9 for divide by zero
+						if(val == 0)
+							sum = 0;
 						for (int k=0; k < 6; k++)
 						{
 							//implementation sum(g(i)*f(i))
 							sum += around[k]/(1+around[k]*around[k]/(val*val));
 
 						}
-						//ret.put(x,y,z-1,s->get(x,y,z)+a*sum/double(6));
-						ret.put(x,y,z-1,s->get(x,y,z));
+						temp->put(x,y,z,s->get(x,y,z)+a*sum/double(6));
+						//ret.put(x,y,z-1,s->get(x,y,z));
 
 					}//for
 				}//for
 				//cout << "times = :" << i << endl;
 			}//for
-			s=&ret;
+			s = temp;
 		}//for
+		for (int i = 0; i < ret.size(); i++ )
+		{
+			ret.putXYZ( i, temp->getXYZ(i + ret.getXsize() * ret.getYsize()) );
+		}
 		delete s;
 	} 
 	else
 	{
-		if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
+		if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize() && iter !=0 ))
 		{
-			Raw *s = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1));
+			Raw *s;
+			if (iter != 0)
+			{
+				 s= new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize() + 1,
+					src.getdata()+ iter * ret.getXsize() * ret.getYsize() * ret.getZsize()-ret.getXsize()*ret.getYsize());
+			} 
+			else
+			{
+				s = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize() + 1,src.getdata());
+			}
+			
+			temp = new Raw (*s);
 			PIXTYPE *around=new PIXTYPE[6];
 			for (i = 0 ;i < delt; i++)
 			{
@@ -147,29 +166,50 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 							around[4]=s->get(x,y+1,z)-s->get(x,y,z);
 							around[5]=s->get(x,y,z+1)-s->get(x,y,z);
 							sum=0;
+
+                            //qym 2014-1-8 for divide by zero
+                            if(val == 0)
+                                sum = 0;
+
 							for (int k=0; k < 6; k++)
 							{
 								//implementation sum(g(i)*f(i))
 								sum+=around[k]/(1+around[k]*around[k]/(val*val));
 
 							}
-							ret.put(x,y,z-1,s->get(x,y,z)+a*sum/double(6));
+							temp->put(x,y,z,s->get(x,y,z)+a*sum/double(6));
 
 						}//for
 					}//for
 					
 				}//for
-				s=&ret;
+				s = temp;
 			}//for
+			if (iter == 0)
+			{
+				for (int i =0; i < ret.size(); i++)
+				{
+					ret.putXYZ(i ,temp->getXYZ(i));
+				}
+			} 
+			else
+			{
+				for (int i =0; i < ret.size(); i++)
+				{
+					ret.putXYZ(i ,temp->getXYZ(i + ret.getXsize()*ret.getYsize() ));
+				}
+			}
+
 			delete s;
 		}//if
-		else// if ()
+		else
 		{
 			//P-M function  2nd-order PDE denoise
 			PIXTYPE a=1,sum;
 			int z,y,x,K,j,i;
 			//Raw *d=new Raw(src.getXsize(),src.getYsize(),src.getZsize(),src.getdata());
-			Raw *d=new Raw(src.getXsize(),src.getYsize(),src.getZsize(),src.getdata());
+			Raw *d=new Raw(src.getXsize(), src.getYsize(), src.getZsize(), src.getdata());
+			temp = new Raw(*d);
 			//Raw s=Raw(src);
 			PIXTYPE *around=new PIXTYPE[6];
 			for (i = 0 ;i < delt; i++)
@@ -187,62 +227,52 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 							around[4]=d->get(x,y+1,z)-d->get(x,y,z);
 							around[5]=d->get(x,y,z+1)-d->get(x,y,z);
 							sum=0;
+							//swf 2014-1-9 for divide by zero
+							if(val == 0)
+								sum = 0;
 							for (int k=0; k < 6; k++)
 							{
 								//implementation sum(g(i)*f(i))
-								sum+=around[k]/(1+around[k]*around[k]/(val*val));
+								sum += around[k]/(1 + around[k] * around[k]/(val * val));
 
 							}
-							ret.put(x,y,z,d->get(x,y,z)+a*sum/double(6));
+							temp->put(x,y,z,d->get(x,y,z)+a*sum/double(6));
 
 						}//for
 					}//for
 					//cout << "times = :" << i << endl;
 				}//for
 				//d += s*(-1);
-				d=&ret;
+				d = temp;
 			}//for delte
+			for ( int i = 0; i < ret.size(); i ++)
+			{
+				ret.putXYZ(i , temp->getXYZ(i) );
+			}
 			delete d;
 			//src = s;
 			//return  d;
 		}
-		//if ((iter+1)*ret.getZsize() ==  src.getZsize())
-		//{
-		//	Raw *s = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1),true);
-		//	PIXTYPE *around=new PIXTYPE[6];
-		//	for (i = 0 ;i < delt; i++)
-		//	{
-		//		for (z = 1; z < s->getZsize()-1;z++)
-		//		{
-		//			for ( y = 1; y < s->getYsize()-1; y++)
-		//			{
-		//				for ( x = 1; x < s->getXsize()-1; x++)
-		//				{
-		//					around[0]=s->get(x-1,y,z)-s->get(x,y,z);
-		//					around[1]=s->get(x,y-1,z)-s->get(x,y,z);
-		//					around[2]=s->get(x,y,z-1)-s->get(x,y,z);
-		//					around[3]=s->get(x+1,y,z-1)-s->get(x,y,z);
-		//					around[4]=s->get(x,y+1,z)-s->get(x,y,z);
-		//					around[5]=s->get(x,y,z+1)-s->get(x,y,z);
-		//					sum=0;
-		//					for (int k=0; k < 6; k++)
-		//					{
-		//						//implementation sum(g(i)*f(i))
-		//						sum+=around[k]/(1+around[k]*around[k]/(val*val));
 
-		//					}
-		//					ret.put(x,y,z-1,s->get(x-1,y-1,z-1)+a*sum/double(6));
-
-		//				}//for
-		//			}//for
-
-		//		}//for
-
-		//	}//for
-
-		//}
 
 	}
+	//if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
+	//{
+
+
+	//} 
+	//else if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
+	//{
+
+
+	//} 
+	//else
+	//{
+
+
+	//}
+
+	
 }
 Raw gradientlaplace(Raw &src)
 {

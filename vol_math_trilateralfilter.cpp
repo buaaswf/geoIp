@@ -880,7 +880,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 	} //for(k..
 	//	printf("i=%d,j=%d\n",i,j);
 	
-	printf("countvar=%d\n",countvar);
+	//printf("countvar=%d\n",countvar);
 }
 	void Trilateralfilter::DetailBilateralFilterSipl(Raw* srcImg, Raw* pSmoothX, Raw* pSmoothY, Raw* pSmoothZ,
 		Raw* fTheta, float sigmaCTheta, float sigmaRTheta)

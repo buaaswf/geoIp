@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "CImg.h"
+//#include "CImg.h"
 #include "test.h"
 #include <assert.h>
 #include "vol_math_Interface.h"
@@ -9,14 +9,14 @@
 
 Raw * testinterface(ImageVolume &src)
 {
-	//AnistropicI anis(2,10,1,2);
+	AnistropicI anis(2,10,1,4);
 	//TrilateralfilterI tril(5,3);
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
 	//BilateralFilterI bil(3,3,5);
 	//Raw * ret=(Raw *)doBilateralI(src,bil);
-	//Raw *ret=(Raw *)doAnistropicI(src,anis);
-	GuassFilterI gs(3,2);
-	Raw * ret = (Raw *)doGuassFilterI(src , gs);
+	Raw *ret=(Raw *)doAnistropicI(src,anis);
+	//GuassFilterI gs(3,1);
+	//Raw * ret = (Raw *)doGuassFilterI(src , gs);
 	
 	return ret;
 	

@@ -107,7 +107,7 @@ public:
 	}
 	static void guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize)
 	{
-		int i=0,j=0,k=0,m=0,n=0,l=0,width=0,depth=0,length=0,index=0;
+		int i=0,j=0,k=0,m=0,n=0,l=0,width=0,depth=0,length=0;
 		float sum = 0;
 		int delta=1;
 		Raw *temp;
@@ -181,9 +181,9 @@ public:
 		{
 			for (int i =0; i < ret->size(); i++)
 			{
-				ret->putXYZ(i ,  guass->getXYZ(i + ret->getXsize()*ret->getYsize()));
+				ret->putXYZ(i ,  guass->getXYZ(i + ret->getXsize()*ret->getYsize()));//?????
 			}
-			
+
 		} 
 		else
 		{
@@ -191,7 +191,7 @@ public:
 			{
 				ret->putXYZ(i , guass->getXYZ(ret->getXsize()*ret->getYsize()));
 			}
-			
+
 		}
 
 		//return guass;
