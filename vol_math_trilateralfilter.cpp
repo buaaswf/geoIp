@@ -182,11 +182,18 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	Raw *pSrcImg;
 	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
 	{
-		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*(iter-1),true);
+		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*iter-ret.getXsize()*ret.getYsize(),true);
 	} 
 	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
 	{
-		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize()-1),true);
+		if ( iter ==0 )
+		{
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata(),true);
+		} 
+		else
+		{
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*ret.getZsize()-ret.getXsize()*ret.getYsize(),true);
+		}
 	}
 	else 
 	{
@@ -300,6 +307,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	/*
 	fwrite(pointer,sizeof(T),length,nfile);
 	fclose(nfile);*/
+
 	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
 	{
 		for ( int i = 0; i < ret.size(); i++)
@@ -310,11 +318,23 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	} 
 	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ) )
 	{
-		for ( int i = 0; i < ret.size(); i++)
+		if (iter == 0)
 		{
-			ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
+			for ( int i = 0; i < ret.size(); i++)
+			{
+				ret.putXYZ( i, destImg.getXYZ(i));
 
+			}
+		} 
+		else
+		{
+			for ( int i = 0; i < ret.size(); i++)
+			{
+				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
+
+			}
 		}
+
 	}
 	else 
 	{
@@ -786,11 +806,28 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 
 	int i, j, k, m, n, l, imax, jmax, kmax, halfSize;
 	int countvar=0;
-	float tmp, diff, detail;
+	float tmp, diff, detail, Maxvar;
 	float  domainWeight, rangeWeight, normFactor;
 	float coeffA, coeffB, coeffC,coeffD; //Plane Equation is z = coeffA.x + coeffB.y + coeffC.z+coeffD
 	//coeffA = dI/dx, coeffB = dI/dy, coeffC = I at center pixel of the filter kernel
 
+	/*swf add for dataflow*/
+	if ( sizeof (PIXTYPE) == 1)
+	{
+		Maxvar = 255;
+	} 
+	else if ( sizeof (PIXTYPE) == 2)
+	{
+		//qym 2014-1-10
+		//Maxvar = 65536;
+		Maxvar = 65535;
+	} 
+	else 
+	{
+		//qym 2014-1-10
+		//Maxvar = 10000000;
+		Maxvar = std::numeric_limits<float>::max();
+	}
 	imax= temp->getXsize();	//get RawImage size
 	jmax= temp->getYsize();	
 	kmax= temp->getZsize();
@@ -861,18 +898,28 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 				if(normFactor == 0)
 					normFactor = 0.1;
 				tmp = tmp / normFactor;
-				if( tmp != 0)
+				//if( tmp != 0)
+				//{
+				//	//printf("tmp=%d\n",tmp);
+				//	tmp += coeffD;
+				//	//if( tmp == coeffD)
+				//	//	printf("tmp==get(i,j)");//swf just for test
+
+
+				//}
+				//else tmp = coeffD;//not changed
+				
+				tmp += coeffD;
+				if ( tmp < Maxvar)
 				{
-					//printf("tmp=%d\n",tmp);
-					tmp += coeffD;
-					if( tmp == coeffD)
-						printf("tmp==get(i,j)");
-
-
+					dest->put(i, j, k, tmp);//copy to the output
+				} 
+				else
+				{
+					dest->put(i, j, k, coeffD);
 				}
-				else tmp = coeffD;//not changed
 				//if(tmp!=0){if(tmp==coeffC)printf("tmp==get(i,j)");}
-				dest->put(i,j,k,tmp);//copy to the output
+				
 
 			}	
 			// for(j...

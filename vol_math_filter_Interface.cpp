@@ -2,7 +2,8 @@
 
 //qym
 #include "vol_math_RawImage.h"
-
+size_t  globalProgressChanged = 0;
+size_t volatile progressStep = 0;
 Raw& MultiThread(int method,int threadcount,Raw &src,void *para);
 Raw& MultiThreadsipl(int method,int threadcount,Raw &src,void *para);
 void * doAnistropicI(ImageVolume & src,AnistropicI & para)
@@ -10,10 +11,9 @@ void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 	//int method,int threadcount,Raw &src,void *para
 	Raw &indata=*(Raw *)ImageVolume2Raw(src);
 	Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para)); 
-	//WipeNioisePde * pde=new WipeNioisePde(indata,para.time,para.val,para.method);
-	//delete pde;
-	//return Raw2ImageVolume(indata,src.PixelType);
 	return ret;
+	 //MultiThreadsipl(2,para.threadcount,indata,(void *)&para);
+	 //return &indata;
 }
 
 void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
@@ -22,7 +22,7 @@ void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
 	//ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(&indata,para.sigmaD,para.sigmaR);
 	//indata=bila->apply(indata);
 	//return Raw2ImageVolume(indata,src.PixelType);
-	MultiThreadsipl(3,para.threadcount,indata,(void *)&para);
+	Raw * ret=new Raw(MultiThreadsipl(3,para.threadcount,indata,(void *)&para));
 	return &indata;
 }
 void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
@@ -37,8 +37,8 @@ void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 {
 	Raw &indata =*(Raw*)ImageVolume2Raw(src);
-	MultiThreadsipl(1,para.threadcount,indata,(void *)&para);
-	return & indata;
+	Raw  *ret =new Raw (MultiThreadsipl(1,para.threadcount,indata,(void *)&para));
+	return ret;
 }
 
 extern void * doMultiOstuI (ImageVolume &src,MultiOstuI &para)
@@ -350,13 +350,20 @@ void * singleAnistropicFilter(void * para)
 	delete pde;
 	return NULL;
 }
+void progress(int type,int total ,int step,bool &cancled)
+{
 
+	printf(" %f\n",(float)step*100/total);
+}
 void * singleAnistropicFilterSipl(void * para)
 {
 	AnistropicPsipl *p=(AnistropicPsipl*) para; 
 	Raw *indata=(p->src);
 	Raw *outdata=(p->ret);
-	WipeNioisePde * pde=new WipeNioisePde(*indata,*outdata,p->iter,p->time,p->val,p->method);//two pointers,one in,one out
+	//WipeNioisePde *pde =new WipeNioisePde();
+		//pde->ProgressChanged = progress;
+	WipeNioisePde *pde=new WipeNioisePde(*indata,*outdata,p->iter,p->time,p->val,p->method,progress);//two pointers,one in,one out
+	
 	delete pde;
 	return NULL;
 }
@@ -428,7 +435,7 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 					}
 				}
 				break;
-			}
+			}	
 		case 3:
 			{
 				{
@@ -527,6 +534,7 @@ Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 			{
 				vector<TrilateralfilterPSipl>parms;parms.resize(threadcount);
 				int znewsize = src.getZsize()/threadcount;
+
 				for (int i = 0; i < threadcount; i++ )
 				{
 					

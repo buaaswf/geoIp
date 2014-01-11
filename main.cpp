@@ -9,7 +9,7 @@
 
 Raw * testinterface(ImageVolume &src)
 {
-	AnistropicI anis(2,10,1,4);
+	 AnistropicI anis(2,10,1,4);
 	//TrilateralfilterI tril(5,3);
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
 	//BilateralFilterI bil(3,3,5);
@@ -24,7 +24,7 @@ Raw * testinterface(ImageVolume &src)
 }
 int main(int argc, char* argv[])
 {
-	int l=281,m=481,n=20;
+	int l=281,m=481,n=100;
 	RawImage test;
 	unsigned char * indata=new unsigned char [l*m*n];
 	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));

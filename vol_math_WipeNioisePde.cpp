@@ -1,12 +1,13 @@
 #include "vol_math_WipeNioisePde.h"
 
 
-WipeNioisePde::WipeNioisePde(Raw &src,Raw &ret,int iter,int time,PIXTYPE value, int method)
+WipeNioisePde::WipeNioisePde(Raw &src,Raw &ret,int iter,int time,PIXTYPE value, int method, void(*ProgressChanged)(int,int,int,bool &))
 {
 	//raw=src;
 	delt=time;
 	val=value;
 	way=method;
+	this->ProgressChanged = ProgressChanged;
 	if (way==1)
 	{
 		Perona_MalikSipl(src,ret,iter);
@@ -26,14 +27,16 @@ WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE value, int method)
 	if (way==1)
 	{
 		Perona_Malik(src);
-		//cout <<"aaa"<<endl;
 	} 
 	else
 	{
 		src=FourPDiff(src);
 	}
 }
+WipeNioisePde::WipeNioisePde()
+{
 
+}
 WipeNioisePde::~WipeNioisePde(void)
 {
 }
@@ -81,20 +84,45 @@ void  WipeNioisePde::Perona_Malik(Raw &src)
 	//src = s;
 	//return  d;
 }
-void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
+void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 {
-	PIXTYPE a=1,sum;
+	//size_t progresstotal = src.size()*this->delt;
+	//size_t progressstep = .size();
+	globalProgressChanged = src.size();//*this->delt;
+	float a=1,sum;
 	int z,y,x,K,j,i;
 	//Raw *d=new Raw(src.getXsize(),src.getYsize(),src.getZsize(),src.getdata());
 	//Raw *d=new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize(),ret.getdata());
 	//Raw s=Raw(src);
 	 Raw * temp;
+	 float Maxvar;
+	 if ( sizeof (PIXTYPE) == 1)
+	 {
+		 Maxvar = 255;
+	 } 
+	 else if ( sizeof (PIXTYPE) == 2)
+	 {
+		 //qym 2014-1-10
+		 //Maxvar = 65536;
+		 Maxvar = 65535;
+	 } 
+	 else 
+	 {
+		 //qym 2014-1-10
+		 //Maxvar = 10000000;
+		 Maxvar = std::numeric_limits<float>::max();
+	 }
 	if (iter > 0 && ( iter+1 )*ret.getZsize() < src.getZsize())
 	{
 		Raw *s = new Raw(ret.getXsize(), ret.getYsize(), ret.getZsize() + 2, src.getdata()+iter*ret.getXsize()*ret.getYsize()*(ret.getZsize())-ret.getXsize()*ret.getYsize());
 		temp = new Raw(*s); 
 
 		PIXTYPE *around =new PIXTYPE[6];
+		//size_t threadtotal = s->size();
+		size_t step = iter *ret.size();
+		int call = 10000;
+		bool flag = false;
+	
 		for (i = 0 ;i < delt; i++)
 		{
 			for (z = 1; z < s->getZsize()-1;z++)
@@ -103,6 +131,7 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 				{
 					for ( x = 1; x < s->getXsize()-1; x++)
 					{
+
 						around[0] = s->get(x-1,y,z)-s->get(x,y,z);
 						around[1] = s->get(x,y-1,z)-s->get(x,y,z);
 						around[2] = s->get(x,y,z-1)-s->get(x,y,z);
@@ -113,31 +142,62 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 						//swf 2014-1-9 for divide by zero
 						if(val == 0)
 							sum = 0;
-						for (int k=0; k < 6; k++)
+
+						else 
 						{
-							//implementation sum(g(i)*f(i))
-							sum += around[k]/(1+around[k]*around[k]/(val*val));
+							for (int k=0; k < 6; k++)
+							{
+								//implementation sum(g(i)*f(i))
+								sum += around[k]/(1 + around[k]*around[k]/(val*val));
 
-						}
-						temp->put(x,y,z,s->get(x,y,z)+a*sum/double(6));
-						//ret.put(x,y,z-1,s->get(x,y,z));
+							}
+							float tempval = s->get(x,y,z) + a*sum/double(6);
 
-					}//for
-				}//for
+							if (tempval <= Maxvar)
+							{
+								temp->put(x, y, z, tempval);
+							} 
+							else 
+							{
+								temp->put(x, y, z, s->get(x,y,z));
+							}
+
+						}//else val !=0...
+
+					}//forx...
+				}//fory...
 				//cout << "times = :" << i << endl;
-			}//for
+			}//for z...
 			s = temp;
-		}//for
-		for (int i = 0; i < ret.size(); i++ )
+		}//for delta .....
+		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+		int rs = 0 ;
+		//bool flag = false;
+		for ( int i = 0; i < ret.size(); i ++)
 		{
+
+			rs ++;
+			if ( rs == interval && ProgressChanged != NULL )
+			{
+				progressStep += interval;
+				rs = 0;
+				ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+			}
+
 			ret.putXYZ( i, temp->getXYZ(i + ret.getXsize() * ret.getYsize()) );
 		}
 		delete s;
 	} 
 	else
 	{
-		if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize() && iter !=0 ))
+		if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize()) || ((iter+1)*ret.getZsize() ==  src.getZsize() && iter !=0 ))
 		{
+			/*
+				two cases:
+				one:number one time
+				two:the last block of the multi thread 
+			*/
+
 			Raw *s;
 			if (iter != 0)
 			{
@@ -159,6 +219,7 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 					{
 						for ( x = 1; x < s->getXsize()-1; x++)
 						{
+
 							around[0]=s->get(x-1,y,z)-s->get(x,y,z);
 							around[1]=s->get(x,y-1,z)-s->get(x,y,z);
 							around[2]=s->get(x,y,z-1)-s->get(x,y,z);
@@ -171,31 +232,74 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
                             if(val == 0)
                                 sum = 0;
 
-							for (int k=0; k < 6; k++)
+							else
 							{
-								//implementation sum(g(i)*f(i))
-								sum+=around[k]/(1+around[k]*around[k]/(val*val));
+								for (int k=0; k < 6; k++)
+								{
+									//implementation sum(g(i)*f(i))
+									sum+=around[k]/(1+around[k]*around[k]/(val*val));
 
+								}
+								float tempval = s->get(x,y,z) + a*sum/double(6);
+								if (tempval <= Maxvar)
+								{
+									temp->put(x, y, z, tempval);
+								} 
+								else 
+								{
+									temp->put(x, y, z, s->get(x,y,z));
+								}
 							}
-							temp->put(x,y,z,s->get(x,y,z)+a*sum/double(6));
+						}//for x..
 
-						}//for
-					}//for
-					
-				}//for
+					}//for  y..
+
+				}//forz..
 				s = temp;
-			}//for
+			}//for delta
+			//size_t step = iter *ret.size();
+			//int call = 10000;
+			bool flag = false;
+			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+			int rs = 0 ;
+			//bool flag = false;
 			if (iter == 0)
 			{
-				for (int i =0; i < ret.size(); i++)
+				int firstvar;
+				if ( progressStep == 0 )
 				{
+					firstvar = 0;
+				}
+				else firstvar = 1;
+				for ( int i = 0; i < ret.size(); i ++)
+				{
+					rs ++;
+					
+					if ( rs == interval && ProgressChanged != NULL )
+					{
+
+						progressStep += interval;
+						rs = 0;
+						ProgressChanged (firstvar, 100, (int) (long long)( progressStep)*100/(globalProgressChanged ), flag);
+					}
 					ret.putXYZ(i ,temp->getXYZ(i));
 				}
 			} 
 			else
 			{
+				int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+				int rs = 0 ;
+				bool flag = false;
+
 				for (int i =0; i < ret.size(); i++)
 				{
+					rs++;
+					if ( rs == interval && ProgressChanged != NULL )
+					{
+						progressStep += interval;
+						rs = 0;
+						ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+					}
 					ret.putXYZ(i ,temp->getXYZ(i + ret.getXsize()*ret.getYsize() ));
 				}
 			}
@@ -204,6 +308,7 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 		}//if
 		else
 		{
+
 			//P-M function  2nd-order PDE denoise
 			PIXTYPE a=1,sum;
 			int z,y,x,K,j,i;
@@ -212,6 +317,7 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 			temp = new Raw(*d);
 			//Raw s=Raw(src);
 			PIXTYPE *around=new PIXTYPE[6];
+
 			for (i = 0 ;i < delt; i++)
 			{
 				for (z = 1; z < src.getZsize()-1;z++)
@@ -230,14 +336,24 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 							//swf 2014-1-9 for divide by zero
 							if(val == 0)
 								sum = 0;
-							for (int k=0; k < 6; k++)
+							else
 							{
-								//implementation sum(g(i)*f(i))
-								sum += around[k]/(1 + around[k] * around[k]/(val * val));
+									for (int k=0; k < 6; k++)
+									{
+										//implementation sum(g(i)*f(i))
+										sum += around[k]/(1 + around[k] * around[k]/(val * val));
 
+									}
+									float tempval = d->get(x,y,z) + a*sum/double(6);
+									if ( tempval <= Maxvar )
+									{
+										temp->put(x, y, z, tempval);
+									} 
+									else 
+									{
+										temp->put(x, y, z, d->get(x,y,z));
+									}
 							}
-							temp->put(x,y,z,d->get(x,y,z)+a*sum/double(6));
-
 						}//for
 					}//for
 					//cout << "times = :" << i << endl;
@@ -245,8 +361,20 @@ void WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 				//d += s*(-1);
 				d = temp;
 			}//for delte
+			//size_t step = iter *ret.size();
+			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+			int rs = 0 ;
+			bool flag = false;
 			for ( int i = 0; i < ret.size(); i ++)
 			{
+				
+				rs ++;
+				if ( rs == interval && ProgressChanged != NULL )
+				{
+					progressStep += interval;
+					rs = 0;
+					ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+				}
 				ret.putXYZ(i , temp->getXYZ(i) );
 			}
 			delete d;

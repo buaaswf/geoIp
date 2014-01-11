@@ -74,7 +74,7 @@ public:				//---------------init fcns-------------
 	int getYsize(void) {return ysize;};		// get # of scanlines.
 	int getZsize(void) {return zsize;};		//get # of RawImage numbers
 	int wipecopy(Raw* src);			// copy, even with size mismatch change from bool swf 2013 4 16
-	int size(){return xsize*ysize*zsize;};
+	size_t size(){return xsize*ysize*zsize;};
 
 	void put(int ix, int iy,int iz, PIXTYPE val)
 	{	// write 'val' at location ix,iy.iz.

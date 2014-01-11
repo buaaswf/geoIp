@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SWF_WIPE_NOISE_PDE_H
+#define SWF_WIPE_NOISE_PDE_H
+#include"vol_math_filter_Interface.h"
 #include"vol_math_RawImage.h"
 //#include "Wipe.h"
 class WipeNioisePde
@@ -8,8 +10,11 @@ private:
 	int delt;
 	PIXTYPE val;
 	int way;
+	
 public:
-	WipeNioisePde(Raw &raw ,Raw &ret,int iter,int time,PIXTYPE value,int method);
+	void (*ProgressChanged)(int ,int ,int ,bool &);
+	WipeNioisePde(Raw &raw ,Raw &ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &));
+	WipeNioisePde();
 	WipeNioisePde(Raw &raw ,int time,PIXTYPE value,int method);
 	~WipeNioisePde(void);
 	void  Perona_MalikSipl( Raw &src,Raw & ret,int iter);
@@ -21,3 +26,4 @@ public:
 	
 };
 
+#endif

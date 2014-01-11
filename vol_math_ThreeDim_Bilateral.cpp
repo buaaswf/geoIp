@@ -155,12 +155,37 @@ void ThreeDim_Bilateral::applySipl(int iter) {// ~i=y j=x
 	if (iter > 0 && (iter+1)*ret->getZsize() < src->getZsize() )
 	{
 		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize()+2* (int)kernelRadius,src->getdata() +\
-			iter *src->getXsize()*src->getYsize()*(ret->getZsize()-(int)kernelRadius));
+			iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
 	}
 	else if (iter == 0 ||(iter+1)*ret->getZsize() == src->getZsize()  )
 	{
-		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata() +\
-			iter *src->getXsize()*src->getYsize()*(ret->getZsize()-(int)kernelRadius));
+		if ( iter == 0)
+		{
+			this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata());
+		} 
+		else
+		{
+			this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata() +\
+				iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
+		}
+
+	}
+	float Maxvar;
+	if ( sizeof (PIXTYPE) == 1)
+	{
+		Maxvar = 255;
+	} 
+	else if ( sizeof (PIXTYPE) == 2)
+	{
+		//qym 2014-1-10
+		//Maxvar = 65536;
+		Maxvar = 65535;
+	} 
+	else 
+	{
+		//qym 2014-1-10
+		//Maxvar = 10000000;
+		Maxvar = std::numeric_limits<float>::max();
 	}
 	//Raw *s =new Raw(*ret);
 	for (int i=0;i<ret->getZsize();i++)
@@ -173,7 +198,7 @@ void ThreeDim_Bilateral::applySipl(int iter) {// ~i=y j=x
 				{
 					double sum = 0;
 					double totalWeight = 0;
-					int intensityCenter =ret->get(i,j,k);
+					int intensityCenter = temp->get(i,j,k);
 
 
 					int mMax = i + kernelRadius;
@@ -199,14 +224,16 @@ void ThreeDim_Bilateral::applySipl(int iter) {// ~i=y j=x
 
 						}
 					}
-					int newvalue=(int)floor(sum / totalWeight);
-					if (sum!=0)
+					float newvalue=( float)floor(sum / totalWeight);
+					if ( newvalue <= Maxvar)
 					{
-						int newvalue=(int)(sum / totalWeight);
 						ret->put(i,j,k,newvalue);
-
+					} 
+					else
+					{
+						ret->put(i,j,k,temp->get(i,j,k));
 					}
-
+						
 				}//if..
 			}//i..
 

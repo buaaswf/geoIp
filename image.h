@@ -1,4 +1,6 @@
-#pragma once
+#ifndef IMAGE_H
+#define IMAGE_H
+
 #define u_char unsigned char
 class image
 {
@@ -21,3 +23,4 @@ private:
 
 };
 
+#endif

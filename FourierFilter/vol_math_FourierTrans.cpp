@@ -4,8 +4,8 @@
 #include <bitset>
 #include <fstream>
 #include <math.h>
-#include "FourierFilter2.h"
-#include "FourierFilter3.h"
+#include "vol_math_FourierFilter3d.h"
+#include "vol_math_FourierFilter2d.h"
 #define pi 3.1415926535
 #define DELTA 5.0
 using std::iostream;

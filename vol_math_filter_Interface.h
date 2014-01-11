@@ -12,6 +12,8 @@
 #include "vol_math_Anistropic2D.h"
 #include "vol_math_2Dtrilateralfilter.h"
 #include "vol_math_Otsu.h"
+extern size_t globalProgressChanged;
+extern size_t volatile progressStep;
 struct GeoBodyDataStruct
 {
     const char* file_name;
