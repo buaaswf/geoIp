@@ -14,12 +14,16 @@ private:
 public:
 	void (*ProgressChanged)(int ,int ,int ,bool &);
 	WipeNioisePde(Raw &raw ,Raw &ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &));
+	WipeNioisePde(Raw *raw ,Raw *ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &));
+
 	WipeNioisePde();
 	WipeNioisePde(Raw &raw ,int time,PIXTYPE value,int method);
 	~WipeNioisePde(void);
 	void  Perona_MalikSipl( Raw &src,Raw & ret,int iter);
+	void  Perona_MalikSipl( Raw *src,Raw * ret,int iter);
 	void  Perona_Malik( Raw &src);
 	Raw FourPDiff(Raw &src);
+	void FourPDiff(Raw &src,Raw &ret);
 	void FourPDiffSipl(Raw &src,Raw &ret,int iter);	
 	double funcg(PIXTYPE *array,int dz,int dy,int dx);
 

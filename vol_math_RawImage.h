@@ -70,13 +70,13 @@ public:				//---------------init fcns-------------
 
 	void sizer(int ixsize, int iysize,int izsize);		// get mem for rectangle of pixels
 	void sizer(Raw* src);					// get same amt. of mem as 'src'
-	int getXsize(void) {return xsize;};		// get # pixels per scanline
-	int getYsize(void) {return ysize;};		// get # of scanlines.
-	int getZsize(void) {return zsize;};		//get # of RawImage numbers
+	inline int getXsize(void) {return xsize;};		// get # pixels per scanline
+	inline int getYsize(void) {return ysize;};		// get # of scanlines.
+	inline int getZsize(void) {return zsize;};		//get # of RawImage numbers
 	int wipecopy(Raw* src);			// copy, even with size mismatch change from bool swf 2013 4 16
 	size_t size(){return xsize*ysize*zsize;};
 
-	void put(int ix, int iy,int iz, PIXTYPE val)
+	inline void put(int ix, int iy,int iz, PIXTYPE val)
 	{	// write 'val' at location ix,iy.iz.
 		data[ix + xsize*iy+xsize*ysize*iz] = val; 
 	};
@@ -88,7 +88,7 @@ public:				//---------------init fcns-------------
 	PIXTYPE getXYZ(int ixyz){		// read value at 1D address ixyz
 		return data[ixyz];
 	};
-	void putXYZ(int ixyz,PIXTYPE val){// write value at 1D address ixy
+	inline void putXYZ(int ixyz,PIXTYPE val){// write value at 1D address ixy
 		data[ixyz] = val;
 	};
 
@@ -106,7 +106,7 @@ public:				//---------------init fcns-------------
 		return *this;
 	}
 
-	Raw& operator+=(const Raw &volume)
+	inline Raw& operator+=(const Raw &volume)
 	{
 		for (int i = 0; i<size(); ++i)
 		{

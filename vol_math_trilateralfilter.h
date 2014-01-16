@@ -5,8 +5,10 @@
 #include <iostream>
 #include <assert.h>
 #include "vol_math_RawImage.h"
+#include "vol_math_filter_Interface.h"
 #include <vector>
 #include <pthread.h>
+#include "vol_math_filter_Interface.h"
 #define M_EXP 2.7182818284590452353602874713527
 class RawArray;
 struct Tri_para 
@@ -26,27 +28,26 @@ struct Tri_para
 class Trilateralfilter
 {
 public:
-	Trilateralfilter(Raw* src,Raw *ret,int iter);
+	Raw* src;
+	Trilateralfilter(Raw* src,Raw *ret,int iter,void(*ProgressChanged)(int,int,int,bool &));
 	Trilateralfilter(Raw* src);
 	~Trilateralfilter(void);
 	//void TrilateralFilter(float sigmaC); 
 	void TrilateralFilter(Raw &src,Raw &ret,float sigmaC); 
 	void TrilateralFilter_Multi(float sigmaC,int threadcount);
-	
+	void TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigmaR,float sigma3,float sigma4,float R,int maxhalfsize);
 private:
 	RawImage* img;
-	Raw* src;
 	Raw *ret;
 	Raw *temp;
 	int iter;
 	RawArray* rawarraydata;
+	void (*ProgressChanged)(int ,int ,int ,bool &);
 	//Computes X , Y and Z gradients of the input RawImage
 	void ComputeGradients(Raw* pX, Raw* pY,Raw *pZ); 
-
 	//Bilaterally filters  gradients pX and pY 
 	void BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSmoothX, 
 		Raw* pSmoothY,Raw * pSmoothZ,float sigmaC,float sigmaS, int filterSize); //sigmaC,sugmaS is change  from PIXTYPE to float
-
 	//Builds the stack of min-max RawImage gradients; returns the range variance
 	PIXTYPE buildMinMaxImageStack(Raw* pX, Raw* pY, Raw* pZ,RawArray* pMinStack,
 		RawArray* pMaxStack , int levelMax, float beta);		// beta is changed from PIXTYPE to float

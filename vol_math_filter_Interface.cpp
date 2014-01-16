@@ -2,67 +2,97 @@
 
 //qym
 #include "vol_math_RawImage.h"
-size_t  globalProgressChanged = 0;
-size_t volatile progressStep = 0;
+extern size_t  globalProgressChanged = 0;
+extern size_t volatile progressStep = 0;
 Raw& MultiThread(int method,int threadcount,Raw &src,void *para);
-Raw& MultiThreadsipl(int method,int threadcount,Raw &src,void *para);
+void MultiThreadsipl(int method,int threadcount,Raw &src,void *para);
+void progress(int type,int total ,int step,bool &cancled)
+{
+
+	printf(" %f\n",(float)step*100/total);
+}
 void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 {
 	//int method,int threadcount,Raw &src,void *para
-	Raw &indata=*(Raw *)ImageVolume2Raw(src);
-	Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para)); 
-	return ret;
-	 //MultiThreadsipl(2,para.threadcount,indata,(void *)&para);
-	 //return &indata;
+	Raw *indata=(Raw *)ImageVolume2Raw(src);
+	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
+	//	return ret;
+	 MultiThreadsipl(2,para.threadcount,*indata,(void *)&para);
+	 return indata;
 }
 
 void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
 {
-	Raw &indata=*(Raw *)ImageVolume2Raw(src);
+	Raw *indata=(Raw *)ImageVolume2Raw(src);
 	//ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(&indata,para.sigmaD,para.sigmaR);
 	//indata=bila->apply(indata);
 	//return Raw2ImageVolume(indata,src.PixelType);
-	Raw * ret=new Raw(MultiThreadsipl(3,para.threadcount,indata,(void *)&para));
-	return &indata;
+	//Raw * ret=new Raw(MultiThreadsipl(3,para.threadcount,indata,(void *)&para),true);
+	MultiThreadsipl(3,para.threadcount,*indata,(void *)&para);
+	return indata;
 }
 void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
 {
-	Raw &indata=*(Raw *)ImageVolume2Raw(src);
+	Raw *indata=(Raw *)ImageVolume2Raw(src);
 	//Filter *guass = new Filter();
 	//Raw *ret=guass->guass3DFilter(&indata,para.halfsize);
 	//return Raw2ImageVolume(*ret,src.PixelType);
-	MultiThreadsipl(4,para.threadcount,indata,(void *) &para);
-	return & indata;
+	MultiThreadsipl(4,para.threadcount,*indata,(void *) &para);
+	return indata;
 }
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 {
-	Raw &indata =*(Raw*)ImageVolume2Raw(src);
-	Raw  *ret =new Raw (MultiThreadsipl(1,para.threadcount,indata,(void *)&para));
+	Raw *indata =(Raw*)ImageVolume2Raw(src);
+	//Raw  *ret =new Raw (MultiThreadsipl(1,para.threadcount,indata,(void *)&para),true);
+	MultiThreadsipl(1,para.threadcount,*indata,(void *)&para);
+	return indata;
+}
+
+//extern void * doMultiOstuI (ImageVolume &src,MultiOstuI &para)
+//{
+//	Raw &indata =*(Raw *)ImageVolume2Raw(src);
+//	OTSU *ostu =new OTSU(indata);
+//	if (para.method==1)
+//	{
+//		
+//		ostu->Otsu_MultiVal(indata,para.classnum);
+//	} 
+//	else
+//	{
+//		//OTSU *ostu =new OTSU(indata);
+//		ostu->Otsu_MultiVal(indata);
+//	}
+//	//delete ostu;
+//	return &ostu->array;
+//
+//}
+//extern void * dolowPassI2D (Image2D &src,lowPassI &para)
+//{
+//	Raw2D indata = Image2D2Raw2D(src);
+//	FourierFilter2 * ff = new FourierFilter2();
+//	ff->lowpass_trans(lowPassI.thresold);
+//	return ff->fraw2d;
+//}
+
+ void *dolowPassI (ImageVolume &src,lowPassI &para)
+{
+	Raw indata = *(Raw *)ImageVolume2Raw(src);
+	FourierFilter3 * ff3 = new FourierFilter3(indata);
+	ff3->lowpass_trans(para.threshold,progress);
+	Raw * ret= new Raw(*(ff3->fraw),true);
 	return ret;
 }
-
-extern void * doMultiOstuI (ImageVolume &src,MultiOstuI &para)
-{
-	Raw &indata =*(Raw *)ImageVolume2Raw(src);
-	OTSU *ostu =new OTSU(indata);
-	if (para.method==1)
-	{
-		
-		ostu->Otsu_MultiVal(indata,para.classnum);
-	} 
-	else
-	{
-		//OTSU *ostu =new OTSU(indata);
-		ostu->Otsu_MultiVal(indata);
-	}
-	//delete ostu;
-	return &ostu->array;
-
-}
-extern void *dolowPassI (ImageVolume &src,lowPassI &para)
-{
-		return NULL;
-}
+ void *doAnistropicykfour_diff (ImageVolume &src,AnistropicI &para)
+ {
+	 Raw indata = *(Raw *)ImageVolume2Raw(src);
+	 //WipeNioisePde * pde =new WipeNioisePde();
+	 Raw *outdata=new Raw(src);
+	 WipeNioisePde *pde=new WipeNioisePde(indata,*outdata,1,para.time,para.val,2,progress);//two pointers,one in,one out
+	Filter * guass = new Filter();
+	guass->guass3DFilter(outdata,3);
+	  delete pde;
+	 return outdata;
+ }
  void *doAnistropicI2D (Image2D &src,AnistropicI & para)
 {
     //qym non-const must be an lvalue
@@ -104,10 +134,7 @@ extern void * doMultiOstuI2D (Image2D &src,MultiOstuI &para)
 	return NULL;
 
 }
-extern void * dolowPassI2D (Image2D &src,lowPassI &)
-{
-		return NULL;
-}
+
 ///=========================================================================================================////
 struct  AnistropicP
 {
@@ -151,12 +178,12 @@ struct  AnistropicPsipl
 	*/
 	AnistropicPsipl(Raw *data,Raw *ret,int iter,int time,int val,int method)
 	{
-		this->src=data;
-		this->ret=ret;
-		this->iter= iter;
-		this->time=time;
-		this->val=val;
-		this->method=method;
+		this->src = data;
+		this->ret = ret;
+		this->iter =  iter;
+		this->time = time;
+		this->val = val;
+		this->method = method;
 	}
 	AnistropicPsipl()
 	{
@@ -278,7 +305,17 @@ struct GuassFilterPSipl
 
 struct lowPassP
 {
+	Raw *src;
+	float threshold;
+	lowPassP(Raw *src, float threshold)
+	{
+		this->src= src;
+		this->threshold =threshold;
+	}
+	lowPassP()
+	{
 
+	}
 };
 struct MultiOstuP
 {
@@ -300,7 +337,7 @@ void * singleBilateralSipl( void *para)
 	BilateralFilterPSipl *p= (BilateralFilterPSipl *) para;
 	Raw *indata = p->src;
 	Raw *outdata = p->ret;
-	ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(indata,*outdata,p->sigmaD,p->sigmaR);
+	ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(indata,*outdata,p->sigmaD,p->sigmaR,progress);
 	bila->applySipl(p->iter);
 	return NULL;
 
@@ -319,7 +356,7 @@ void * singleGuassFilterSipl(void * para)
 	Raw *indata = p->src;
 	Raw *outdata = p->ret;
 	Filter *guass=new Filter();
-	guass->guass3DFilterSipl(indata,outdata,p->iter,p->halfsize);
+	guass->guass3DFilterSipl(indata,outdata,p->iter,p->halfsize,progress);
 	return NULL;
 }
 
@@ -337,7 +374,7 @@ void * singleTrilateralfilterSipl(void *para)
 	TrilateralfilterPSipl *p=(TrilateralfilterPSipl*) para; 
 	Raw *indata = p->src;
 	Raw *outdata = p->ret;
-	Trilateralfilter f(indata,outdata,p->iter);
+	Trilateralfilter f(indata,outdata,p->iter,progress);
 	f.TrilateralFilter(*indata,*outdata,p->sigmaC);
 
 	return NULL;
@@ -350,11 +387,7 @@ void * singleAnistropicFilter(void * para)
 	delete pde;
 	return NULL;
 }
-void progress(int type,int total ,int step,bool &cancled)
-{
 
-	printf(" %f\n",(float)step*100/total);
-}
 void * singleAnistropicFilterSipl(void * para)
 {
 	AnistropicPsipl *p=(AnistropicPsipl*) para; 
@@ -362,9 +395,9 @@ void * singleAnistropicFilterSipl(void * para)
 	Raw *outdata=(p->ret);
 	//WipeNioisePde *pde =new WipeNioisePde();
 		//pde->ProgressChanged = progress;
-	WipeNioisePde *pde=new WipeNioisePde(*indata,*outdata,p->iter,p->time,p->val,p->method,progress);//two pointers,one in,one out
+	WipeNioisePde *pde=new WipeNioisePde(indata,outdata,p->iter,p->time,p->val,p->method,progress);//two pointers,one in,one out
 	
-	delete pde;
+	//delete pde;
 	return NULL;
 }
 
@@ -515,7 +548,7 @@ Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 
 	*/
 }
-Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
+void  MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 {
 	//divide into slices
 	//create+join
@@ -649,11 +682,11 @@ Raw & MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 		{
 			countvar ++;
 		}
-		
+
 	}
-	
+	src = *ret;
 	cout << countvar <<endl;
-	return *ret;
+	delete  ret;
 
 	/*
 	1\trilaterfilter

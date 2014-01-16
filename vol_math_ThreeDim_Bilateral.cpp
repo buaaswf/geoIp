@@ -2,12 +2,12 @@
 
 //qym
 #include <math.h>
-ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double sigmaR)
+ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double sigmaR,void(*ProgressChanged)(int, int, int, bool&))
 {
 	this->src=image;
 	this->ret = &ret;
 	int sigmaMax = max(sigmaD, sigmaR);
-
+	this->ProgressChanged = ProgressChanged;
 
 
 
@@ -150,14 +150,17 @@ void ThreeDim_Bilateral::apply(Raw &ret) {// ~i=y j=x
 
 
 }
-void ThreeDim_Bilateral::applySipl(int iter) {// ~i=y j=x 
+void ThreeDim_Bilateral::applySipl(int iter)
+{
+	globalProgressChanged = src->size();
+	// ~i=y j=x 
 	//Raw * temp;
-	if (iter > 0 && (iter+1)*ret->getZsize() < src->getZsize() )
+	if (iter > 0 && (iter+1)*ret->getZsize() < src->getZsize())
 	{
 		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize()+2* (int)kernelRadius,src->getdata() +\
 			iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
 	}
-	else if (iter == 0 ||(iter+1)*ret->getZsize() == src->getZsize()  )
+	else if (iter == 0 || (iter+1)*ret->getZsize() == src->getZsize())
 	{
 		if ( iter == 0)
 		{
@@ -188,12 +191,23 @@ void ThreeDim_Bilateral::applySipl(int iter) {// ~i=y j=x
 		Maxvar = std::numeric_limits<float>::max();
 	}
 	//Raw *s =new Raw(*ret);
+	int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+	int rs = 0 ;
+	bool flag = false;
 	for (int i=0;i<ret->getZsize();i++)
 	{
 		for (int j=0;j<ret->getYsize();j++)
 		{
 			for (int k=0; k < ret->getXsize(); k++)
 			{
+
+				rs ++;
+				if ( rs == interval && ProgressChanged != NULL )
+				{
+					progressStep += interval;
+					rs = 0;
+					ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+				}
 				if(i>0 && j>0 && k>0 && i<ret->getXsize() && j< ret->getYsize() && k < ret->getZsize())
 				{
 					double sum = 0;

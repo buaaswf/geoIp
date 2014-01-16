@@ -1,11 +1,15 @@
 #include "vol_math_trilateralfilter.h"
+
+
 static float lgtt=log10(2.0f);
+
 //=====================================================================================================
-Trilateralfilter::Trilateralfilter(Raw* img,Raw * ret, int iter)
+Trilateralfilter::Trilateralfilter(Raw* img,Raw * ret, int iter,void(*ProgressChanged)(int,int,int,bool &))
 {
 	this->src = img;
 	this->ret = ret;
 	this->iter = iter;
+	this->ProgressChanged=ProgressChanged;
 	//if ()
 	//{
 	//} 
@@ -177,8 +181,9 @@ Trilateralfilter::~Trilateralfilter(void)
 void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	//=====================================================================================================
 {	
-	this->src=&src;
-	this->ret=&ret;
+	globalProgressChanged = src.size();
+	this->src = &src;
+	this->ret = &ret;
 	Raw *pSrcImg;
 	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
 	{
@@ -347,6 +352,183 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	}
 
 }
+//for more  paras
+void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
+	//=====================================================================================================
+{	
+	globalProgressChanged = src.size();
+	this->src = &src;
+	this->ret = &ret;
+	Raw *pSrcImg;
+	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
+	{
+		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*iter-ret.getXsize()*ret.getYsize(),true);
+	} 
+	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
+	{
+		if ( iter ==0 )
+		{
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata(),true);
+		} 
+		else
+		{
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*ret.getZsize()-ret.getXsize()*ret.getYsize(),true);
+		}
+	}
+	else 
+	{
+		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize(),src.getdata(),true);
+	}
+	pSrcImg = temp;
+	Raw destImg;//= new Raw(ret,true); 			
+	Raw fTheta; 			//stores Adaptive neighborhood size for each pixel
+	RawArray minGradientStack;	
+	RawArray maxGradientStack; 
+	Raw xGradient, yGradient,zGradient; 	//X and Y gradients of the input RawImage
+	Raw xSmoothGradient, ySmoothGradient, zSmoothGradient; 	//Bilaterally filtered X and Y gradients of the input RawImage
+	int levX, levY,levZ, levelMax, filterSize;  //level = log2(xsize) or log2(ysize)
+	float sigmaR, sigmaCTheta, sigmaRTheta,beta;
+	float  R;
+	//domain variance for the two filters: sigmaC, sigmaCTheta
+	//range variance of the two filters: sigmaR, sigmaRTheta
+	//R -- threshold to compute adaptive region 
+
+	//Default internal Parameters
+	sigmaCTheta = sigmaC; //Variance of the Domain Filter, the only user set parameter
+	beta = (float)0.15; //Always set between 0.1 and 0.2
+	filterSize = (int) sigmaC; 
+
+	//Compute the RawImage stack height
+
+
+	levX=(int) (log10(float (pSrcImg->getXsize()))/lgtt);
+	levY=(int) (log10(float (pSrcImg->getYsize()))/lgtt);
+	levZ=(int) (log10(float (pSrcImg->getZsize()))/lgtt);
+	if(levX < levY)
+		levelMax = levX+1;
+	else
+		levelMax = levY+1;
+	if (levelMax > levZ +1 )
+	{
+		levelMax = levZ + 1;
+	}
+	//Allocate memory for the Min-Max Image Stack
+	minGradientStack.sizer(pSrcImg->getXsize(),pSrcImg->getYsize(),pSrcImg->getZsize(),levelMax);
+	maxGradientStack.sizer(pSrcImg->getXsize(),pSrcImg->getYsize(),pSrcImg->getZsize(),levelMax);
+
+	//Allocate memory for the gradient vectors and output RawImage
+	xGradient.sizer(pSrcImg); 
+	yGradient.sizer(pSrcImg);
+	zGradient.sizer(pSrcImg);
+	xSmoothGradient.sizer(pSrcImg);
+	ySmoothGradient.sizer(pSrcImg); 
+	zSmoothGradient.sizer(pSrcImg); 
+	fTheta.sizer(pSrcImg);
+	destImg.sizer(pSrcImg);
+
+	/**
+	Compute Gradients using Forward Difference (Step 1)
+	X gradient is stored in xGradient
+	Y gradient is stored in yGradient
+	**/
+	ComputeGradientsSipl(&xGradient,&yGradient,&zGradient);
+
+	/**
+	Builds the Min-Max Image Stack consisting of Image Gradients (Step 2).//compute the six neighbors M-m
+	**/
+	sigmaR = buildMinMaxImageStack(&xGradient,&yGradient,&zGradient,&minGradientStack,&maxGradientStack,levelMax,beta);
+	
+	//Set the remaining internal parameters required for trilateral filter
+	R = sigmaR;
+	sigmaRTheta =sigmaR;//from  sigmaRTheta= R = sigmaR
+	/**
+	Bilaterally filter the X,Y and Z gradients of the input RawImage (Step 3, equation 4 and 5)
+	to produce xSmoothGradient and ySmoothGradient.
+	**/
+	//Trilateralfilter ps = new Trilateralfilter(temp);
+	BilateralGradientFilter(&xGradient, &yGradient,&zGradient, &xSmoothGradient, &ySmoothGradient, &zSmoothGradient,sigmaC, sigmaR, filterSize);
+
+	/**
+	Find the adaptive neighborhood fTheta for each pixel location (Step 4). fTheta size is
+	given by stack level. The min-max gradient stacks and range threshold "R" are used for this calculation
+	
+	**/
+	//Trilateralfilter *f = new Trilateralfilter(temp);
+	findAdaptiveRegion(&minGradientStack, &maxGradientStack, &fTheta, R, levelMax );
+	//fTheta=new Raw(*(f->src),false);
+	
+	/**
+	Performs bilateral filter on the detail signal (Step 5).
+
+	**/
+	//Trilateralfilter *d = new Trilateralfilter(temp);
+	DetailBilateralFilter(pSrcImg, &xSmoothGradient, &ySmoothGradient,&zSmoothGradient,&fTheta,&destImg, sigmaCTheta, sigmaRTheta);
+	//destImg =new Raw (*(d->src),false);
+	//Copying the result to the output RawImage
+	//wipecopy(&destImg);
+
+	//FILE *p=fopen("F:\\3D.src","ab+");
+	//fwrite(destImg.getdata(),sizeof(PIXTYPE),281*481*100,p);
+	//fclose(p);
+	//fflush(stdout);
+
+	//printf("write is ok");
+	/*delete [] xGradient.y;
+	delete [] yGradient.y;
+	delete [] xSmoothGradient.y;
+	delete [] ySmoothGradient.y;
+	delete [] minGradientStack.z;
+	delete [] maxGradientStack.z;
+	delete [] fTheta.y;
+	delete [] destImg.y;*/
+
+
+
+	/*
+	fwrite(pointer,sizeof(T),length,nfile);
+	fclose(nfile);*/
+
+	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
+	{
+		for ( int i = 0; i < ret.size(); i++)
+		{
+			ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
+
+		}
+	} 
+	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ) )
+	{
+		if (iter == 0)
+		{
+			for ( int i = 0; i < ret.size(); i++)
+			{
+				ret.putXYZ( i, destImg.getXYZ(i));
+
+			}
+		} 
+		else
+		{
+			for ( int i = 0; i < ret.size(); i++)
+			{
+				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
+
+			}
+		}
+
+	}
+	else 
+	{
+		for ( int i = 0; i < ret.size(); i++)
+		{
+			ret.putXYZ( i, destImg.getXYZ(i) );
+
+		}
+		
+	}
+
+}
+
+
 void Trilateralfilter::ComputeGradientsSipl(Raw* pX, Raw *pY, Raw* pZ)
 {
 	//Raw *temp;
@@ -366,12 +548,17 @@ void Trilateralfilter::ComputeGradientsSipl(Raw* pX, Raw *pY, Raw* pZ)
 	//	temp =new Raw (src->getXsize(), src->getYsize(), ret->getZsize(), 
 	//		src->getdata());
 	//}
+	
+	
 	int i, j, k, imax, jmax, kmax, jN, iE, kU;
 	PIXTYPE Cval, Eval, Nval,Uval, gE, gN, gU;
 
 	imax =  temp->getXsize();		// get RawImage size,
 	jmax =  temp->getYsize();
 	kmax =  temp->getZsize();
+	size_t interval = globalProgressChanged/1000 == 0?1:globalProgressChanged/1000;
+	int rs = 0;
+	bool flag = false;
 	for(k=0; k<kmax; k++)
 	{
 		kU = k+1;
@@ -384,6 +571,13 @@ void Trilateralfilter::ComputeGradientsSipl(Raw* pX, Raw *pY, Raw* pZ)
 			jN = jmax -1 ;
 		for( i=0; i < imax; i++)			// and each pixel on a scanline,
 		{
+			rs++;
+			if ( rs == interval && ProgressChanged != NULL )
+			{
+				progressStep += interval;
+				rs = 0;
+				ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged ),flag);
+			}
 			iE = i+1;
 			if( iE > imax -1)
 				iE = imax -1;	// addr. of East neighbor
@@ -458,7 +652,9 @@ RawArray* pMaxStack , int levelMax, float beta)
 	jmax= temp->getYsize();
 	kmax= temp->getZsize();
 
-
+	size_t interval = levelMax*globalProgressChanged/1000==0 ?1:globalProgressChanged/1000;
+	int rs = 0;
+	bool flag = false;
 	for(lev=0; lev < levelMax; lev++) 
 	{
 		for(k=0;k<kmax;k++)
@@ -467,6 +663,14 @@ RawArray* pMaxStack , int levelMax, float beta)
 			{
 				for(i=0; i < imax; i++) 
 				{
+					
+					rs++;
+					if ( rs == interval && ProgressChanged != NULL )
+					{
+						progressStep += interval/levelMax;
+						rs = 0;
+						ProgressChanged (1, 100,(int) (long long)( progressStep)*20/globalProgressChanged,flag);
+					}
 					if( lev == 0) { //stack level 0 is the magnitude of the gradients of original RawImage
 						tmp = (float) sqrt((float) pX->get(i,j,k)*pX->get(i,j,k) + pY->get(i,j,k)*pY->get(i,j,k) +pZ->get(i,j,k)*pZ->get(i,j,k));
 						if(maxGrad < tmp)
@@ -600,14 +804,22 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 	jmax =  temp->getYsize(); 
 	kmax =  temp->getZsize();
 	halfSize = (int) (filterSize-1)/2; //size of the filter kernel
-
-
+	size_t interval = globalProgressChanged/1000 == 0?1:globalProgressChanged/1000;
+	int rs = 0;
+	bool flag = false;
 	for(i=0; i<imax; i++) //X scanline origion i=0
 	{		
 		for(j=0; j<jmax; j++) //Y scaline origion i=0
 		{ 
 			for(k=0;k<kmax;k++)//Z scanline origion k=0
 			{
+				rs++;
+				if ( rs == interval && ProgressChanged != NULL )
+				{
+					progressStep += interval;
+					rs = 0;
+					ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged),flag);
+				}
 				normFactor=0.0;
 				tmpX=0.0;
 				tmpY=0.0;
@@ -761,6 +973,9 @@ void Trilateralfilter::findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxSta
 	imax = temp->getXsize();	//get RawImage size
 	jmax = temp->getYsize();
 	kmax = temp->getZsize();
+	size_t interval = levelMax*globalProgressChanged/1000 == 0 ?1:globalProgressChanged/1000;
+	int rs = 0;
+	bool flag = false;
 	for(k = 0; k<kmax; k++)
 	{
 	for(j = 0; j < jmax; j++) {
@@ -768,6 +983,14 @@ void Trilateralfilter::findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxSta
 			for(lev=0; lev < levelMax; lev++) {
 				//Compute the adaptive neighboirhood based on the similarity of
 				//the neighborhood gradients
+				rs++;
+				if ( rs == interval && ProgressChanged != NULL )
+				{
+					progressStep += interval/levelMax;
+					rs = 0;
+					ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged )/levelMax,flag);
+				}
+
 				if ( pMaxStack->get(i,j,k,lev) > (pMaxStack->get(i,j,k,0) + R) ||
 					pMinStack->get(i,j,k,lev) < (pMaxStack->get(i,j,k,0) - R) )
 					break;
@@ -803,7 +1026,9 @@ void Trilateralfilter::findAdaptiveRegionSipl(RawArray* pMinStack, RawArray* pMa
 void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pSmoothY, Raw* pSmoothZ,
 	Raw* fTheta, Raw *dest,float sigmaCTheta, float sigmaRTheta)
 {
-
+	size_t interval = globalProgressChanged/1000 == 0?1:globalProgressChanged/1000;
+	int rs = 0;
+	bool flag =false;
 	int i, j, k, m, n, l, imax, jmax, kmax, halfSize;
 	int countvar=0;
 	float tmp, diff, detail, Maxvar;
@@ -811,7 +1036,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 	float coeffA, coeffB, coeffC,coeffD; //Plane Equation is z = coeffA.x + coeffB.y + coeffC.z+coeffD
 	//coeffA = dI/dx, coeffB = dI/dy, coeffC = I at center pixel of the filter kernel
 
-	/*swf add for dataflow*/
+	/*swf add for data overflow*/
 	if ( sizeof (PIXTYPE) == 1)
 	{
 		Maxvar = 255;
@@ -836,7 +1061,20 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 		for(j = 0; j < jmax; j++ ) 
 		{	//Y scanline...
 			for(k = 0;k < kmax; k++ ) 
-			{ //zscanline..
+			{ 	
+				rs++;
+				if ( rs == interval && ProgressChanged != NULL )
+				{
+					progressStep += interval;
+					rs = 0;
+					ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged ),flag);
+				}
+				if (i ==imax-1 && k == kmax-1 && j == jmax-1  && progressStep < globalProgressChanged)
+				{
+					ProgressChanged (1, 100,100,flag);
+				}
+				
+				//zscanline..
 				normFactor=0.0;
 				tmp=0.0;
 				//filter window width is calculated from fTheta
@@ -845,7 +1083,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 				//halfSize = (int) (pow(2.0f,halfSize)/2);
 				//halfSize=halfSize*halfSize;
 				//halfSize=1.5;
-				if(halfSize>2){halfSize=2;}//halfsize=5
+				if(halfSize>5){halfSize=5;}//halfsize=5
 				//Coefficients defining the centerplane 
 				//from the smoothed RawImage gradients
 				coeffA=pSmoothX->get(i,j,k); 

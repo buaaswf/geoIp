@@ -12,6 +12,8 @@
 #include "vol_math_Anistropic2D.h"
 #include "vol_math_2Dtrilateralfilter.h"
 #include "vol_math_Otsu.h"
+#include"vol_math_FourierFilter2.h"
+#include "vol_math_FourierFilter3.h"
 extern size_t globalProgressChanged;
 extern size_t volatile progressStep;
 struct GeoBodyDataStruct
@@ -138,6 +140,11 @@ struct GuassFilterI
 
 struct lowPassI
 {
+	float threshold;
+	lowPassI(float threshold)
+	{
+		this->threshold =threshold;
+	}
 
 
 };
@@ -156,6 +163,7 @@ struct MultiOstuI
 	}
 };
 extern void * doAnistropicI (ImageVolume &src,AnistropicI &);
+extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
 extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);
 extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);

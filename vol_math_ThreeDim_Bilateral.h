@@ -3,7 +3,7 @@
 
 #include "vol_math_Raw3D_Independt.h"
 #include "vol_math_RawImage.h"
-
+#include "vol_math_filter_Interface.h"
 class ThreeDim_Bilateral
 {
 	
@@ -15,8 +15,9 @@ private:
 	double *** kernelD;
 	double *gaussSimilarity;
 public:
+	void (*ProgressChanged)(int ,int ,int ,bool &);
 	ThreeDim_Bilateral(Raw *src,double sigmaD, double sigmaR);
-	ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double sigmaR);
+	ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double sigmaR,void(*ProgressChanged)(int,int,int,bool &));
 	~ThreeDim_Bilateral(void);
 	void apply(Raw &ret);
 	void applySipl(int iter);
