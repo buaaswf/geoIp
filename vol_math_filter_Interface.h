@@ -162,7 +162,61 @@ struct MultiOstuI
 		this->method=method;
 	}
 };
+
+//=======================================================================================================================================
+//2014 -1-21add by buaa songwf :
+// big data multi thread process interface add a
+// struct  process(
+//int window_size;
+//pixtype **line;
+//pixtype *resault;
+//parameters .....)
+// 用于窗口为n的一般意义上的滤波。比如window_size一般为3，下面那个pixtype **line就放三个剖面的数据。然后根据参数计算结果。
+struct Process
+{
+		
+	int method;
+	/*
+	1 tilateral
+	2 anistropic
+	3 bilatetral
+	4 gauss
+	*/
+	int datatype;
+	/*
+	1u char
+	2 u short
+	3 float
+	*/
+	int xsize;
+	int ysize;
+	int window_size; //for normal filters
+	PIXTYPE **slices;
+	PIXTYPE *result;
+	double sigmaD;//bilateral filter,trilateral filter
+	double sigmaR;//bilateral filter ,trilateral filter
+	double sigmaD2;//trilateral filter
+	double sigmaR2;//trilateral filter
+	int threadcount;
+	Process (int datatype, int xsize,int ysize,int window_size , PIXTYPE **slice, PIXTYPE *result, double s1 ,double s2, double s3, double s4 ,int threadcount)
+	{
+		this->datatype = datatype;
+		this->xsize = xsize;
+		this->ysize = ysize;
+		this->window_size = window_size;
+		this->slices = slice;
+		this->result = result;
+		this->sigmaD = s1 ;
+		this->sigmaR = s2 ;
+		this->sigmaD2 = s3 ;
+		this->sigmaR2 = s4 ;
+		this->threadcount = threadcount;
+
+	}
+
+};
 extern void * doAnistropicI (ImageVolume &src,AnistropicI &);
+extern void * doAnistropicI (Process &);
 extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
 extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);

@@ -45,7 +45,6 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *dat
 	this->Height=height;
 	this->Depth=depth;
 	this->PixelType=pixelType;
-	
 		//if(PixelType==1)
 		//{
 		//	unsigned char  * cData=new unsigned char[GetLength()];

@@ -338,6 +338,10 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
 			int rs = 0 ;
 			bool flag = false;
+			//recover  data order from  x,z,y
+			// 
+
+
 			for ( int i = 0; i < ret->size(); i ++)
 			{
 				

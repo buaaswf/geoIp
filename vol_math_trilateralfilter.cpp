@@ -353,7 +353,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 
 }
 //for more  paras
-void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
+void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigma,float sigmab,float sigmc)
 	//=====================================================================================================
 {	
 	globalProgressChanged = src.size();

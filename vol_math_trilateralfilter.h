@@ -36,6 +36,7 @@ public:
 	void TrilateralFilter(Raw &src,Raw &ret,float sigmaC); 
 	void TrilateralFilter_Multi(float sigmaC,int threadcount);
 	void TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigmaR,float sigma3,float sigma4,float R,int maxhalfsize);
+	void TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigma,float sigmab,float sigmc) /*===================================================================================================== */;
 private:
 	RawImage* img;
 	Raw *ret;

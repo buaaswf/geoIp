@@ -37,7 +37,7 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 	//Raw * _ret =new Raw(*temp);
 	width=temp->getXsize();
 	length=temp->getYsize();
-	depth = temp->getZsize();
+	depth = ret->getZsize();
 	Raw *guass = new Raw(*temp);	///< The result of guass filter. 
 
 	for (i = 0; i < depth; i++)
