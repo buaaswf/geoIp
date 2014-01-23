@@ -8,7 +8,7 @@ extern size_t  globalProgressChanged = 0;
 extern size_t volatile progressStep = 0;
 Raw& MultiThread(int method,int threadcount,Raw &src,void *para);
 void MultiThreadsipl(int method,int threadcount,Raw &src,void *para);
-void MultiThreadsY(int method,int threadcount,Raw &src,void *para);
+void MultiThreadsY(int method,int threadcount,Raw &src,Raw &ret,void *para);
 void progress(int type,int total ,int step,bool &cancled)
 {
 
@@ -20,7 +20,7 @@ void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
 	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
 	//	return ret;
-	 MultiThreadsY(2,para.threadcount,*indata,(void *)&para);
+	 MultiThreadsipl(2,para.threadcount,*indata,(void *)&para);
 	 return indata;
 }
 
@@ -42,10 +42,10 @@ void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 		 memcpy(val, slice , para.xsize*para.ysize*sizeof(PIXTYPE));
 		 val += para.xsize*para.ysize;
 	 }
-	 Raw *indata= new Raw(para.xsize,para.ysize,para.window_size,val);
-	 //Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
+	 Raw *indata= new Raw(para.xsize,para.ysize,para.window_size,val,true);
+	 Raw *ret =new Raw(para.xsize,para.ysize,para.window_size,para.result ,true); 
 	 //	return ret;
-	 MultiThreadsY(2,para.threadcount,*indata,(void *)&para);
+	 MultiThreadsY(2,para.threadcount,*indata,*ret,(void *)&para);
 	 return indata;
  }
 
@@ -87,18 +87,18 @@ void *doGuassFilterI (Process &para)
 		memcpy(val, slice , para.xsize*para.ysize*sizeof(PIXTYPE));
 		val += para.xsize*para.ysize;
 	}
-	Raw *indata= new Raw(para.xsize,para.ysize,para.window_size,val);
-	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
+	Raw *indata= new Raw(para.xsize,para.ysize,para.window_size,val,true);
+	Raw *ret =new Raw(para.xsize,para.ysize,para.window_size,val ,true); 
 	//	return ret;
-	MultiThreadsY(2,para.threadcount,*indata,(void *)&para);
+	MultiThreadsY(2,para.threadcount,*indata,*ret,(void *)&para);
 	return indata;
-	 return NULL;
+	 //return NULL;
 }
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 {
 	Raw *indata =(Raw*)ImageVolume2Raw(src);
 	//Raw  *ret =new Raw (MultiThreadsipl(1,para.threadcount,indata,(void *)&para),true);
-	MultiThreadsY(1,para.threadcount,*indata,(void *)&para);
+	MultiThreadsipl(1,para.threadcount,*indata,(void *)&para);
 	return indata;
 }
 
@@ -752,7 +752,7 @@ void  MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 
 	*/
 }
-void  MultiThreadsY(int method,int threadcount,Raw &src,void *para)
+void  MultiThreadsY(int method,int threadcount,Raw &src,Raw & result,void *para)
 {
 	//divide into slices
 	//create+join
