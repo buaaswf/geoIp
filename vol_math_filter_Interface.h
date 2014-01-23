@@ -220,6 +220,7 @@ extern void * doAnistropicI (Process &);
 extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
 extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);
+extern void *doGuassFilterI (Process &);
 extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
 extern void *doMultiOstuI (ImageVolume &src,MultiOstuI &);
 extern void *dolowPassI (ImageVolume &src,lowPassI &);

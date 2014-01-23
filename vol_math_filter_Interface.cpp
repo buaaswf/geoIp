@@ -34,15 +34,13 @@ void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 
  void * doAnistropicI (Process & para)
  {
-	 PIXTYPE * in = new PIXTYPE[para.xsize*para.ysize*para.window_size];
-	 PIXTYPE *val ;
+	 PIXTYPE ** in = para.slices;
+	 PIXTYPE *val = para.result ;
 	 for ( int i = 0; i < para.window_size; i++ )
 	 {
-		 val = in;
-		 PIXTYPE ** slice = para.slices;
+		 PIXTYPE *slice = *(in + i);
+		 memcpy(val, slice , para.xsize*para.ysize*sizeof(PIXTYPE));
 		 val += para.xsize*para.ysize;
-		 slice ++;
-		 memcpy(val, *slice , para.xsize*para.ysize*sizeof(PIXTYPE));
 	 }
 	 Raw *indata= new Raw(para.xsize,para.ysize,para.window_size,val);
 	 //Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
@@ -67,7 +65,7 @@ void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
 	//indata=bila->apply(indata);
 	//return Raw2ImageVolume(indata,src.PixelType);
 	//Raw * ret=new Raw(MultiThreadsipl(3,para.threadcount,indata,(void *)&para),true);
-	MultiThreadsY(3,para.threadcount,*indata,(void *)&para);
+	MultiThreadsipl(3,para.threadcount,*indata,(void *)&para);
 	return indata;
 }
 void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
@@ -76,8 +74,18 @@ void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
 	//Filter *guass = new Filter();
 	//Raw *ret=guass->guass3DFilter(&indata,para.halfsize);
 	//return Raw2ImageVolume(*ret,src.PixelType);
-	MultiThreadsY(4,para.threadcount,*indata,(void *) &para);
+	MultiThreadsipl(4,para.threadcount,*indata,(void *) &para);
 	return indata;
+}
+void *doGuassFilterI (Process &)
+{
+	//Raw *indata=(Raw *)ImageVolume2Raw(src);
+	////Filter *guass = new Filter();
+	////Raw *ret=guass->guass3DFilter(&indata,para.halfsize);
+	////return Raw2ImageVolume(*ret,src.PixelType);
+	//MultiThreadsipl(4,para.threadcount,*indata,(void *) &para);
+	//return indata;
+	 return NULL;
 }
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 {
@@ -596,7 +604,7 @@ void  MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 	//single
 	Raw  *ret = new Raw(src);
 	int countvar=0;
-	if (threadcount>=1)
+	if (threadcount >= 1)
 	{
 		vector <Raw *> raw;
 		std::vector<pthread_t>threads;threads.resize(threadcount);
@@ -694,11 +702,11 @@ void  MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 					{
 						data=ret->getdata()+znewsize*i*src.getXsize()*src.getYsize();
 						raw.push_back(new Raw(src.getXsize(),src.getYsize(),znewsize,data,true));
-						int ret;
+						int pid;
 						GuassFilterI *p=(GuassFilterI*)para;
 						parms[i]=GuassFilterPSipl(&src,raw[i],i,p->halfsize);
 						pthread_attr_t *attr;
-						ret=pthread_create(&threads[i],NULL,singleGuassFilterSipl,&parms[i]);
+						pid=pthread_create(&threads[i],NULL,singleGuassFilterSipl,&parms[i]);
 						cout <<i<<endl;
 					}
 					for(int i=0;i<threadcount;i++)
