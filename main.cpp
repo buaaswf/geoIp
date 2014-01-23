@@ -27,14 +27,15 @@ Raw * testinterface(ImageVolume &src)
 }
 Raw * testinterface1(Process &src)
 {
-	//AnistropicI anis(3,30,1,2);
+	AnistropicI anis(3,30,1,2);
 	//TrilateralfilterI tril(3,2);
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
 	//BilateralFilterI bil(3,3,5);
 	//Raw * ret=(Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
-	Raw *ret =(Raw*)doAnistropicI(src);
+	//Raw *ret =(Raw*)doAnistropicI(src);
 	//GuassFilterI gs(3,2);
+	Raw *ret = (Raw *)doGuassFilterI(src);
 	//Raw * ret = (Raw *)doGuassFilterI(src , gs);
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);

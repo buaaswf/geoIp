@@ -77,14 +77,21 @@ void * doGuassFilterI( ImageVolume & src,GuassFilterI & para)
 	MultiThreadsipl(4,para.threadcount,*indata,(void *) &para);
 	return indata;
 }
-void *doGuassFilterI (Process &)
+void *doGuassFilterI (Process &para)
 {
-	//Raw *indata=(Raw *)ImageVolume2Raw(src);
-	////Filter *guass = new Filter();
-	////Raw *ret=guass->guass3DFilter(&indata,para.halfsize);
-	////return Raw2ImageVolume(*ret,src.PixelType);
-	//MultiThreadsipl(4,para.threadcount,*indata,(void *) &para);
-	//return indata;
+	PIXTYPE ** in = para.slices;
+	PIXTYPE *val = para.result ;
+	for ( int i = 0; i < para.window_size; i++ )
+	{
+		PIXTYPE *slice = *(in + i);
+		memcpy(val, slice , para.xsize*para.ysize*sizeof(PIXTYPE));
+		val += para.xsize*para.ysize;
+	}
+	Raw *indata= new Raw(para.xsize,para.ysize,para.window_size,val);
+	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
+	//	return ret;
+	MultiThreadsY(2,para.threadcount,*indata,(void *)&para);
+	return indata;
 	 return NULL;
 }
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
