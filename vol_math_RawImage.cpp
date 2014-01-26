@@ -255,7 +255,7 @@ Raw::Raw(const Raw & src, bool _is_shared)
 	this->zsize=src.zsize;
 	this->is_shared = _is_shared;
 
-	if (src.is_shared == true) {
+	if (this->is_shared == true) {
 		this->data = src.data;
 	} else {
 		this->data=new PIXTYPE[size()];
@@ -415,6 +415,48 @@ void *  ImageVolume2Raw(ImageVolume &src)
 	return ret;
 
 }
+void *  ImageVolume2Raw(ImageVolume *src)
+{
+	PIXTYPE *data= new PIXTYPE[src->GetLength()];
+	if (src->PixelType==1)
+	{
+		unsigned char* datSrc = (unsigned char*)(src->Data);
+		//PIXTYPE *data= new PIXTYPE[src->GetLength()];
+		for (int i=0;i<src->GetLength();i++)
+		{
+			data[i]=(PIXTYPE)datSrc[i];
+		}
+	}
+	else if (src->PixelType == 2)
+	{
+
+		unsigned short * datSrc = (unsigned short *)(src->Data);
+		//PIXTYPE *data= new PIXTYPE[src->GetLength()];
+		for (int i=0;i<src->GetLength();i++)
+		{
+			data[i]=(PIXTYPE)datSrc[i];
+		}
+
+	}
+	else if (src->PixelType == 3 )
+	{
+
+
+		float* datSrc = (float*)(src->Data);
+
+		for (int i=0;i<src->GetLength();i++)
+		{
+			data[i]=(PIXTYPE)datSrc[i];
+		}
+
+	}
+
+
+	//src->Data=data;
+	Raw *ret=new Raw(src->Width,src->Height,src->Depth,data);
+	return ret;
+
+}
 void *  Raw2ImageVolume(Raw  &src,int type)
 {
 	PIXTYPE *datSrc = (PIXTYPE *)(src.getdata());
@@ -424,12 +466,14 @@ void *  Raw2ImageVolume(Raw  &src,int type)
 		unsigned char *data= new unsigned char[src.size()];
 
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
+		for (int i = 0; i < src.size();i++)
 		{
-			data[i]=datSrc[i];
+			data[i] =(unsigned char) datSrc[i];
 		}
 		void * ret=(void *)data;
-		return ret;
+		ImageVolume * res = new ImageVolume(src.getXsize(),src.getYsize(),src.getZsize());
+		res->Data = ret;
+		return res;
 	}
 	else if (type == 2 )
 	{

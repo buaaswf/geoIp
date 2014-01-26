@@ -1,4 +1,6 @@
 #include "vol_math_WipeNioisePde.h"
+#include <limits>
+
 
 
 WipeNioisePde::WipeNioisePde(Raw &src,Raw &ret,int iter,int time,PIXTYPE value, int method, void(*ProgressChanged)(int,int,int,bool &))

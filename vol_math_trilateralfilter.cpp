@@ -1,4 +1,7 @@
 #include "vol_math_trilateralfilter.h"
+#include <string.h>
+#include <limits>
+
 
 
 static float lgtt=log10(2.0f);

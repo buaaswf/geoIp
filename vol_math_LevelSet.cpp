@@ -4,6 +4,9 @@
 #include <iostream>
 #define pi 3.141592653
 #include<math.h>
+#include<stdio.h>
+#include <string.h>
+
 //using namespace cimg_library;
 using namespace std;
 PIXTYPE *p;

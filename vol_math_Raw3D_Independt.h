@@ -3,8 +3,10 @@
 #ifndef Raw2D_H
 #define Raw2D_H
 #include <iostream>
+#include <string.h>
+
 using namespace std;
-#define PIXTYPE unsigned char
+#define PIXTYPE float
 //typedef unsigned char PIXTYPE;
 class Raw2DArray;
 class Raw2D

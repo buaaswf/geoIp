@@ -45,12 +45,12 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *dat
 	this->Height=height;
 	this->Depth=depth;
 	this->PixelType=pixelType;
-		//if(PixelType==1)
-		//{
-		//	unsigned char  * cData=new unsigned char[GetLength()];
+		if(PixelType==1)
+		{
+			unsigned char  * cData=new unsigned char[GetLength()];
 			this->Data = (void *)data;
-		//	memcpy(Data,data,sizeof(unsigned char)*GetLength());
-		//}
+			memcpy(Data,data,sizeof(unsigned char)*GetLength());
+		}
 		if(PixelType==2)
 		{
 			unsigned short * sData=new unsigned short[GetLength()];

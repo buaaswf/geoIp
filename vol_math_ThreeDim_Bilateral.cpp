@@ -2,6 +2,9 @@
 
 //qym
 #include <math.h>
+#include <string.h>
+#include <limits>
+
 ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double sigmaR,void(*ProgressChanged)(int, int, int, bool&))
 {
 	this->src=image;

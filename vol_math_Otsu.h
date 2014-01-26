@@ -16,14 +16,25 @@ void order(int *p,int n);//数组大小排序：从小到大
  
 int Max_number(struct Point_3 *p,int n);//寻找最大方差
 
+struct Points{
+	float x;
+	float y;
+	float z;
+	Points(float x,float y,float z){
+	     this->x=x;
+		 this->y=y;
+		 this->z=z;
+	}
+	Points(){}
+};
+
 //定义一个类OTSU
 class OTSU{
 public:
 	Raw2D image_2D;//二维数据
 	Raw image;//三维数据
-	vector<int>arrays;//储存阈值
-
-	int t_number;//指定阈值的个数
+	vector<unsigned char>arrays;//储存阈值
+	unsigned char t_number;//指定阈值的个数
 	//定义构造函数
 	OTSU(){}//空的构造函数
 	//二维构造函数
@@ -42,29 +53,28 @@ public:
 	void setData(Raw newImage,int newT_number);
 
 	//二维数据处理
-    int Otsu(Raw2D image_2D,int Min_pix,int Max_pix);//简单局部图像单阈值OTSU算法 
-    int Otsu(Raw2D image_2D);//优化步长单阈值OTSU算法 
+    int Otsu(Raw2D &image_2D,int Min_pix,int Max_pix);//简单局部图像单阈值OTSU算法 
+    int Otsu(Raw2D &image_2D);//优化步长单阈值OTSU算法 
 
 	// 下面定义多阈值OTSU算法
-	void Otsu_MultiVal(Raw2D image_2D,int t_number);//多阈值OTSU算法一
-	void Otsu_MultiVal(Raw2D image_2D);//多阈值OTSU算法二
-	void SaveImage(Raw2D image_2D);//保存二维数据
-//	Points** output(Raw2D image_2D);
-
+	void Otsu_MultiVal(Raw2D &image_2D,int t_number);//多阈值OTSU算法一
+	void Otsu_MultiVal(Raw2D &image_2D);//多阈值OTSU算法二
+	vector< vector <Points> > output(Raw2D &image_2D);
+	Raw2D Output(Raw2D &image_2D);
 	//三维数据处理
-    int Otsu(Raw image,int Min_pix,int Max_pix);//简单局部图像单阈值OTSU算法 
-    int Otsu(Raw image);//优化步长单阈值OTSU算法 
+    int Otsu(Raw &image,int Min_pix,int Max_pix);//简单局部图像单阈值OTSU算法 
+    int Otsu(Raw &image);//优化步长单阈值OTSU算法 
 
 	/*  下面定义多阈值OTSU算法*/
-	void Otsu_MultiVal(Raw image,int t_number);//多阈值OTSU算法一
-	void Otsu_MultiVal(Raw image);//多阈值OTSU算法二
-	void SaveImage(Raw image);//保存三维数据
-//	Points** output(Raw image);
-
+	void Otsu_MultiVal(Raw &image,int t_number);//多阈值OTSU算法一
+	void Otsu_MultiVal(Raw &image);//多阈值OTSU算法二
+	void SaveImage(Raw &image);//保存三维数据
+	vector< vector <Points> > output(Raw &image);
+	Raw  Output(Raw &image);
 
 	//析构函数
 	~OTSU(){
-	  arrays.~vector<int>(); 
+	  arrays.~vector<unsigned char>(); 
 	}
 };
 #endif

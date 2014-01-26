@@ -12,8 +12,8 @@
 #include "vol_math_Anistropic2D.h"
 #include "vol_math_2Dtrilateralfilter.h"
 #include "vol_math_Otsu.h"
-#include"vol_math_FourierFilter2.h"
-#include "vol_math_FourierFilter3.h"
+//#include"vol_math_FourierFilter2.h"
+//#include "vol_math_FourierFilter3.h"
 extern size_t globalProgressChanged;
 extern size_t volatile progressStep;
 struct GeoBodyDataStruct
@@ -69,18 +69,41 @@ struct GeoBodyDataStruct
 
     }
 };
-struct Points
+	//struct Points
+	//{
+	//	short x;
+	//	short y;
+	//	short z;
+	//	//void * pixel;
+	//	Points(short x,short y,short z)
+	//	{
+	//		this->x = x;
+	//		this->y = y;
+	//		this->z = z;
+	//	}
+	//};
+struct  AnistropicII
 {
-	short x;
-	short y;
-	short z;
-	//void * pixel;
-	Points(short x,short y,short z)
+	int time;
+	int val; //val=1
+	int method; 
+	int datatype;
+	int threadcount;
+	/*
+	method:
+	1:Perona_Malik();
+	2:four_diff
+	*/
+	AnistropicII(int time,int val,int method,int datatype,int threadcount)
 	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
+		this->time = time;
+		this->val = val;
+		this->method = method;
+		this->datatype = datatype;
+		this->threadcount = threadcount;
 	}
+
+
 };
 struct  AnistropicI
 {
@@ -95,10 +118,10 @@ struct  AnistropicI
 	*/
 	AnistropicI(int time,int val,int method,int threadcount)
 	{
-		this->time=time;
-		this->val=val;
-		this->method=method;
-		this->threadcount=threadcount;
+		this->time = time;
+		this->val = val;
+		this->method = method;
+		this->threadcount = threadcount;
 	}
 
 
@@ -216,12 +239,22 @@ struct Process
 
 };
 extern void * doAnistropicI (ImageVolume &src,AnistropicI &);
+extern void * doAnistropicI (Raw *src, Raw *ret, AnistropicII &);
+bool doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
+bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
 extern void * doAnistropicI (Process &);
 extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
+bool  doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
 extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);
+
 extern void *doGuassFilterI (Process &);
+
+bool doGuassFilterI (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
+bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
+
 extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
+bool  doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 extern void *doMultiOstuI (ImageVolume &src,MultiOstuI &);
 extern void *dolowPassI (ImageVolume &src,lowPassI &);
 extern void *doMultiOstuI(ImageVolume &,MultiOstuI &);

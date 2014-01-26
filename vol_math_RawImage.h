@@ -268,11 +268,14 @@ public:				//---------------init fcns-------------
 //global functions to change data type//
 void *  ImageVolume2Raw(ImageVolume &src);
 
+void *  ImageVolume2Raw(ImageVolume *src);
+
 void *  Raw2ImageVolume(Raw  &src,int type);
 
 Raw2D Image2D2Raw2D(Image2D &src);
 
 void * Raw2D2Image2D(Raw2D &src,int type);
+void *  ImageVolume2Raw(ImageVolume *src);
 
 
 

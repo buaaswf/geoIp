@@ -3,21 +3,18 @@
 #include "vol_math_Otsu.h"
 
 using namespace std;
-/*
+
 int Max_number(struct Point_3 *p,int n){
-	struct Point_3 *Max_s=new struct Point_3 [1];
-	Max_s->s=p->s;
+    double Maxs=p->s;
 	int m=0,number=0;
 	//寻找最大方差
 	while(n--){
-		if( Max_s->s< p->s){
-			Max_s->s= p->s;
+		if( Maxs<(p+m)->s){
+			Maxs=(p+m)->s;
 			number=m;
 		}
-		p++;
 		m++;
 	}
-	delete(Max_s);
     return number;
 }
 
@@ -32,7 +29,6 @@ void order(int *p,int n){
 			}
 	 }
 }
-
 //OTSU类的实现
 OTSU::OTSU(Raw2D newImage):image_2D(newImage){}
 OTSU::OTSU(Raw2D newImage,int newT_number):image_2D(newImage){
@@ -58,8 +54,8 @@ void OTSU::setData(Raw newImage,int newT_number){
 	t_number=newT_number;
 }
 
-//三维数据处理
-int OTSU::Otsu(Raw image,int Min_pix,int Max_pix){
+//three Dimensions data process
+int OTSU::Otsu(Raw &image,int Min_pix,int Max_pix){
 	double w1;//前景的像素点数所占比例
 	double u1;//前景的平均灰度
 	double w2;//背景的像素点数所占比例
@@ -116,7 +112,7 @@ int OTSU::Otsu(Raw image,int Min_pix,int Max_pix){
 	}//计算出分割阀值t
 	return t;
 }
-int OTSU::Otsu(Raw image){
+int OTSU::Otsu(Raw &image){
 	int step;//步长
 	double w1;//前景的像素点数占整幅图像的比例
 	double u1;//前景的平均灰度
@@ -211,7 +207,7 @@ int OTSU::Otsu(Raw image){
 	}
 	return t;
 }
-void OTSU::Otsu_MultiVal(Raw image,int t_number){
+void OTSU::Otsu_MultiVal(Raw &image,int t_number){
 	struct Point_3 *ss=new struct Point_3 [t_number];
     double s=0.0,M_s=0.0;//类间方差
 	double u1;//前景的平均灰度
@@ -256,11 +252,9 @@ void OTSU::Otsu_MultiVal(Raw image,int t_number){
 	arrays.clear();//清零
 	do{//多阀值OTSU分割算法
 		//单阀值Otsu算法步骤
-		//cout<<"Min_pix="<< Min_pix<<"  Max_pix="<<Max_pix<<endl;
 		t=Otsu(image,Min_pix,Max_pix);//计算出分割阀值t
-        cout<<"t_number="<<l<<"  t="<<t<<endl;
+		arrays.push_back((unsigned char)t);//储存阈值
 		l--;
-		arrays.push_back(t);//提取阀值
 		if(l){
 		   //计算类间方差
 		   pix_number1=0.0;//像素个数
@@ -277,7 +271,6 @@ void OTSU::Otsu_MultiVal(Raw image,int t_number){
 			   }
 		   } 
 		   else u1=Min_pix;
-		   
 		   pix_number2=0.0;
 		   Pix_val=0.0;
 		   for(;i<=Max_pix;i++){
@@ -295,35 +288,43 @@ void OTSU::Otsu_MultiVal(Raw image,int t_number){
 
 		   //储存方差与上下界
 		   cout<<"s1="<<s1<<" s2="<<s2<<endl;
-		   for(i=0;i<t_number;i++,ss++){
-			    if(ss->Min_val==Min_pix && ss->Max_val==Max_pix){
-			       ss->Max_val=t;//改变上界
-			       ss->s=s1;//改变方差大小
+		   for(i=0;i<t_number;i++){
+			    if((ss+i)->Min_val==Min_pix && (ss+i)->Max_val==Max_pix){
+					if(s1<s2){
+						(ss+i)->Min_val=t;//改变下界
+						(ss+i)->s=s2;
+					}
+					else {
+						(ss+i)->Max_val=t;//改变上界
+						(ss+i)->s=s1;//改变方差大小
+					}
 				   break;
 		        }
-		   }
-		   ss-=i;//返回到指针头位置
-		   k=0;
-		   while(ss->s){
-			   ss++;//查找方差为零的指针
-			   k++;
+		   }  
+		   i=0;
+		   while((ss+(i++))->s){//查找方差为零的指针
 		   }
 		   //赋值
-		   cout<<"ss->s="<<ss->s<<endl;
-		   ss->Min_val=t;//
-		   ss->Max_val=Max_pix;
-		   ss->s=s2;
-		   cout<<"ss->s="<<ss->s<<endl;
-		   ss-=k;//返回到指针头位置
+		   j=i-1;
+		   cout<<"j="<<j<<endl;
+		   if(s1<s2){		
+			   (ss+j)->Max_val=t;//改变上界	
+			   (ss+j)->Min_val=Min_pix;//改变下界
+			   (ss+j)->s=s1;//改变方差大小
+		   }		
+		   else {		
+			   (ss+j)->Max_val=Max_pix;//改变上界	
+			   (ss+j)->Min_val=t;//改变下界	
+			   (ss+j)->s=s2;//改变方差大小	
+		   }
 		   k=Max_number(ss,t_number);//计算方差最大的位置
-		   cout<<"k="<<k<<endl;
 		   Min_pix=(ss+k)->Min_val;
 		   Max_pix=(ss+k)->Max_val;
 		}
 	}while(l);
-	delete(ss);
+	delete []ss;
 }
-void OTSU::Otsu_MultiVal(Raw image){
+void OTSU::Otsu_MultiVal(Raw &image){
 	int t;//阀值
 	int i,j,k,size,Min_val,t_number,pix,Min_pix,Max_pix;
 	size=image.size();//获得图像的大小
@@ -374,144 +375,182 @@ void OTSU::Otsu_MultiVal(Raw image){
 			}
 		}
 	}
-	//cout<<"t=";
-	//for(i=0;i<k;i++){
-	//	cout<<temp_tvalue[i]<<"  ";
-	//}
-	//cout<<endl;
-	//除去伪峰
-	for(i=0;i<k-1;i++){
-		if(abs(temp_tvalue[i]-temp_tvalue[i+1]) < 10){//合并伪峰
-			if(i+2<k){
-			  if(abs(temp_tvalue[i]-temp_tvalue[i+1])<=abs(temp_tvalue[i+1]-temp_tvalue[i+2])){
-				 if(temp_tvalue[i]<temp_tvalue[i+1]){
-				    temp_tvalue[i]=Min_pix-1;
-				 }
-				 else temp_tvalue[i+1]=Min_pix-1;
-			  }
-			  else {
-			     if(temp_tvalue[i+1]<temp_tvalue[i+2]){
-				    temp_tvalue[i+1]=Min_pix-1;
-				 }
-				 else temp_tvalue[i+2]=Min_pix-1;
-			  }
-		    }
-			else {
-				if(temp_tvalue[i]<temp_tvalue[i+1]){
-				    temp_tvalue[i]=Min_pix-1;
-				 }
-				 else temp_tvalue[i+1]=Min_pix-1;
-			} 		
-		}
-	}
-	//cout<<"t=";
-	//for(i=0;i<k;i++){
-	//	cout<<temp_tvalue[i]<<"  ";
-	//}
-	//cout<<endl;
-	//在相邻的两个波峰间进行阀值分割
 	arrays.clear();
-	for(i=0;i<k-1;i++){
-		if(temp_tvalue[i]>=Min_pix){
-		  for(j=i+1;i<k;j++){
-			  if(temp_tvalue[j]>=Min_pix){
-                 t=Otsu(image,temp_tvalue[i],temp_tvalue[j]);
-				 arrays.push_back(t);
-				 break;
-			  }
-		  }
+	if(k>1){
+		//除去伪峰
+		for(i=0;i<k-1;i++){
+			if(abs(temp_tvalue[i]-temp_tvalue[i+1]) < 10){//合并伪峰
+				if(i+2<k){
+					if(abs(temp_tvalue[i]-temp_tvalue[i+1])<=abs(temp_tvalue[i+1]-temp_tvalue[i+2])){
+						if(temp_tvalue[i]<temp_tvalue[i+1]){
+							temp_tvalue[i]=Min_pix-1;
+						}
+						else temp_tvalue[i+1]=Min_pix-1;
+					}
+					else {
+						if(temp_tvalue[i+1]<temp_tvalue[i+2]){
+							temp_tvalue[i+1]=Min_pix-1;
+						}
+						else temp_tvalue[i+2]=Min_pix-1;
+					}
+				}
+				else {
+					if(temp_tvalue[i]<temp_tvalue[i+1]){
+						temp_tvalue[i]=Min_pix-1;
+					}
+					else temp_tvalue[i+1]=Min_pix-1;
+				} 		
+			}
+		}
+		cout<<"k="<<k<<endl;
+		//在相邻的两个波峰间进行阀值分割
+		
+		for(i=0;i<k-1;i++){
+			if(temp_tvalue[i]>=Min_pix){
+				for(j=i+1;i<k;j++){
+					if(temp_tvalue[j]>=Min_pix){
+						t=Otsu(image,temp_tvalue[i],temp_tvalue[j]);
+						arrays.push_back(t);
+						break;
+					}
+				}
+			}
 		}
 	}
+	else arrays.push_back(Otsu(image));
 }
-void OTSU::SaveImage(Raw image){
+void OTSU::SaveImage(Raw &image){
 	int size=image.size();
 	int i,j,k,step;
 	FILE *f=NULL;
-	float val;
+	unsigned char val;
 	k=arrays.size();//阈值个数
-	if(k>1){
+	if(k==0)return;
+	else if(k==1){
+		for( i=0;i<size;i++){
+			val=image.getXYZ(i);
+			if(val<arrays.at(0)) image.putXYZ(i,0);
+			else  image.putXYZ(i,255);
+		}
+	}
+	else{
 		step=(int)(250/k);//步长
 		for( i=0;i<size;i++){
 			val=image.getXYZ(i);
-			if(val<arrays.at(0)) image.putXYZ(i,-128);
-			else if(val>=arrays.at(k-1)) image.putXYZ(i,127);	
+			if(val<arrays.at(0)) image.putXYZ(i,0);
+			else if(val>=arrays.at(k-1)) image.putXYZ(i,255);	
 			else{
 				for(j=1;j<k;j++){
-					if(val>=arrays.at(j-1) && val<arrays.at(j)) image.putXYZ(i,-128+step*j);	
+					if(val>=arrays.at(j-1) && val<arrays.at(j)) image.putXYZ(i,step*j);	
 				}
 			}
 		}	
-	}
-	else{
-		for( i=0;i<size;i++){
-			if(val<arrays.at(0)) image.putXYZ(i,-128);
-			else  image.putXYZ(i,127);
-		}
 	}
 	f=fopen("img\\Image.raw","wb");
 	fwrite(image.getdata(),sizeof(unsigned char),size,f);
 	fclose(f);//关闭文件
 }
-*/
-//Points** OTSU::output(Raw image){
-//	int i,j,k,m,n,x,y,z;
-//	float val;
-//	//图像大小
-//	x=image.getXsize();
-//	y=image.getYsize();
-//	z=image.getZsize();
-//	m=arrays.size();//阈值个数
-//	vector<Points> *pointss=new vector<Points>[m+1];//m+1个类
-//	//vector<int>p(m+1,0);//m+1个变量,初始值为零
-//	Points point(0,0,0);
-//	if(m>1){//多阈值处理
-//		//遍历
-//		for(k=0;k<z;k++){
-//			for(i=0;i<y;i++){
-//				for(j=0;j<x;j++){
-//					val=image.get(j,i,k);//获得图像的像素值的大小	
-//					point.x=j;
-//					point.y=i;
-//					point.z=k;
-//					if(val<arrays.at(0)) {//(*p)++;*(*(pointss)+(*p))(j,i,k);
-//						pointss[0].push_back(point);
-//					}
-//					else if(val>=arrays.at(m-1)){
-//						pointss[m].push_back(point);
-//					}
-//					else{//中间的类
-//						for(n=1;j<m;j++){
-//
-//							if(val>=arrays.at(n-1) && val<arrays.at(n)){
-//								pointss[].push_back(point);
-//							}	
-//						}//for
-//					}//else
-//				}//for
-//			}//for
-//		}//for	
-//	}
-//	else{//单阈值处理
-//		//遍历
-//		for(k=0;k<z;k++){
-//			for(i=0;i<y;i++){
-//				for(j=0;j<x;j++){
-//					val=image.get(j,i,k);//获得图像的像素值的大小
-//					point.x=j;
-//					point.y=i;
-//					point.z=k;
-//					if(val<arrays.at(0)) *(pointss).push_back(point);
-//					else  *(pointss+1).push_back(point);
-//				}//for
-//			}//for
-//		}//for
-//	}
-//}
+vector< vector <Points> > OTSU::output(Raw &image){
+	int i,j,k,m,n,x,y,z;
+	float val;
+	//图像大小
+	x=image.getXsize();
+	y=image.getYsize();
+	z=image.getZsize();
+	m=arrays.size();//阈值个数
+    vector< vector <Points> >pointss(m+1);//m+1个类
+	Points point(0,0,0);
+	if(m>1){//多阈值处理
+		for(k=0;k<z;k++){//遍历
+			for(i=0;i<y;i++){
+				for(j=0;j<x;j++){
+					val=image.get(j,i,k);//get the value
+					point.x=(float)j;
+					point.y=(float)i;
+					point.z=(float)k;
+					if(val<arrays.at(0)) {
+						pointss[0].push_back(point);
+					}
+					else if(val>=arrays.at(m-1)){
+						pointss[m].push_back(point);
+					}
+					else{//中间的类
+						for(n=1;n<m;n++){
+							if(val>=arrays.at(n-1) && val<arrays.at(n)){
+								pointss[n].push_back(point);
+							}	
+						}//for
+					}//else
+				}//for
+			}//for
+		}//for	
+	}
+	else{//单阈值处理
+		for(k=0;k<z;k++){//遍历
+			for(i=0;i<y;i++){
+				for(j=0;j<x;j++){
+					val=image.get(j,i,k);//get the value 
+					point.x=(float)j;
+					point.y=(float)i;
+					point.z=(float)k;
+					if(val<arrays.at(0)) pointss[0].push_back(point);
+					else  pointss[1].push_back(point);
+				}//for
+			}//for
+		}//for
+	}
+	return pointss;
+}
+Raw OTSU::Output(Raw &image){
+	int i,j,k,m,n,x,y,z;
+	float val;
+	//图像大小
+	x=image.getXsize();
+	y=image.getYsize();
+	z=image.getZsize();
+	Raw marker(x,y,z);
+	m=arrays.size();//阈值个数
+	if(m>1){//多阈值处理
+		//遍历
+		for(k=0;k<z;k++){
+			for(i=0;i<y;i++){
+				for(j=0;j<x;j++){
+					val=image.get(j,i,k);//获得图像的像素值的大小	
+					if(val<arrays.at(0)) {
+						marker.put(j,i,z,1);
+					}
+					else if(val>=arrays.at(m-1)){
+						marker.put(j,i,z,m+1);
+					}
+					else{//中间的类
+						for(n=1;n<m;n++){
+							if(val>=arrays.at(n-1) && val<arrays.at(n)){
+								marker.put(j,i,z,n+1);
+							}	
+						}//for
+					}//else
+				}//for
+			}//for
+		}//for	
+	}
+	else{//单阈值处理
+		//遍历
+		for(k=0;k<z;k++){
+			for(i=0;i<y;i++){
+				for(j=0;j<x;j++){
+					val=image.get(j,i,k);//获得图像的像素值的大小
+					if(val<arrays.at(0)) marker.put(j,i,z,1);
+					else  marker.put(j,i,z,2);
+				}//for
+			}//for
+		}//for
+	}
+	return marker;
+}
 
-/*
 
-//二维数据处理
-int OTSU::Otsu(Raw2D image,int Min_pix,int Max_pix){
+//two Dimensions data process 
+int OTSU::Otsu(Raw2D &image,int Min_pix,int Max_pix){
 	double w1;//前景的像素点数占整幅图像的比例
 	double u1;//前景的平均灰度
 	double w2;//背景的像素点数占整幅图像的比例
@@ -569,7 +608,7 @@ int OTSU::Otsu(Raw2D image,int Min_pix,int Max_pix){
 	}//计算出分割阀值t
 	return t;
 }
-int OTSU::Otsu(Raw2D image){
+int OTSU::Otsu(Raw2D &image){
 	int step;//步长
 	double w1;//前景的像素点数占整幅图像的比例
 	double u1;//前景的平均灰度
@@ -662,7 +701,7 @@ int OTSU::Otsu(Raw2D image){
 	}
 	return t;
 }
-void OTSU::Otsu_MultiVal(Raw2D image,int t_number){
+void OTSU::Otsu_MultiVal(Raw2D &image,int t_number){
 	struct Point_3 *ss=new struct Point_3 [t_number];
     double s=0.0,M_s=0.0;//类间方差
 	double u1;//前景的平均灰度
@@ -772,9 +811,9 @@ void OTSU::Otsu_MultiVal(Raw2D image,int t_number){
 		   Max_pix=(ss+k)->Max_val;
 		}
 	}while(l);
-	delete(ss);
+	delete []ss;
 }
-void OTSU::Otsu_MultiVal(Raw2D image){
+void OTSU::Otsu_MultiVal(Raw2D &image){
 	int t;//阀值
 	int i,j,k,size,Min_val,t_number,pix,Min_pix,Max_pix;
 	size=image.size();//获得图像的大小
@@ -874,32 +913,32 @@ void OTSU::Otsu_MultiVal(Raw2D image){
 		}
 	}
 }
-Points** OTSU::output(Raw2D image_2D){
-	int i,j,k,m,n,x,y;
+vector< vector <Points> > OTSU::output(Raw2D &image_2D){
+	int i,j,m,n,x,y;
 	float val;
 	//图像大小
 	x=image.getXsize();
 	y=image.getYsize();
 	m=arrays.size();//阈值个数
-    vector<Points*>pointss(m+1);//m+1个类
+    vector< vector <Points> >pointss(m+1);//m+1个类
 	Points point(0,0,0);
 	if(m>1){//多阈值处理
 		//遍历
 		for(i=0;i<y;i++){
 			for(j=0;j<x;j++){
-				val=image.get(j,i);//获得图像的像素值的大小		
-				point.x=j;
-				point.y=i;	
+				val=image_2D.get(j,i);//获得图像的像素值的大小		
+				point.x=(float)j;
+				point.y=(float)i;	
 				if(val<arrays.at(0)) {	
-					*(pointss).push_back(point);	
+					pointss[0].push_back(point);	
 				}
 				else if(val>=arrays.at(m-1)){	
-					*(pointss+m).push_back(point);
+					pointss[m].push_back(point);
 				}
 				else{//中间的类	
-					for(n=1;j<m;n){	
+					for(n=1;n<m;n++){	
 						if(val>=arrays.at(n-1) && val<arrays.at(n)){	
-							*(pointss+n).push_back(point);
+							pointss[0].push_back(point);
 						}		
 					}//for
 				}//else
@@ -910,13 +949,13 @@ Points** OTSU::output(Raw2D image_2D){
 		//遍历	
 		for(i=0;i<y;i++){
 			for(j=0;j<x;j++){	
-				val=image.get(j,i);//获得图像的像素值的大小	
-				point.x=j;
-				point.y=i;				
-				if(val<arrays.at(0)) *(pointss).push_back(point);		
-				else  *(pointss+1).push_back(point);	
+				val=image_2D.get(j,i);//获得图像的像素值的大小	
+				point.x=(float)j;
+				point.y=(float)i;				
+				if(val<arrays.at(0)) pointss[0].push_back(point);		
+				else  pointss[1].push_back(point);	
 			}//for	
 		}//for
 	}//for
+	return pointss;
 }
-*/
