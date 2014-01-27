@@ -192,16 +192,21 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	{
 		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*iter-ret.getXsize()*ret.getYsize(),true);
 	} 
-	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
+	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| 
+		((iter+1)*ret.getZsize() >=  src.getZsize() && iter !=0 ))
 	{
 		if ( iter ==0 )
 		{
 			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata(),true);
 		} 
-		else
+		else //if(((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
 		{
-			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*ret.getZsize()-ret.getXsize()*ret.getYsize(),true);
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(src.getZsize()/(iter+1))-ret.getXsize()*ret.getYsize(),true);
 		}
+		//else if((iter+1) * (src.getZsize()/(iter+1))  >=  src.getZsize())
+		//{
+		//	temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+src.size()-ret.getXsize()*ret.getYsize()*(1+ret.getZsize()),true);
+		//}
 	}
 	else 
 	{

@@ -12,7 +12,7 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 	Raw *temp;
 	bool MULTITHREADMIDLESILCES = iter !=0 && (iter+1)*ret->getZsize() < src->getZsize();
 	bool MULTITHREADFIRST = (iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize());
-	bool MULTITHREADLAST =   ((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 );
+	bool MULTITHREADLAST =   ((iter+1)*ret->getZsize() >=  src->getZsize()&& iter !=0 );
 	bool SINGLETHREAD = true ;
 	if (MULTITHREADMIDLESILCES)
 	{
@@ -163,7 +163,7 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 		else//last slice
 		{
 			temp = new Raw(ret->getXsize(),ret->getYsize(), ret->getZsize()+halfsize, 
-				src->getdata() + iter*ret->size()-ret->getXsize()*ret->getYsize() * halfsize,true);
+				src->getdata() + iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),true);
 			//globalProgressChanged = src->size();
 			size_t interval = globalProgressChanged/1000 == 0? 1:globalProgressChanged/1000;
 			int rs = 0;

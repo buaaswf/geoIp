@@ -530,7 +530,7 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 	} 
 	else
 	{
-		if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize()) || ((iter+1)*ret.getZsize() ==  src.getZsize() && iter !=0 ))
+		if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize()) || ((iter+1)*ret.getZsize() >=  src.getZsize() && iter !=0 ))
 		{
 			/*
 				two cases:
@@ -542,7 +542,7 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 			if (iter != 0)
 			{
 				 s= new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize() + 1,
-					src.getdata()+ iter * ret.getXsize() * ret.getYsize() * ret.getZsize()-ret.getXsize()*ret.getYsize());
+					src.getdata()+ iter*ret.getXsize()*ret.getYsize()*(src.getZsize()/(iter+1))-ret.getXsize()*ret.getYsize());
 			} 
 			else
 			{
