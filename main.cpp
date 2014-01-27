@@ -32,10 +32,10 @@ ImageVolume * testinterface()
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
 	
-	AnistropicI anis(3,30,1,2);
+	//AnistropicI anis(3,30,1,4);
 	//doAnistropicI(src,ret,anis);
-	//TrilateralfilterI tril(15,3);
-	//doTrilateralfilterI(src,ret,tril);
+	TrilateralfilterI tril(15,3);
+	doTrilateralfilterIY(src,ret,tril);
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
 	//BilateralFilterI bil(3,3,5);
 	//Raw * ret=(Raw *)doBilateralI(src,bil);
@@ -45,9 +45,9 @@ ImageVolume * testinterface()
 	//BilateralFilterI bil(3,3,10);
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
-	doAnistropicI(src,ret,anis);
+	//doAnistropicI(src,ret,anis);
 	//GuassFilterI gs(3,15);
-	//doGuassFilterI(src,ret,gs);
+	//doGuassFilterIY(src,ret,gs);
 
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);
