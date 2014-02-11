@@ -205,6 +205,41 @@ RawImage::~RawImage(void)
 	delete[] buf;
 }
 
+
+void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i )
+{
+	FILE * op=fopen(file,"rb");
+	if(op==NULL)
+	{
+		printf("open fail");
+	}
+	//unsigned char * unsignedbuf=new unsigned char[size];
+	fseek(op,l*m*i*3L,SEEK_SET);
+	fread(buf,sizeof(unsigned char),l*m*3,op);
+
+	fclose(op);
+	printf("read is ok\n");
+}
+
+void RawImage:: writeImageSesmicRecursive(void * src, int l ,int m, int n)
+{
+
+	FILE *p;
+	if((p=fopen("F:\\sesmic.raw","a+"))==NULL)  //"ab+"append
+	{
+		printf("cant open the file");
+		exit(0);
+	}
+	//= new unsigned char [l *m*n];
+	//unsigned char *  data =(unsigned char *) src;
+	fwrite(src, sizeof(unsigned char), l*m*n, p);
+	fclose(p);
+	fflush(stdout);
+
+	//delete[] data;
+	printf("write is ok");
+}
+
 //=====================================================================================================
 Raw::Raw(ImageVolume &src)
 {
@@ -454,6 +489,8 @@ void *  ImageVolume2Raw(ImageVolume *src)
 
 	//src->Data=data;
 	Raw *ret=new Raw(src->Width,src->Height,src->Depth,data);
+	delete [] data;
+	data = NULL;
 	return ret;
 
 }
@@ -470,9 +507,11 @@ void *  Raw2ImageVolume(Raw  &src,int type)
 		{
 			data[i] =(unsigned char) datSrc[i];
 		}
-		void * ret=(void *)data;
+		//void * ret=(void *)data;
 		ImageVolume * res = new ImageVolume(src.getXsize(),src.getYsize(),src.getZsize());
-		res->Data = ret;
+		res->Data = data;
+		//delete src;
+		//delete [] data;
 		return res;
 	}
 	else if (type == 2 )

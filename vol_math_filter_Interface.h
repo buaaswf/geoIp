@@ -1,7 +1,7 @@
 #ifndef INTERFACE_SWF
 #define INTERFACE_SWF
 
-
+#include "KDetectMemoryLeak.h"
 #include "vol_math_ImageVolume.h"
 #include "vol_math_RawImage.h"
 #include "vol_math_WipeNioisePde.h" //3d ansitropic filter

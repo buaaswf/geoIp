@@ -1,19 +1,24 @@
 #include <stdio.h>
-#include <stdlib.h>
+
 //#include "CImg.h"
 //#include "test.h"
 #include <assert.h>
 #include "vol_math_filter_interface.h"
 #include <stdio.h>
 #include <tchar.h>
+#define CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#include "KDetectMemoryLeak.h"
+
 
 ImageVolume * testinterface()
 {
-	int l = 281, m = 481, n = 50;
+	int l = 4338, m = 3353, n = 3;
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
-	test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));
+	test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));
 	//PIXTYPE **slice =new PIXTYPE *[n];
 	//for (int k = 0; k < n; k++)
 	//{
@@ -34,8 +39,10 @@ ImageVolume * testinterface()
 	
 	//AnistropicI anis(3,30,1,4);
 	//doAnistropicI(src,ret,anis);
-	TrilateralfilterI tril(15,3);
-	doTrilateralfilterIY(src,ret,tril);
+	// trilateral 20140211============
+	//TrilateralfilterI tril(15,3);
+	//doTrilateralfilterIY(src,ret,tril);
+	// //=======================
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
 	//BilateralFilterI bil(3,3,5);
 	//Raw * ret=(Raw *)doBilateralI(src,bil);
@@ -46,8 +53,8 @@ ImageVolume * testinterface()
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	//doAnistropicI(src,ret,anis);
-	//GuassFilterI gs(3,15);
-	//doGuassFilterIY(src,ret,gs);
+	GuassFilterI gs(3,15);
+	doGuassFilterIY(src,ret,gs);
 
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);
@@ -75,33 +82,6 @@ Raw * testinterface1(Process &src)
 
 
 }
-//int  testv1()
-//{
-//	int l=281,m=481,n = 10;
-//	RawImage test;
-//	unsigned char * indata=new unsigned char [l*m*n];
-//
-//	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));
-//
-//	ImageVolume *imagevol=new ImageVolume(l,m,n,1,indata);
-//	Raw  * ret = testinterface(*imagevol);
-//	unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
-//	test.writeImagesesmicarray(data ,ret->getXsize(),ret->getYsize(),ret->getZsize());
-//
-//	unsigned char * outdata=new unsigned char [l*m*n];
-//	test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));
-//	ImageVolume *in=new ImageVolume(l,m,n,1,indata);
-//	ImageVolume *out=new ImageVolume(l,m,n,1,outdata);
-//	ImageVolume *ret= testinterface(in,out);
-//	unsigned char* data =(unsigned char *) ret->Data;
-//	test.writeImagesesmicarray(data ,ret->Width,ret->Height,ret->Depth);
-//
-//	system("pause");
-//	return 1;
-//}
-
-
-
 void testprocess()
 {
 	int l = 281, m = 481, n = 15;
@@ -129,11 +109,57 @@ void testprocess()
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
 	test.writeImagesesmicarray(ret->Data ,ret->Width,ret->Height,ret->Depth);
 }
+void testbigdata()
+{
+	int l = 989, m = 1241, total = 30, n = 3;
+	for (int i=0; i < total/3 ; i++)
+	{
+		RawImage test;
+		unsigned char * indata = new unsigned char [l*m*n];
+		test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
+		unsigned char * outdata = new unsigned char[l*m*n]; 
+		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
+		ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
+		delete [] indata;
+		indata = NULL;
+		delete [] outdata;
+		outdata = NULL;
+		GuassFilterI gs(3,15);
+		doGuassFilterIY(src,ret,gs);
+		test.writeImageSesmicRecursive(ret->Data ,ret->Width,ret->Height,ret->Depth);
+		delete src;
+		delete ret;
+		delete [] outdata;
+		delete [] indata;
+		//outdata=NULL;
+		//delete indata;
+		//indata = NULL;
+	}
+
+}
+void Exit()
+{
+	int i = _CrtDumpMemoryLeaks();
+	assert( i == 0);
+}
+
 int main(int argc, char* argv[])
 {
-	testinterface();
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	//testinterface();
+
+	//_CrtSetBreakAlloc(307);
+	
+	
+
+	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
+	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
+	_CrtSetDbgFlag( tmpFlag );
+	 testbigdata();
+	 _CrtDumpMemoryLeaks();
+	// _CrtDumpMemoryLeaks;
+	//atexit(Exit);
 	system("pause");
 	return 1;
 
 }
-//sadasdasdasd/

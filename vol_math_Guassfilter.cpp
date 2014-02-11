@@ -88,7 +88,10 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 
 			ret->putXYZ( i, guass->getXYZ(i + ret->getXsize()*ret->getYsize()) );
 		}
+		delete guass;
+		delete temp;
 	} 
+
 	else if ( MULTITHREADFIRST|| MULTITHREADLAST )
 	{
 		if ( iter ==0 )
@@ -159,6 +162,10 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 
 				ret->putXYZ(i ,  guass->getXYZ(i));
 			}
+
+
+			delete guass;
+			delete temp;
 		} //...if first multi thread 
 		else//last slice
 		{
@@ -229,7 +236,10 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 
 				ret->putXYZ(i ,  guass->getXYZ(i + ret->getXsize()*ret->getYsize()));//?????
 			}
+			delete guass;
+			delete temp;
 		}
+		
 
 
 
@@ -301,8 +311,10 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 
 			ret->putXYZ(i , guass->getXYZ(i));
 		}
+		delete guass;
+		delete temp;
 	}
-
+	
 	//if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
 	//{
 

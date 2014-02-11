@@ -160,6 +160,8 @@ bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para)
 	 //return indata;
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
+	delete res;
+	delete outdata;
 	return true;
 }
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
@@ -506,6 +508,7 @@ void * singleGuassFilterSipl(void * para)
 	Raw *outdata = p->ret;
 	Filter *guass=new Filter();
 	guass->guass3DFilterSipl(indata,outdata,p->iter,p->halfsize/2,progress);
+	delete guass;
 	return NULL;
 }
 
@@ -1302,7 +1305,10 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 	}
 
 	Raw  *ret = new Raw(src->getXsize(),src->getZsize(),src->getYsize(),datatp,true);
-	*src = Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),datatp);
+	delete src;
+	//src->getdata() =NULL;
+	src =new  Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),datatp);
+	
 	//memcpy(res->getdata() ,data, src->size()*datasize);
 	//res = ret;
 	/*int datasize = 1;
@@ -1508,6 +1514,12 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 			break;
 		
 		}//switch... 
+		for (vector<int>::size_type ix = 0; ix!= raw.size(); ++ix)
+		{
+			Raw *t;
+			t=raw[ix];
+			delete t;
+		}
 
 	}//if...
 	else
@@ -1540,7 +1552,14 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 		}
 	}
 	cout << countvar <<endl;
-	*res = Raw (src->getXsize(),src->getZsize(),src->getYsize(),outdata);
+	//delete src;
+	delete res;
+	res = new Raw (src->getXsize(),src->getZsize(),src->getYsize(),outdata);
+	delete [] outdata;
+	outdata = NULL;
+
+	delete ret;
+	delete src;
 	//memcpy(res->getdata(),outdata,src->size()*datasize);
 	//delete  ret;
 

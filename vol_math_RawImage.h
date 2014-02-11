@@ -38,6 +38,7 @@ public:
 	}
 	~RawImage(void);
 	void readImage( unsigned char * buf,char const *file ,int size);
+	void readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i);
 	void readImagesi(short  * buf,char const *file ,int size);
 	void readStream(short *buf,char const *file,int size);
 	void writeImagecolon(Raw& destImg);
@@ -46,6 +47,7 @@ public:
 	void readImage2(float * buf,char const *file ,int size);
 	float * buf2float(unsigned char *buf);
 	void writeImagesesmicarray(void * src, int l ,int m, int n);
+	void writeImageSesmicRecursive(void * src, int l ,int m, int n);
 	void save();
 };
 

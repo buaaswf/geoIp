@@ -48,7 +48,7 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *dat
 		if(PixelType==1)
 		{
 			unsigned char  * cData=new unsigned char[GetLength()];
-			this->Data = (void *)data;
+			this->Data = cData;
 			memcpy(Data,data,sizeof(unsigned char)*GetLength());
 		}
 		if(PixelType==2)
