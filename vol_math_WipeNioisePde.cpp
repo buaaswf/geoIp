@@ -58,6 +58,7 @@ WipeNioisePde::WipeNioisePde()
 }
 WipeNioisePde::~WipeNioisePde(void)
 {
+
 }
 void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 {
@@ -143,7 +144,8 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 				}//fory...
 				//cout << "times = :" << i << endl;
 			}//for z...
-			s = temp;
+			delete s;
+			s = new Raw(*temp);
 		}//for delta .....
 		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
 		int rs = 0 ;
@@ -162,6 +164,8 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			ret->putXYZ( i, temp->getXYZ(i + ret->getXsize() * ret->getYsize()) );
 		}
 		delete s;
+		delete temp;
+		delete [] around;
 	} 
 	else
 	{
@@ -230,7 +234,9 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 					}//for  y..
 
 				}//forz..
-				s = temp;
+				delete s;
+				
+				s =new Raw(*temp);
 			}//for delta
 			//size_t step = iter *ret->size();
 			//int call = 10000;
@@ -280,6 +286,8 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			}//else ..._if iter =0
 
 			delete s;
+			delete [] around;
+			delete temp;
 		}//if
 		else
 		{
@@ -357,11 +365,12 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 				ret->putXYZ(i , temp->getXYZ(i) );
 			}
 			delete d;
+
 			//src = s;
 			//return  d;
 		}
 
-
+		
 	}
 	//if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
 	//{

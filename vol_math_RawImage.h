@@ -6,6 +6,7 @@
 #include <fstream>
 #include "vol_math_ImageVolume.h"
 #include"vol_math_Raw3D_Independt.h"
+#include"KDetectMemoryLeak.h"
 //#define u_char unsigned char
 //#define PIXTYPE unsigned char
 using namespace std;

@@ -124,8 +124,20 @@ void testbigdata()
 		indata = NULL;
 		delete [] outdata;
 		outdata = NULL;
-		GuassFilterI gs(3,15);
-		doGuassFilterIY(src,ret,gs);
+		//int choice=1;
+		//cin>>choice;
+		//if (choice==1)
+		//{
+		//} 
+		//else
+		//{
+		//}
+		//GuassFilterI gs(3,15);
+		//doGuassFilterIY(src,ret,gs);
+		//AnistropicI ani(2,1,1,15);
+		//doAnistropicIY(src,ret,ani);
+		TrilateralfilterI tri(15,3.0);
+		doTrilateralfilterIY(src,ret,tri);
 		test.writeImageSesmicRecursive(ret->Data ,ret->Width,ret->Height,ret->Depth);
 		delete src;
 		delete ret;
@@ -148,7 +160,7 @@ int main(int argc, char* argv[])
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	//testinterface();
 
-	//_CrtSetBreakAlloc(307);
+	//_CrtSetBreakAlloc(520);
 	
 	
 

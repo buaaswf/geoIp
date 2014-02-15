@@ -240,8 +240,8 @@ struct Process
 };
 extern void * doAnistropicI (ImageVolume &src,AnistropicI &);
 extern void * doAnistropicI (Raw *src, Raw *ret, AnistropicII &);
-bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
-bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
+extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
+extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
 extern void * doAnistropicI (Process &);
 extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);

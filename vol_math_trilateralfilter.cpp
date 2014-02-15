@@ -34,6 +34,9 @@ Trilateralfilter::Trilateralfilter(Raw* img)
 Trilateralfilter::~Trilateralfilter(void)
 {
 	img=NULL;
+	delete temp;
+	//delete ret;
+	//delete rawarraydata;
 	//delete this->src;
 	//delete rawarray;
 }
@@ -212,7 +215,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	{
 		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize(),src.getdata(),true);
 	}
-	pSrcImg = temp;
+	pSrcImg = new Raw(*temp);
 	Raw destImg;//= new Raw(ret,true); 			
 	Raw fTheta; 			//stores Adaptive neighborhood size for each pixel
 	RawArray minGradientStack;	
@@ -358,7 +361,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 		}
 		
 	}
-
+	delete pSrcImg;
 }
 //for more  paras
 void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigma,float sigmab,float sigmc)

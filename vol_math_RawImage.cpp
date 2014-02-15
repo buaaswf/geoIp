@@ -225,7 +225,7 @@ void RawImage:: writeImageSesmicRecursive(void * src, int l ,int m, int n)
 {
 
 	FILE *p;
-	if((p=fopen("F:\\sesmic.raw","a+"))==NULL)  //"ab+"append
+	if((p=fopen("F:\\sesmic.raw","ab+"))==NULL)  //"ab+"append
 	{
 		printf("cant open the file");
 		exit(0);

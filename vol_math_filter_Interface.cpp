@@ -56,6 +56,9 @@ bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 	//memcpy((unsigned char*)ret->Data,outdata->getdata(),outdata->size()*sizeof(unsigned char));
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char)); 
+	delete res;
+	delete outdata;
+	//delete indata;
 	return true;
 }
  void * doAnistropicI (Process & para)
@@ -194,6 +197,8 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 	 //return indata;
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
+	delete res;
+	delete outdata;
 	 return true;
 
 }
@@ -526,9 +531,9 @@ void * singleTrilateralfilterSipl(void *para)
 	TrilateralfilterPSipl *p=(TrilateralfilterPSipl*) para; 
 	Raw *indata = p->src;
 	Raw *outdata = p->ret;
-	Trilateralfilter f(indata,outdata,p->iter,progress);
-	f.TrilateralFilter(*indata,*outdata,p->sigmaC);
-
+	Trilateralfilter *f=new Trilateralfilter(indata,outdata,p->iter,progress);
+	f->TrilateralFilter(*indata,*outdata,p->sigmaC);
+	delete f;
 	return NULL;
 }
 void * singleAnistropicFilter(void * para)
@@ -549,7 +554,7 @@ void * singleAnistropicFilterSipl(void * para)
 		//pde->ProgressChanged = progress;
 	WipeNioisePde *pde=new WipeNioisePde(indata,outdata,p->iter,p->time,p->val,p->method,progress);//two pointers,one in,one out
 	
-	//delete pde;
+	delete pde;
 	return NULL;
 }
 //bool single(Raw *src, Raw *ret, int size,int position)
