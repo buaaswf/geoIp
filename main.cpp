@@ -111,38 +111,48 @@ void testprocess()
 }
 void testbigdata()
 {
-	int l = 989, m = 1241, total = 30, n = 3;
-	for (int i=0; i < total/3 ; i++)
+	//int l = 989, m = 1241, total = 30, n = 3;
+	int l = 281, m = 481, total = 2000, n = 100;
+	for (int i=0; i < total/n ; i++)
 	{
 		RawImage test;
 		unsigned char * indata = new unsigned char [l*m*n];
-		test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
+		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
+		test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
+		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i);
 		unsigned char * outdata = new unsigned char[l*m*n]; 
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
+		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
+
+
+		//GuassFilterI gs(3,15);
+		//doGuassFilterIY(src,ret,gs);
+		//AnistropicI ani(3,30,1,15);
+		//doAnistropicIY(src,ret,ani);
+		TrilateralfilterI tri(15,3.0);
+		doTrilateralfilterIY(src,ret,tri);
+		//int cc=0;
+		//for (int i=0;i<src->GetLength();i++)
+		//{
+		//	//src_bak->Data = (unsigned char*)src_bak->Data;
+		//	//ret->Data = (unsigned char*)ret->Data;
+		//	if (indata[i]!=outdata[i])
+		//	{
+		//		cc++;
+		//	}
+		//}
 		delete [] indata;
 		indata = NULL;
 		delete [] outdata;
 		outdata = NULL;
-		//int choice=1;
-		//cin>>choice;
-		//if (choice==1)
-		//{
-		//} 
-		//else
-		//{
-		//}
-		//GuassFilterI gs(3,15);
-		//doGuassFilterIY(src,ret,gs);
-		//AnistropicI ani(2,1,1,15);
-		//doAnistropicIY(src,ret,ani);
-		TrilateralfilterI tri(15,3.0);
-		doTrilateralfilterIY(src,ret,tri);
+		//cout << cc<<endl;
 		test.writeImageSesmicRecursive(ret->Data ,ret->Width,ret->Height,ret->Depth);
 		delete src;
+		delete src_bak;
 		delete ret;
-		delete [] outdata;
-		delete [] indata;
+		//delete [] outdata;
+		//delete [] indata;
 		//outdata=NULL;
 		//delete indata;
 		//indata = NULL;

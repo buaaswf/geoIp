@@ -125,6 +125,8 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 							{
 								//implementation sum(g(i)*f(i))
 								sum += around[k]/(1 + around[k]*around[k]/(val*val));
+							//	if (sum!=0)
+							///*		cout <<sum<<endl;*/
 
 							}
 							float tempval = s->get(x,y,z) + a*sum/double(6);
@@ -146,6 +148,7 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			}//for z...
 			delete s;
 			s = new Raw(*temp);
+			//s=temp;
 		}//for delta .....
 		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
 		int rs = 0 ;
@@ -517,7 +520,7 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 				}//fory...
 				//cout << "times = :" << i << endl;
 			}//for z...
-			s = temp;
+			s = new Raw (*temp);
 		}//for delta .....
 		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
 		int rs = 0 ;
@@ -604,7 +607,7 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 					}//for  y..
 
 				}//forz..
-				s = temp;
+				s =new Raw(*temp);
 			}//for delta
 			//size_t step = iter *ret.size();
 			//int call = 10000;
@@ -708,7 +711,7 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 					//cout << "times = :" << i << endl;
 				}//for
 				//d += s*(-1);
-				d = temp;
+				d = new Raw(*temp);
 			}//for delte
 			//size_t step = iter *ret.size();
 			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1

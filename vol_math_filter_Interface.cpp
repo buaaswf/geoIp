@@ -1309,11 +1309,10 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 		}
 	}
 
-	Raw  *ret = new Raw(src->getXsize(),src->getZsize(),src->getYsize(),datatp,true);
+	Raw  *ret = new Raw(src->getXsize(),src->getZsize(),src->getYsize(),datatp);
 	delete src;
-	//src->getdata() =NULL;
 	src =new  Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),datatp);
-	
+	Raw *src_bak =new Raw(*src);
 	//memcpy(res->getdata() ,data, src->size()*datasize);
 	//res = ret;
 	/*int datasize = 1;
@@ -1551,23 +1550,29 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 		{
 			for (int k = 0; k < src->getXsize(); k++)
 			{
-				//src->put( k, j, i, ret->get(k, i, j) );
 				outdata[k + j*src->getXsize() + i*src->getXsize()*src->getZsize()] = ret->get(k, i, j);
 			}
 		}
 	}
 	cout << countvar <<endl;
-	//delete src;
 	delete res;
 	res = new Raw (src->getXsize(),src->getZsize(),src->getYsize(),outdata);
+	int coutvarfinal = 0;
+
+	for (int i = 0; i < src->size(); i++ )
+	{
+		if (src_bak->getXYZ(i)!= res->getXYZ(i))
+		{
+			coutvarfinal ++;
+		}
+
+	}
+	cout<<coutvarfinal<<endl;
 	delete [] outdata;
 	outdata = NULL;
-
 	delete ret;
 	delete src;
-	//memcpy(res->getdata(),outdata,src->size()*datasize);
-	//delete  ret;
-
+	delete src_bak;
 	/*
 	1\trilaterfilter
 	2\anistropic

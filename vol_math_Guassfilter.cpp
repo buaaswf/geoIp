@@ -170,7 +170,7 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 		else//last slice
 		{
 			temp = new Raw(ret->getXsize(),ret->getYsize(), ret->getZsize()+halfsize, 
-				src->getdata() + iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),true);
+				src->getdata() + iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize()*halfsize,true);
 			//globalProgressChanged = src->size();
 			size_t interval = globalProgressChanged/1000 == 0? 1:globalProgressChanged/1000;
 			int rs = 0;

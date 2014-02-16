@@ -214,8 +214,8 @@ void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,i
 		printf("open fail");
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
-	fseek(op,l*m*i*3L,SEEK_SET);
-	fread(buf,sizeof(unsigned char),l*m*3,op);
+	fseek(op,l*m*200+l*m*i*100L,SEEK_SET);
+	fread(buf,sizeof(unsigned char),l*m*100,op);
 
 	fclose(op);
 	printf("read is ok\n");
@@ -293,7 +293,7 @@ Raw::Raw(const Raw & src, bool _is_shared)
 	if (this->is_shared == true) {
 		this->data = src.data;
 	} else {
-		this->data=new PIXTYPE[size()];
+		this->data=new PIXTYPE[this->size()];
 		memcpy(this->data,src.data,sizeof(PIXTYPE)*size());
 	}
 }
