@@ -214,8 +214,8 @@ void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,i
 		printf("open fail");
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
-	fseek(op,l*m*i*10L,SEEK_SET);
-	fread(buf,sizeof(unsigned char),l*m*10,op);
+	fseek(op,l*m*i*3L,SEEK_SET);
+	fread(buf,sizeof(unsigned char),l*m*3,op);
 
 	fclose(op);
 	printf("read is ok\n");
@@ -225,7 +225,7 @@ void RawImage:: writeImageSesmicRecursive(void * src, int l ,int m, int n)
 {
 
 	FILE *p;
-	if((p=fopen("F:\\sesmic.raw","ab+"))==NULL)  //"ab+"append
+	if((p=fopen("F:\\sesmic.raw","a+"))==NULL)  //"ab+"append
 	{
 		printf("cant open the file");
 		exit(0);
@@ -293,7 +293,7 @@ Raw::Raw(const Raw & src, bool _is_shared)
 	if (this->is_shared == true) {
 		this->data = src.data;
 	} else {
-		this->data=new PIXTYPE[this->size()];
+		this->data=new PIXTYPE[size()];
 		memcpy(this->data,src.data,sizeof(PIXTYPE)*size());
 	}
 }
@@ -489,8 +489,6 @@ void *  ImageVolume2Raw(ImageVolume *src)
 
 	//src->Data=data;
 	Raw *ret=new Raw(src->Width,src->Height,src->Depth,data);
-	delete [] data;
-	data = NULL;
 	return ret;
 
 }
@@ -507,11 +505,9 @@ void *  Raw2ImageVolume(Raw  &src,int type)
 		{
 			data[i] =(unsigned char) datSrc[i];
 		}
-		//void * ret=(void *)data;
+		void * ret=(void *)data;
 		ImageVolume * res = new ImageVolume(src.getXsize(),src.getYsize(),src.getZsize());
-		res->Data = data;
-		//delete src;
-		//delete [] data;
+		res->Data = ret;
 		return res;
 	}
 	else if (type == 2 )

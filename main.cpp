@@ -111,15 +111,15 @@ void testprocess()
 }
 void testbigdata()
 {
-	//int l = 989, m = 1241, total = 30, n = 3;
-	int l = 281, m = 481, total = 2000, n = 100;
+	//int l = 989, m = 1241, total = 500, n = 10;
+	int l = 281, m = 481, total = 2000, n = 10;
 	for (int i=0; i < total/n ; i++)
 	{
 		RawImage test;
 		unsigned char * indata = new unsigned char [l*m*n];
 		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
-		test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
-		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i);
+		//test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
+		test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i);
 		unsigned char * outdata = new unsigned char[l*m*n]; 
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
