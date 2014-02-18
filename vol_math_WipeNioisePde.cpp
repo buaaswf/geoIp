@@ -20,13 +20,14 @@ WipeNioisePde::WipeNioisePde(Raw &src,Raw &ret,int iter,int time,PIXTYPE value, 
 		FourPDiff(src,ret);
 	}
 }
-WipeNioisePde::WipeNioisePde(Raw *src,Raw *ret,int iter,int time,PIXTYPE value, int method, void(*ProgressChanged)(int,int,int,bool &))
+WipeNioisePde::WipeNioisePde(Raw *src,Raw *ret,int iter,int time,PIXTYPE value, int method, void(*ProgressChanged)(int,int,int,bool &),int datatype)
 {
 	//raw=src;
 	delt=time;
 	val=value;
 	way=method;
 	this->ProgressChanged = ProgressChanged;
+	this->datatype =datatype;
 	if (way==1)
 	{
 		Perona_MalikSipl(src,ret,iter);
@@ -72,11 +73,11 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 	//Raw s=Raw(src);
 	 Raw * temp;
 	 float Maxvar;
-	 if ( sizeof (PIXTYPE) == 1)
+	 if ( sizeof (datatype) == 1)
 	 {
 		 Maxvar = 255;
 	 } 
-	 else if ( sizeof (PIXTYPE) == 2)
+	 else if ( sizeof (datatype) == 2)
 	 {
 		 //qym 2014-1-10
 		 //Maxvar = 65536;
@@ -150,7 +151,7 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			s = new Raw(*temp);
 			//s=temp;
 		}//for delta .....
-		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diyigeshi0 houmianshi 1
 		int rs = 0 ;
 		//bool flag = false;
 		for ( int i = 0; i < ret->size(); i ++)

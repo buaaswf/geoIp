@@ -10,11 +10,12 @@ private:
 	int delt;
 	PIXTYPE val;
 	int way;
+	int datatype;
 	
 public:
 	void (*ProgressChanged)(int ,int ,int ,bool &);
 	WipeNioisePde(Raw &raw ,Raw &ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &));
-	WipeNioisePde(Raw *raw ,Raw *ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &));
+	WipeNioisePde(Raw *raw ,Raw *ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &),int datatype);
 
 	WipeNioisePde();
 	WipeNioisePde(Raw &raw ,int time,PIXTYPE value,int method);

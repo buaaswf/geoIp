@@ -112,7 +112,7 @@ void testprocess()
 void testbigdata()
 {
 	//int l = 989, m = 1241, total = 500, n = 10;
-	int l = 281, m = 481, total = 2000, n = 10;
+	int l = 281, m = 481, total = 10, n = 10;
 	for (int i=0; i < total/n ; i++)
 	{
 		RawImage test;
@@ -126,12 +126,12 @@ void testbigdata()
 		ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 
 
-		//GuassFilterI gs(3,15);
-		//doGuassFilterIY(src,ret,gs);
+		GuassFilterI gs(3,15);
+		doGuassFilterIY(src,ret,gs);
 		//AnistropicI ani(3,30,1,15);
 		//doAnistropicIY(src,ret,ani);
-		TrilateralfilterI tri(15,3.0);
-		doTrilateralfilterIY(src,ret,tri);
+		//TrilateralfilterI tri(15,3.0);
+		//doTrilateralfilterIY(src,ret,tri);
 		//int cc=0;
 		//for (int i=0;i<src->GetLength();i++)
 		//{

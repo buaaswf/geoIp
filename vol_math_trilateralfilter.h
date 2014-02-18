@@ -29,19 +29,33 @@ class Trilateralfilter
 {
 public:
 	Raw* src;
+
+	/**
+	 \brief	Constructor.
+	
+	 \param [in,out]	src			   	If non-null, source for the.
+	 \param [in,out]	ret			   	If non-null, the ret.
+	 \param	iter					   	The iterator.
+	 \param [in,out]	ProgressChanged	If non-null, the progress changed.
+	 in use 20140218
+	 */
+
 	Trilateralfilter(Raw* src,Raw *ret,int iter,void(*ProgressChanged)(int,int,int,bool &));
+	Trilateralfilter(Raw* src,Raw *ret,int iter,void(*ProgressChanged)(int,int,int,bool &),int datatype);
 	Trilateralfilter(Raw* src);
 	~Trilateralfilter(void);
 	//void TrilateralFilter(float sigmaC); 
 	void TrilateralFilter(Raw &src,Raw &ret,float sigmaC); 
 	void TrilateralFilter_Multi(float sigmaC,int threadcount);
 	void TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigmaR,float sigma3,float sigma4,float R,int maxhalfsize);
-	void TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigma,float sigmab,float sigmc) /*===================================================================================================== */;
+	void TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigma); 
+/*===================================================================================================== */
 private:
 	RawImage* img;
 	Raw *ret;
 	Raw *temp;
 	int iter;
+	int srcdatatype;
 	RawArray* rawarraydata;
 	void (*ProgressChanged)(int ,int ,int ,bool &);
 	//Computes X , Y and Z gradients of the input RawImage

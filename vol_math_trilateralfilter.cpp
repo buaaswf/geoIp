@@ -25,6 +25,26 @@ Trilateralfilter::Trilateralfilter(Raw* img,Raw * ret, int iter,void(*ProgressCh
 
 	//this->src=rawarray(img);
 }
+
+Trilateralfilter::Trilateralfilter(Raw* img,Raw * ret, int iter,void(*ProgressChanged)(int,int,int,bool &) ,int datatype)
+{
+	this->src = img;
+	this->ret = ret;
+	this->iter = iter;
+	this->ProgressChanged=ProgressChanged;
+	this->srcdatatype = datatype;
+	//if ()
+	//{
+	//} 
+	//else if ()
+	//{
+	//}
+	//else
+	//{
+	//}
+
+	//this->src=rawarray(img);
+}
 Trilateralfilter::Trilateralfilter(Raw* img)
 {
 	this->src = img;
@@ -187,7 +207,7 @@ Trilateralfilter::~Trilateralfilter(void)
 void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	//=====================================================================================================
 {	
-	globalProgressChanged = src.size();
+	globalProgressChanged = src.getZsize();
 	this->src = &src;
 	this->ret = &ret;
 	Raw *pSrcImg;
@@ -363,34 +383,41 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	}
 	delete pSrcImg;
 }
-//for more  paras
-void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigma,float sigmab,float sigmc)
+//for more  paras 20140218
+void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float sigmaA)
 	//=====================================================================================================
 {	
-	globalProgressChanged = src.size();
+	globalProgressChanged = ret.size();
+	size_t interval = globalProgressChanged/1000==0 ?1:globalProgressChanged/1000;
 	this->src = &src;
 	this->ret = &ret;
 	Raw *pSrcImg;
+	int rs =0;
 	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
 	{
 		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*iter-ret.getXsize()*ret.getYsize(),true);
 	} 
-	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
+	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| 
+		((iter+1)*ret.getZsize() >=  src.getZsize() && iter !=0 ))
 	{
 		if ( iter ==0 )
 		{
 			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata(),true);
 		} 
-		else
+		else //if(((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
 		{
-			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*ret.getZsize()-ret.getXsize()*ret.getYsize(),true);
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(src.getZsize()/(iter+1))-ret.getXsize()*ret.getYsize(),true);
 		}
+		//else if((iter+1) * (src.getZsize()/(iter+1))  >=  src.getZsize())
+		//{
+		//	temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+src.size()-ret.getXsize()*ret.getYsize()*(1+ret.getZsize()),true);
+		//}
 	}
 	else 
 	{
 		temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize(),src.getdata(),true);
 	}
-	pSrcImg = temp;
+	pSrcImg = new Raw(*temp);
 	Raw destImg;//= new Raw(ret,true); 			
 	Raw fTheta; 			//stores Adaptive neighborhood size for each pixel
 	RawArray minGradientStack;	
@@ -457,7 +484,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 	to produce xSmoothGradient and ySmoothGradient.
 	**/
 	//Trilateralfilter ps = new Trilateralfilter(temp);
-	BilateralGradientFilter(&xGradient, &yGradient,&zGradient, &xSmoothGradient, &ySmoothGradient, &zSmoothGradient,sigmaC, sigmaR, filterSize);
+	BilateralGradientFilter(&xGradient, &yGradient,&zGradient, &xSmoothGradient, &ySmoothGradient, &zSmoothGradient,sigmaA, sigmaR, filterSize);
 
 	/**
 	Find the adaptive neighborhood fTheta for each pixel location (Step 4). fTheta size is
@@ -498,11 +525,19 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 	/*
 	fwrite(pointer,sizeof(T),length,nfile);
 	fclose(nfile);*/
-
+	bool flag =true;
 	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
 	{
 		for ( int i = 0; i < ret.size(); i++)
 		{
+			rs++;
+			if ( rs == interval && ProgressChanged != NULL )
+			{
+				progressStep += interval;
+				rs = 0;
+				ProgressChanged (1, 100,(int) (long long)( progressStep*100)/(globalProgressChanged*src.getZsize()/ret.getZsize() ),flag);
+			}
+
 			ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
 
 		}
@@ -513,6 +548,22 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 		{
 			for ( int i = 0; i < ret.size(); i++)
 			{
+				//if (i < src->getZsize()/iter+1/ret.getXsize()/ret.getYsize())
+				//{
+					rs++;
+				//}
+				
+				if ( rs == interval && ProgressChanged != NULL )
+				{
+					progressStep += interval;
+					rs = 0;
+					ProgressChanged (1, 100,(int) (long long)( progressStep*100)/(globalProgressChanged*src.getZsize()/ret.getZsize() ),flag);
+				}
+				//if (i ==imax-1 && k == kmax-1 && j == jmax-1  && progressStep < globalProgressChanged)
+				//{
+				//	ProgressChanged (1, 100,100,flag);
+				//}
+				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
 				ret.putXYZ( i, destImg.getXYZ(i));
 
 			}
@@ -521,6 +572,13 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 		{
 			for ( int i = 0; i < ret.size(); i++)
 			{
+				rs++;
+				if ( rs == interval && ProgressChanged != NULL )
+				{
+					progressStep += interval;
+					rs = 0;
+					ProgressChanged (1, 100,(int) (long long)( progressStep*100)/(globalProgressChanged*src.getZsize()/ret.getZsize() ),flag);
+				}
 				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
 
 			}
@@ -531,12 +589,19 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 	{
 		for ( int i = 0; i < ret.size(); i++)
 		{
+			rs++;
+			if ( rs == interval && ProgressChanged != NULL )
+			{
+				progressStep += interval;
+				rs = 0;
+				ProgressChanged (1, 100,(int) (long long)( progressStep*100)/(globalProgressChanged*src.getZsize()/ret.getZsize() ),flag);
+			}
 			ret.putXYZ( i, destImg.getXYZ(i) );
 
 		}
 		
 	}
-
+	delete pSrcImg;
 }
 
 
@@ -568,7 +633,7 @@ void Trilateralfilter::ComputeGradientsSipl(Raw* pX, Raw *pY, Raw* pZ)
 	jmax =  temp->getYsize();
 	kmax =  temp->getZsize();
 	size_t interval = globalProgressChanged/1000 == 0?1:globalProgressChanged/1000;
-	int rs = 0;
+	//int rs = 0;
 	bool flag = false;
 	for(k=0; k<kmax; k++)
 	{
@@ -582,13 +647,14 @@ void Trilateralfilter::ComputeGradientsSipl(Raw* pX, Raw *pY, Raw* pZ)
 			jN = jmax -1 ;
 		for( i=0; i < imax; i++)			// and each pixel on a scanline,
 		{
-			rs++;
+			// delete 20140218
+		/*	rs++;
 			if ( rs == interval && ProgressChanged != NULL )
 			{
 				progressStep += interval;
 				rs = 0;
 				ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged ),flag);
-			}
+			}*/
 			iE = i+1;
 			if( iE > imax -1)
 				iE = imax -1;	// addr. of East neighbor
@@ -664,7 +730,7 @@ RawArray* pMaxStack , int levelMax, float beta)
 	kmax= temp->getZsize();
 
 	size_t interval = levelMax*globalProgressChanged/1000==0 ?1:globalProgressChanged/1000;
-	int rs = 0;
+	//int rs = 0;
 	bool flag = false;
 	for(lev=0; lev < levelMax; lev++) 
 	{
@@ -674,14 +740,14 @@ RawArray* pMaxStack , int levelMax, float beta)
 			{
 				for(i=0; i < imax; i++) 
 				{
-					
-					rs++;
-					if ( rs == interval && ProgressChanged != NULL )
-					{
-						progressStep += interval/levelMax;
-						rs = 0;
-						ProgressChanged (1, 100,(int) (long long)( progressStep)*20/globalProgressChanged,flag);
-					}
+					//delete the progress bar 20140218
+					//rs++;
+					//if ( rs == interval && ProgressChanged != NULL )
+					//{
+					//	progressStep += interval/levelMax;
+					//	rs = 0;
+					//	ProgressChanged (1, 100,(int) (long long)( progressStep)*20/globalProgressChanged,flag);
+					//}
 					if( lev == 0) { //stack level 0 is the magnitude of the gradients of original RawImage
 						tmp = (float) sqrt((float) pX->get(i,j,k)*pX->get(i,j,k) + pY->get(i,j,k)*pY->get(i,j,k) +pZ->get(i,j,k)*pZ->get(i,j,k));
 						if(maxGrad < tmp)
@@ -816,7 +882,7 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 	kmax =  temp->getZsize();
 	halfSize = (int) (filterSize-1)/2; //size of the filter kernel
 	size_t interval = globalProgressChanged/1000 == 0?1:globalProgressChanged/1000;
-	int rs = 0;
+	//int rs = 0;
 	bool flag = false;
 	for(i=0; i<imax; i++) //X scanline origion i=0
 	{		
@@ -824,13 +890,14 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 		{ 
 			for(k=0;k<kmax;k++)//Z scanline origion k=0
 			{
-				rs++;
+				//delete the progress bar 20140218
+	/*			rs++;
 				if ( rs == interval && ProgressChanged != NULL )
 				{
 					progressStep += interval;
 					rs = 0;
 					ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged),flag);
-				}
+				}*/
 				normFactor=0.0;
 				tmpX=0.0;
 				tmpY=0.0;
@@ -985,7 +1052,7 @@ void Trilateralfilter::findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxSta
 	jmax = temp->getYsize();
 	kmax = temp->getZsize();
 	size_t interval = levelMax*globalProgressChanged/1000 == 0 ?1:globalProgressChanged/1000;
-	int rs = 0;
+	//int rs = 0;
 	bool flag = false;
 	for(k = 0; k<kmax; k++)
 	{
@@ -994,13 +1061,14 @@ void Trilateralfilter::findAdaptiveRegion(RawArray* pMinStack, RawArray* pMaxSta
 			for(lev=0; lev < levelMax; lev++) {
 				//Compute the adaptive neighboirhood based on the similarity of
 				//the neighborhood gradients
-				rs++;
+				// delete the progress bar 20140218
+			/*	rs++;
 				if ( rs == interval && ProgressChanged != NULL )
 				{
 					progressStep += interval/levelMax;
 					rs = 0;
 					ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged )/levelMax,flag);
-				}
+				}*/
 
 				if ( pMaxStack->get(i,j,k,lev) > (pMaxStack->get(i,j,k,0) + R) ||
 					pMinStack->get(i,j,k,lev) < (pMaxStack->get(i,j,k,0) - R) )
@@ -1037,8 +1105,8 @@ void Trilateralfilter::findAdaptiveRegionSipl(RawArray* pMinStack, RawArray* pMa
 void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pSmoothY, Raw* pSmoothZ,
 	Raw* fTheta, Raw *dest,float sigmaCTheta, float sigmaRTheta)
 {
-	size_t interval = globalProgressChanged/1000 == 0?1:globalProgressChanged/1000;
-	int rs = 0;
+	//size_t interval = globalProgressChanged/1000 == 0?1:globalProgressChanged/1000;
+	//int rs = 0;
 	bool flag =false;
 	int i, j, k, m, n, l, imax, jmax, kmax, halfSize;
 	int countvar=0;
@@ -1048,11 +1116,11 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 	//coeffA = dI/dx, coeffB = dI/dy, coeffC = I at center pixel of the filter kernel
 
 	/*swf add for data overflow*/
-	if ( sizeof (PIXTYPE) == 1)
+	if ( sizeof (srcdatatype) == 1)
 	{
 		Maxvar = 255;
 	} 
-	else if ( sizeof (PIXTYPE) == 2)
+	else if ( sizeof (srcdatatype) == 2)
 	{
 		//qym 2014-1-10
 		//Maxvar = 65536;
@@ -1072,19 +1140,20 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 		for(j = 0; j < jmax; j++ ) 
 		{	//Y scanline...
 			for(k = 0;k < kmax; k++ ) 
-			{ 	
-				rs++;
-				if ( rs == interval && ProgressChanged != NULL )
-				{
-					progressStep += interval;
-					rs = 0;
-					ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged ),flag);
-				}
-				if (i ==imax-1 && k == kmax-1 && j == jmax-1  && progressStep < globalProgressChanged)
-				{
-					ProgressChanged (1, 100,100,flag);
-				}
-				
+			{ 	//z scanline
+				//delete the progress bar 20140218
+				//rs++;
+				//if ( rs == interval && ProgressChanged != NULL )
+				//{
+				//	progressStep += interval;
+				//	rs = 0;
+				//	ProgressChanged (1, 100,(int) (long long)( progressStep)*20/(globalProgressChanged ),flag);
+				//}
+				//if (i ==imax-1 && k == kmax-1 && j == jmax-1  && progressStep < globalProgressChanged)
+				//{
+				//	ProgressChanged (1, 100,100,flag);
+				//}
+
 				//zscanline..
 				normFactor=0.0;
 				tmp=0.0;

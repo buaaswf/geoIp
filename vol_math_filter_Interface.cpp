@@ -24,6 +24,17 @@ void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 	 MultiThreadsY(2,para.threadcount,*indata,(void *)&para);
 	 return indata;
 }
+
+/**
+ \brief	Executes the anistropic filter interface operation for x direction slcing.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 {
 	
@@ -39,7 +50,7 @@ bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 	 return true;
 }
  /**
-  \brief	Executes the anistropic  interface operation
+  \brief	Executes the anistropic fiter interface operation for Y direction
  
   \param [in,out]	para	The para.
  
@@ -82,7 +93,7 @@ bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
  }
 
 /**
- \brief	Executes the bilateral i operation.
+ \brief	Executes the bilateral iinterface operation.
 
  \param [in,out]	src 	Source for the.
  \param [in,out]	para	The para.
@@ -100,6 +111,17 @@ void * doBilateralI( ImageVolume & src,BilateralFilterI & para)
 	MultiThreadsY(3,para.threadcount,*indata,(void *)&para);
 	return indata;
 }
+
+/**
+ \brief	Executes the bilateral i operation.just input src,ret pointers
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para)
 {
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
@@ -300,6 +322,7 @@ struct  AnistropicP
 	int val; //val=1
 	int method; 
 
+
 	/*
 	method:
 	1:Perona_Malik();
@@ -311,6 +334,7 @@ struct  AnistropicP
 		this->time=time;
 		this->val=val;
 		this->method=method;
+		
 	}
 	AnistropicP()
 	{
@@ -327,12 +351,23 @@ struct  AnistropicPsipl
 	int time;
 	int val; //val=1
 	int method; 
+	int datatype;
 
 	/*
 	method:
 	1:Perona_Malik();
 	2:four_diff
 	*/
+	AnistropicPsipl(Raw *data,Raw *ret,int iter,int time,int val,int method,int datatype)
+	{
+		this->src = data;
+		this->ret = ret;
+		this->iter =  iter;
+		this->time = time;
+		this->val = val;
+		this->method = method;
+		this->datatype = datatype;
+	}
 	AnistropicPsipl(Raw *data,Raw *ret,int iter,int time,int val,int method)
 	{
 		this->src = data;
@@ -341,6 +376,7 @@ struct  AnistropicPsipl
 		this->time = time;
 		this->val = val;
 		this->method = method;
+		//this->datatype = datatype;
 	}
 	AnistropicPsipl()
 	{
@@ -372,12 +408,23 @@ struct  TrilateralfilterPSipl
 	Raw *src;
 	Raw * ret;
 	int iter;
+	int srcdatatype;
+	TrilateralfilterPSipl( Raw *src, Raw *ret, float sigmaC,int iter , int srcdatatype)
+	{
+		this->src = src;
+		this->ret = ret;
+		this->sigmaC = sigmaC;
+		this->iter = iter;
+		this->srcdatatype = srcdatatype ;
+
+	}
 	TrilateralfilterPSipl( Raw *src, Raw *ret, float sigmaC,int iter )
 	{
 		this->src = src;
 		this->ret = ret;
 		this->sigmaC = sigmaC;
 		this->iter = iter;
+		//this->srcdatatype = srcdatatype ;
 
 	}
 	TrilateralfilterPSipl()
@@ -531,8 +578,9 @@ void * singleTrilateralfilterSipl(void *para)
 	TrilateralfilterPSipl *p=(TrilateralfilterPSipl*) para; 
 	Raw *indata = p->src;
 	Raw *outdata = p->ret;
-	Trilateralfilter *f=new Trilateralfilter(indata,outdata,p->iter,progress);
-	f->TrilateralFilter(*indata,*outdata,p->sigmaC);
+	int datatype = p->srcdatatype;
+	Trilateralfilter *f=new Trilateralfilter(indata,outdata,p->iter,progress,datatype);
+	f->TrilateralFilter(*indata,*outdata,p->sigmaC,p->sigmaC);
 	delete f;
 	return NULL;
 }
@@ -552,7 +600,7 @@ void * singleAnistropicFilterSipl(void * para)
 	Raw *outdata=(p->ret);
 	//WipeNioisePde *pde =new WipeNioisePde();
 		//pde->ProgressChanged = progress;
-	WipeNioisePde *pde=new WipeNioisePde(indata,outdata,p->iter,p->time,p->val,p->method,progress);//two pointers,one in,one out
+	WipeNioisePde *pde=new WipeNioisePde(indata,outdata,p->iter,p->time,p->val,p->method,progress,p->datatype);//two pointers,one in,one out
 	
 	delete pde;
 	return NULL;
@@ -1276,6 +1324,19 @@ void  MultiThreadsY(int method,int threadcount,Raw &src,void *para)
 
 	*/
 }
+
+/**
+ \brief	Multi threads yptr.
+
+ \param	method				The method.
+ \param	datatype			The datatype.
+ \param	threadcount			The threadcount.
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	res 	If non-null, the resource.
+ \param [in,out]	para	If non-null, the para.
+ in use 20140218
+ */
+
 void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res,void *para)
 {
 	//divide into slices
@@ -1354,7 +1415,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 						raw.push_back(d);
 						int ret;
 						TrilateralfilterI *p=(TrilateralfilterI*)para;
-						parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,i);
+						parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,i ,datatype);
 						pthread_attr_t *attr;
 						ret=pthread_create(&threads[i],NULL,singleTrilateralfilterSipl,&parms[i]);
 						std::cout <<i<<endl;
@@ -1366,7 +1427,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 						raw.push_back(d);
 						int ret;
 						TrilateralfilterI *p=(TrilateralfilterI*)para;
-						parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,i);
+						parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,i,datatype);
 						pthread_attr_t *attr;
 						ret=pthread_create(&threads[i],NULL,singleTrilateralfilterSipl,&parms[i]);
 						std::cout <<i<<endl;
@@ -1398,7 +1459,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 							raw.push_back(d);
 							int pret;
 							AnistropicI *p = (AnistropicI*)para;
-							parms[i] = AnistropicPsipl(src,raw[i],i,p->time,p->val,p->method);
+							parms[i] = AnistropicPsipl(src,raw[i],i,p->time,p->val,p->method,datatype);
 							pthread_attr_t *attr;
 							pret=pthread_create(&threads[i],NULL,singleAnistropicFilterSipl,(void *)&parms[i]);
 							std::cout <<i<<endl;
@@ -1410,7 +1471,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 							raw.push_back(d);
 							int pret;
 							AnistropicI *p = (AnistropicI*)para;
-							parms[i] = AnistropicPsipl(src,raw[i],i,p->time,p->val,p->method);
+							parms[i] = AnistropicPsipl(src,raw[i],i,p->time,p->val,p->method,datatype);
 							pthread_attr_t *attr;
 							pret=pthread_create(&threads[i],NULL,singleAnistropicFilterSipl,(void *)&parms[i]);
 							std::cout <<i<<endl;
