@@ -126,12 +126,14 @@ void testbigdata()
 		ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 
 
-		GuassFilterI gs(3,15);
-		doGuassFilterIY(src,ret,gs);
+		//GuassFilterI gs(3,15);
+		//doGuassFilterIY(src,ret,gs);
 		//AnistropicI ani(3,30,1,15);
 		//doAnistropicIY(src,ret,ani);
-		//TrilateralfilterI tri(15,3.0);
+		//TrilateralfilterI tri(15,3.0,3.0);
 		//doTrilateralfilterIY(src,ret,tri);
+		lowPassI lowpass(1000);
+		dolowPassI(src,ret,lowpass);
 		//int cc=0;
 		//for (int i=0;i<src->GetLength();i++)
 		//{

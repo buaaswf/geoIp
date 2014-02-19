@@ -59,8 +59,7 @@ public:
 	// 下面定义多阈值OTSU算法
 	void Otsu_MultiVal(Raw2D &image_2D,int t_number);//多阈值OTSU算法一
 	void Otsu_MultiVal(Raw2D &image_2D);//多阈值OTSU算法二
-	vector< vector <Points> > output(Raw2D &image_2D);
-	Raw2D Output(Raw2D &image_2D);
+	void Output(Raw2D &image_2D,Raw2D &dest);
 	//三维数据处理
     int Otsu(Raw &image,int Min_pix,int Max_pix);//简单局部图像单阈值OTSU算法 
     int Otsu(Raw &image);//优化步长单阈值OTSU算法 
@@ -69,8 +68,7 @@ public:
 	void Otsu_MultiVal(Raw &image,int t_number);//多阈值OTSU算法一
 	void Otsu_MultiVal(Raw &image);//多阈值OTSU算法二
 	void SaveImage(Raw &image);//保存三维数据
-	vector< vector <Points> > output(Raw &image);
-	Raw  Output(Raw &image);
+	void Output(Raw &image,Raw &dest);
 
 	//析构函数
 	~OTSU(){

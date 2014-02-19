@@ -12,8 +12,8 @@
 #include "vol_math_Anistropic2D.h"
 #include "vol_math_2Dtrilateralfilter.h"
 #include "vol_math_Otsu.h"
-//#include"vol_math_FourierFilter2.h"
-//#include "vol_math_FourierFilter3.h"
+#include"vol_math_FourierFilter2.h"
+#include "vol_math_FourierFilter3.h"
 extern size_t globalProgressChanged;
 extern size_t volatile progressStep;
 struct GeoBodyDataStruct
@@ -128,12 +128,20 @@ struct  AnistropicI
 };
 struct  TrilateralfilterI
 {
-	float sigmaC;//sigmaC=1
+	float sigmaC;//sigmaC=1	spacing domain variance
+	float sigmaA;//value  domain variance
 	int threadcount;
+
 	TrilateralfilterI(int threadcount,float sigmaC =3)
 	{
 		this->sigmaC = sigmaC;
 		this->threadcount=threadcount;
+	}
+	TrilateralfilterI(int threadcount,float sigmaC,float sigmaA)
+	{
+		this->sigmaC = sigmaC;
+		this->threadcount=threadcount;
+		this->sigmaA;
 	}
 };
 
@@ -253,9 +261,8 @@ bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
 extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
 bool  doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
-extern void *doMultiOstuI (ImageVolume &src,MultiOstuI &);
-extern void *dolowPassI (ImageVolume &src,lowPassI &);
-extern void *doMultiOstuI(ImageVolume &,MultiOstuI &);
+bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para);
+bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &);
 extern void *doAnistropicI2D (Image2D &src,AnistropicI &);
 extern void *doBilateralI2D (Image2D&, BilateralFilterI &);
 extern void *doGuassFilterI2D (Image2D &, GuassFilterI &);

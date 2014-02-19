@@ -269,8 +269,31 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 	  delete pde;
 	 return outdata;
  }
+ bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &para)
+ {
+	 Raw  indata = *(Raw *)ImageVolume2Raw(src);
+	 FourierFilter3 * ff3 = new FourierFilter3(indata);
+	 ff3->lowpass_trans(para.threshold,progress);
+	 ImageVolume * res = (ImageVolume*)Raw2ImageVolume(*(ff3->fraw),ret->PixelType);
+	 memcpy(ret->Data,res->Data,ff3->fraw->size()*sizeof(unsigned char));
+	 delete res;
+	 delete ff3;
+	 return true;
+ }
+ bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para)
+ {
+
+		Raw *indata=(Raw *)ImageVolume2Raw(src);
+		Raw *outdata=(Raw *)ImageVolume2Raw(ret);
+		OTSU *test =new OTSU();
+		test->Otsu(*indata);
+		ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
+		memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
+		return true;
 
 
+
+ }
 
  void *doAnistropicI2D (Image2D &src,AnistropicI & para)
 {
@@ -405,15 +428,17 @@ struct  TrilateralfilterP
 struct  TrilateralfilterPSipl
 {
 	float sigmaC;//sigmaC=1
+	float sigmaA;
 	Raw *src;
 	Raw * ret;
 	int iter;
 	int srcdatatype;
-	TrilateralfilterPSipl( Raw *src, Raw *ret, float sigmaC,int iter , int srcdatatype)
+	TrilateralfilterPSipl( Raw *src, Raw *ret, float sigmaC,float sigmaA,int iter , int srcdatatype)
 	{
 		this->src = src;
 		this->ret = ret;
 		this->sigmaC = sigmaC;
+		this->sigmaA = sigmaA;
 		this->iter = iter;
 		this->srcdatatype = srcdatatype ;
 
@@ -1415,7 +1440,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 						raw.push_back(d);
 						int ret;
 						TrilateralfilterI *p=(TrilateralfilterI*)para;
-						parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,i ,datatype);
+						parms[i]=TrilateralfilterPSipl(src, raw[i], p->sigmaC, p->sigmaA, i ,datatype);
 						pthread_attr_t *attr;
 						ret=pthread_create(&threads[i],NULL,singleTrilateralfilterSipl,&parms[i]);
 						std::cout <<i<<endl;
@@ -1427,7 +1452,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 						raw.push_back(d);
 						int ret;
 						TrilateralfilterI *p=(TrilateralfilterI*)para;
-						parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,i,datatype);
+						parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,p->sigmaA,i,datatype);
 						pthread_attr_t *attr;
 						ret=pthread_create(&threads[i],NULL,singleTrilateralfilterSipl,&parms[i]);
 						std::cout <<i<<endl;
