@@ -112,28 +112,30 @@ void testprocess()
 void testbigdata()
 {
 	//int l = 989, m = 1241, total = 500, n = 10;
-	int l = 281, m = 481, total = 10, n = 10;
+	//int l = 281, m = 481, total = 10, n = 10;
+	int l = 4338, m = 3753, total = 3, n = 3;
 	for (int i=0; i < total/n ; i++)
 	{
 		RawImage test;
 		unsigned char * indata = new unsigned char [l*m*n];
 		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
-		test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i);
+		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i);
+		test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i);
 		unsigned char * outdata = new unsigned char[l*m*n]; 
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 
 
-		//GuassFilterI gs(3,15);
-		//doGuassFilterIY(src,ret,gs);
+		GuassFilterI gs(3,20);
+		doGuassFilterIY(src,ret,gs);
 		//AnistropicI ani(3,30,1,15);
 		//doAnistropicIY(src,ret,ani);
 		//TrilateralfilterI tri(15,3.0,3.0);
 		//doTrilateralfilterIY(src,ret,tri);
-		lowPassI lowpass(1000);
-		dolowPassI(src,ret,lowpass);
+		//lowPassI lowpass(1000);
+		//dolowPassI(src,ret,lowpass);
 		//int cc=0;
 		//for (int i=0;i<src->GetLength();i++)
 		//{

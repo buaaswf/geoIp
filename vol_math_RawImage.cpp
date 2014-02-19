@@ -214,8 +214,8 @@ void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,i
 		printf("open fail");
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
-	fseek(op,l*m*i*10L,SEEK_SET);
-	fread(buf,sizeof(unsigned char),l*m*10,op);
+	fseek(op,l*m*100+l*m*i*3L,SEEK_SET);
+	fread(buf,sizeof(unsigned char),l*m*3,op);
 
 	fclose(op);
 	printf("read is ok\n");
