@@ -206,16 +206,24 @@ RawImage::~RawImage(void)
 }
 
 
-void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i )
+void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i ,int winsize)
 {
 	FILE * op=fopen(file,"rb");
 	if(op==NULL)
 	{
 		printf("open fail");
 	}
-	//unsigned char * unsignedbuf=new unsigned char[size];
-	fseek(op,l*m*100+l*m*i*3L,SEEK_SET);
-	fread(buf,sizeof(unsigned char),l*m*3,op);
+	if (i==0)
+	{
+		fseek(op,l*m*100+l*m*i*winsize,SEEK_SET);
+		fread(buf,sizeof(unsigned char),l*m*winsize,op);
+	} 
+	else
+	{
+		fseek(op,l*m*100+l*m*i*winsize-l*m*2L,SEEK_SET);
+		fread(buf,sizeof(unsigned char),l*m*winsize,op);
+	}
+
 
 	fclose(op);
 	printf("read is ok\n");
@@ -230,9 +238,8 @@ void RawImage:: writeImageSesmicRecursive(void * src, int l ,int m, int n)
 		printf("cant open the file");
 		exit(0);
 	}
-	//= new unsigned char [l *m*n];
-	//unsigned char *  data =(unsigned char *) src;
-	fwrite(src, sizeof(unsigned char), l*m*n, p);
+	fseek(p,l*m,SEEK_SET);
+	fwrite(src, sizeof(unsigned char), l*m, p);
 	fclose(p);
 	fflush(stdout);
 

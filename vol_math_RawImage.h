@@ -39,7 +39,7 @@ public:
 	}
 	~RawImage(void);
 	void readImage( unsigned char * buf,char const *file ,int size);
-	void readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i);
+	void readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i,int winsize);
 	void readImagesi(short  * buf,char const *file ,int size);
 	void readStream(short *buf,char const *file,int size);
 	void writeImagecolon(Raw& destImg);

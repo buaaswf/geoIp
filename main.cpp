@@ -113,16 +113,18 @@ void testbigdata()
 {
 	//int l = 989, m = 1241, total = 500, n = 10;
 	//int l = 281, m = 481, total = 10, n = 10;
-	int l = 4338, m = 3753, total = 3, n = 3;
-	for (int i=0; i < total/n ; i++)
+	int l = 4338, m = 3753, total = 4, n = 3;
+
+	unsigned char * indata = new unsigned char [l*m*n];
+	unsigned char * outdata = new unsigned char[l*m*n]; 
+	for (int i=0; i < total-2 ; i++)
 	{
 		RawImage test;
-		unsigned char * indata = new unsigned char [l*m*n];
+		
 		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
 		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i);
-		test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i);
-		unsigned char * outdata = new unsigned char[l*m*n]; 
+		test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i,n);
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
@@ -136,31 +138,16 @@ void testbigdata()
 		//doTrilateralfilterIY(src,ret,tri);
 		//lowPassI lowpass(1000);
 		//dolowPassI(src,ret,lowpass);
-		//int cc=0;
-		//for (int i=0;i<src->GetLength();i++)
-		//{
-		//	//src_bak->Data = (unsigned char*)src_bak->Data;
-		//	//ret->Data = (unsigned char*)ret->Data;
-		//	if (indata[i]!=outdata[i])
-		//	{
-		//		cc++;
-		//	}
-		//}
-		delete [] indata;
-		indata = NULL;
-		delete [] outdata;
-		outdata = NULL;
-		//cout << cc<<endl;
+
 		test.writeImageSesmicRecursive(ret->Data ,ret->Width,ret->Height,ret->Depth);
 		delete src;
 		delete src_bak;
 		delete ret;
-		//delete [] outdata;
-		//delete [] indata;
-		//outdata=NULL;
-		//delete indata;
-		//indata = NULL;
 	}
+	delete [] indata;
+	indata = NULL;
+	delete [] outdata;
+	outdata = NULL;
 
 }
 void Exit()
