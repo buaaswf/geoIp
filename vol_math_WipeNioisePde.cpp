@@ -20,9 +20,10 @@ WipeNioisePde::WipeNioisePde(Raw &src,Raw &ret,int iter,int time,PIXTYPE value, 
 		FourPDiff(src,ret);
 	}
 }
-WipeNioisePde::WipeNioisePde(Raw *src,Raw *ret,int iter,int time,PIXTYPE value, int method, void(*ProgressChanged)(int,int,int,bool &),int datatype)
-{
-	//raw=src;
+WipeNioisePde::	WipeNioisePde(Raw *src ,Raw *ret,int const iter,int const time,
+	const PIXTYPE value,const int method,void(*ProgressChanged)(int,int,int,bool &),const int datatype)
+	//:delt(time),val(value),way(method),datatype(datatype),ProgressChanged(ProgressChanged)
+{	//raw=src;
 	delt=time;
 	val=value;
 	way=method;
@@ -164,11 +165,60 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 	 //the multi thread in the middle
  	if (iter > 0 && ( iter+1 )*ret->getZsize() < src->getZsize())
 	{
-		Raw *s = new Raw(ret->getXsize(), ret->getYsize(), ret->getZsize() + 2, src->getdata()+iter*ret->getXsize()*ret->getYsize()*(ret->getZsize())-ret->getXsize()*ret->getYsize());
+		Raw *s = new Raw(ret->getXsize(), ret->getYsize(), ret->getZsize() + 2, 
+			src->getdata()+iter*ret->getXsize()*ret->getYsize()*(ret->getZsize())-ret->getXsize()*ret->getYsize());
 		temp = new Raw(*s); 
+		//PIXTYPE *around=new PIXTYPE[6];
+		for (i = 0 ;i < delt; i++)
+		{
+			for (z = 1; z < s->getZsize()-1;z++)
+			{
+				for ( y = 1; y < s->getYsize()-1; y++)
+				{
+					for ( x = 1; x < s->getXsize()-1; x++)
+					{
 
+						around[0]=s->get(x-1,y,z)-s->get(x,y,z);
+						around[1]=s->get(x,y-1,z)-s->get(x,y,z);
+						around[2]=s->get(x,y,z-1)-s->get(x,y,z);
+						around[3]=s->get(x+1,y,z-1)-s->get(x,y,z);
+						around[4]=s->get(x,y+1,z)-s->get(x,y,z);
+						around[5]=s->get(x,y,z+1)-s->get(x,y,z);
+						sum=0;
+
+						//qym 2014-1-8 for divide by zero
+						if(val == 0)
+							sum = 0;
+
+						else
+						{
+							for (int k=0; k < 6; k++)
+							{
+								//implementation sum(g(i)*f(i))
+								sum+=around[k]/(1+around[k]*around[k]/(val*val));
+
+							}
+							float tempval = s->get(x,y,z) + a*sum/double(6);
+							if (tempval <= Maxvar)
+							{
+								temp->put(x, y, z, tempval);
+							} 
+							else 
+							{
+								temp->put(x, y, z, s->get(x,y,z));
+							}
+						}
+					}//for x..
+
+				}//for  y..
+
+			}//forz..
+			delete s;
+
+			s =new Raw(*temp);
+		}//for delta
 	
-		PureAlg(ret, temp,s,Maxvar,iter ,delt,val,a,around);
+		//PureAlg(ret, temp,s,Maxvar,iter ,delt,val,a,around);
 		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diyigeshi0 houmianshi 1
 		
 		bool flag = false;
@@ -216,58 +266,58 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			
 			temp = new Raw (*s);
 			//PIXTYPE *around=new PIXTYPE[6];
-			//for (i = 0 ;i < delt; i++)
-			//{
-			//	for (z = 1; z < s->getZsize()-1;z++)
-			//	{
-			//		for ( y = 1; y < s->getYsize()-1; y++)
-			//		{
-			//			for ( x = 1; x < s->getXsize()-1; x++)
-			//			{
+			for (i = 0 ;i < delt; i++)
+			{
+				for (z = 1; z < s->getZsize()-1;z++)
+				{
+					for ( y = 1; y < s->getYsize()-1; y++)
+					{
+						for ( x = 1; x < s->getXsize()-1; x++)
+						{
 
-			//				around[0]=s->get(x-1,y,z)-s->get(x,y,z);
-			//				around[1]=s->get(x,y-1,z)-s->get(x,y,z);
-			//				around[2]=s->get(x,y,z-1)-s->get(x,y,z);
-			//				around[3]=s->get(x+1,y,z-1)-s->get(x,y,z);
-			//				around[4]=s->get(x,y+1,z)-s->get(x,y,z);
-			//				around[5]=s->get(x,y,z+1)-s->get(x,y,z);
-			//				sum=0;
+							around[0]=s->get(x-1,y,z)-s->get(x,y,z);
+							around[1]=s->get(x,y-1,z)-s->get(x,y,z);
+							around[2]=s->get(x,y,z-1)-s->get(x,y,z);
+							around[3]=s->get(x+1,y,z-1)-s->get(x,y,z);
+							around[4]=s->get(x,y+1,z)-s->get(x,y,z);
+							around[5]=s->get(x,y,z+1)-s->get(x,y,z);
+							sum=0;
 
-   //                         //qym 2014-1-8 for divide by zero
-   //                         if(val == 0)
-   //                             sum = 0;
+                            //qym 2014-1-8 for divide by zero
+                            if(val == 0)
+                                sum = 0;
 
-			//				else
-			//				{
-			//					for (int k=0; k < 6; k++)
-			//					{
-			//						//implementation sum(g(i)*f(i))
-			//						sum+=around[k]/(1+around[k]*around[k]/(val*val));
+							else
+							{
+								for (int k=0; k < 6; k++)
+								{
+									//implementation sum(g(i)*f(i))
+									sum+=around[k]/(1+around[k]*around[k]/(val*val));
 
-			//					}
-			//					float tempval = s->get(x,y,z) + a*sum/double(6);
-			//					if (tempval <= Maxvar)
-			//					{
-			//						temp->put(x, y, z, tempval);
-			//					} 
-			//					else 
-			//					{
-			//						temp->put(x, y, z, s->get(x,y,z));
-			//					}
-			//				}
-			//			}//for x..
+								}
+								float tempval = s->get(x,y,z) + a*sum/double(6);
+								if (tempval <= Maxvar)
+								{
+									temp->put(x, y, z, tempval);
+								} 
+								else 
+								{
+									temp->put(x, y, z, s->get(x,y,z));
+								}
+							}
+						}//for x..
 
-			//		}//for  y..
+					}//for  y..
 
-			//	}//forz..
-			//	delete s;
-			//	
-			//	s =new Raw(*temp);
-			//}//for delta
-			//size_t step = iter *ret->size();
-			//int call = 10000;
+				}//forz..
+				delete s;
+				
+				s =new Raw(*temp);
+			}//for delta
+			size_t step = iter *ret->size();
+			int call = 10000;
 			
-			PureAlg(ret, temp,s,Maxvar,iter ,delt,val,a,around);
+			//PureAlg(ret, temp,s,Maxvar,iter ,delt,val,a,around);
 			bool flag = false;
 			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
 			//int rs = 0 ;
@@ -333,51 +383,52 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			//Raw s=Raw(src);
 			//PIXTYPE *around=new PIXTYPE[6];
 
-			//for (i = 0 ;i < delt; i++)
-			//{
-			//	for (z = 1; z < src->getZsize()-1;z++)
-			//	{
-			//		for ( y = 1; y < src->getYsize()-1; y++)
-			//		{
-			//			for ( x = 1; x < src->getXsize()-1; x++)
-			//			{
-			//				around[0]=d->get(x-1,y,z)-d->get(x,y,z);
-			//				around[1]=d->get(x,y-1,z)-d->get(x,y,z);
-			//				around[2]=d->get(x,y,z-1)-d->get(x,y,z);
-			//				around[3]=d->get(x+1,y,z-1)-d->get(x,y,z);
-			//				around[4]=d->get(x,y+1,z)-d->get(x,y,z);
-			//				around[5]=d->get(x,y,z+1)-d->get(x,y,z);
-			//				sum=0;
-			//				//swf 2014-1-9 for divide by zero
-			//				if(val == 0)
-			//					sum = 0;
-			//				else
-			//				{
-			//						for (int k=0; k < 6; k++)
-			//						{
-			//							//implementation sum(g(i)*f(i))
-			//							sum += around[k]/(1 + around[k] * around[k]/(val * val));
+			for (i = 0 ;i < delt; i++)
+			{
+				for (z = 1; z < src->getZsize()-1;z++)
+				{
+					for ( y = 1; y < src->getYsize()-1; y++)
+					{
+						for ( x = 1; x < src->getXsize()-1; x++)
+						{
+							around[0]=d->get(x-1,y,z)-d->get(x,y,z);
+							around[1]=d->get(x,y-1,z)-d->get(x,y,z);
+							around[2]=d->get(x,y,z-1)-d->get(x,y,z);
+							around[3]=d->get(x+1,y,z-1)-d->get(x,y,z);
+							around[4]=d->get(x,y+1,z)-d->get(x,y,z);
+							around[5]=d->get(x,y,z+1)-d->get(x,y,z);
+							sum=0;
+							//swf 2014-1-9 for divide by zero
+							if(val == 0)
+								sum = 0;
+							else
+							{
+									for (int k=0; k < 6; k++)
+									{
+										//implementation sum(g(i)*f(i))
+										sum += around[k]/(1 + around[k] * around[k]/(val * val));
 
-			//						}
-			//						float tempval = d->get(x,y,z) + a*sum/double(6);
-			//						if ( tempval <= Maxvar )
-			//						{
-			//							temp->put(x, y, z, tempval);
-			//						} 
-			//						else 
-			//						{
-			//							temp->put(x, y, z, d->get(x,y,z));
-			//						}
-			//				}
-			//			}//...for
-			//		}//...for
-			//		
-			//	}//...for
-			//	
-			//	d = temp;
-			//}//...for delte
+									}
+									float tempval = d->get(x,y,z) + a*sum/double(6);
+									if ( tempval <= Maxvar )
+									{
+										temp->put(x, y, z, tempval);
+									} 
+									else 
+									{
+										temp->put(x, y, z, d->get(x,y,z));
+									}
+							}
+						}//...for
+					}//...for
+					
+				}//...for
+				delete d;
 			
-			PureAlg(ret, temp,d,Maxvar,iter ,delt,val,a,around);
+				d = new Raw(*temp);
+			}//...for delte
+			
+			//PureAlg(ret, temp,d,Maxvar,iter ,delt,val,a,around);
 			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
 			//int rs = 0 ;
 			bool flag = false;
@@ -398,15 +449,16 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 				ret->putXYZ(i , temp->getXYZ(i) );
 			}
 			delete d;
-
+			delete temp;
 			//src = s;
 			//return  d;
+		
 		}
 
 		
 	}
-delete [] around;
-
+	
+	delete [] around;	
 
 }
 void  WipeNioisePde::Perona_Malik(Raw &src)

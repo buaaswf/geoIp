@@ -13,7 +13,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *ret
 void progress(int type,int total ,int step,bool &cancled)
 {
 
-	printf(" %f\n",(float)step*100/total);
+	//printf(" %f\n",(float)step*100/total);
 }
 void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 {
@@ -72,6 +72,87 @@ bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 	//delete indata;
 	return true;
 }
+bool doAnistropicFilterFileMode(void **srco,int width,int height ,int count,void * reto,AnistropicI &para,int datatype)
+{
+		/*
+	datatype
+	1:unsigned char
+	2:unsigned short
+	3:float
+
+	*/
+	switch (datatype)
+	{
+	case 1:
+		{
+			unsigned char **src=(unsigned char **)srco;
+			unsigned char *ret = (unsigned char*)reto;
+			unsigned char *indata =new unsigned char [width*height*count];
+			unsigned char *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned char));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doAnistropicIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned char*)retraw->Data+width*height,sizeof(unsigned char)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 2:
+		{
+			unsigned short **src=(unsigned short **)srco;
+			unsigned short *ret = (unsigned short*)reto;
+			unsigned short *indata =new unsigned short [width*height*count];
+			unsigned short *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned short));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doAnistropicIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned short*)retraw->Data+width*height,sizeof(unsigned short)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 3:
+
+		{
+			float **src=(float **)src;
+			float *ret = (float*)ret;
+			float *indata =new float [width*height*count];
+			float *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(float));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doAnistropicIY(srcraw,retraw,para);
+
+			memcpy(ret,(float*)retraw->Data+width*height,sizeof(float)*width*height);
+			delete srcraw;
+			delete retraw;
+	}
+		break;
+
+
+	}
+
+
+	return true;
+
+}
+
  void * doAnistropicI (Process & para)
  {
 	 PIXTYPE * in = new PIXTYPE[para.xsize*para.ysize*para.window_size];
@@ -189,6 +270,85 @@ bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para)
 	delete outdata;
 	return true;
 }
+bool doGuassFilterFileMode(void **srco,int width,int height ,int count,void * reto,GuassFilterI &para,int datatype)
+{
+	/*
+	datatype 
+	1:unsigned char
+	2:unsigned short
+	3:float
+
+	*/
+	switch (datatype)
+	{
+	case 1:
+		{
+			unsigned char **src=(unsigned char **)srco;
+			unsigned char *ret = (unsigned char*)reto;
+			unsigned char *indata =new unsigned char [width*height*count];
+			unsigned char *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned char));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doGuassFilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned char*)retraw->Data+width*height,sizeof(unsigned char)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 2:
+		{
+			unsigned short **src=(unsigned short **)srco;
+			unsigned short *ret = (unsigned short*)reto;
+			unsigned short *indata =new unsigned short [width*height*count];
+			unsigned short *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned short));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doGuassFilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned short*)retraw->Data+width*height,sizeof(unsigned short)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 3:
+		
+		{
+			float **src=(float **)src;
+			float *ret = (float*)ret;
+			float *indata =new float [width*height*count];
+			float *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(float));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doGuassFilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(float*)retraw->Data+width*height,sizeof(float)*width*height);
+			delete srcraw;
+			delete retraw;
+	}
+		break;
+
+
+	}
+
+
+	return true;
+}
 void * doTrilateralfilterI(ImageVolume &src, TrilateralfilterI & para)
 {
 	Raw *indata =(Raw*)ImageVolume2Raw(src);
@@ -224,6 +384,88 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 	 return true;
 
 }
+
+bool doTrilateralFilterFileMode(void **srco,int width,int height ,int count,void * reto,TrilateralfilterI &para,int datatype)
+{
+		/*
+	datatype
+	1:unsigned char
+	2:unsigned short
+	3:float
+
+	*/
+	switch (datatype)
+	{
+	case 1:
+		{
+			unsigned char **src=(unsigned char **)srco;
+			unsigned char *ret = (unsigned char*)reto;
+			unsigned char *indata =new unsigned char [width*height*count];
+			unsigned char *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned char));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doTrilateralfilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned char*)retraw->Data+width*height,sizeof(unsigned char)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 2:
+		{
+			unsigned short **src=(unsigned short **)srco;
+			unsigned short *ret = (unsigned short*)reto;
+			unsigned short *indata =new unsigned short [width*height*count];
+			unsigned short *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned short));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doTrilateralfilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned short*)retraw->Data+width*height,sizeof(unsigned short)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 3:
+
+		{
+			float **src=(float **)src;
+			float *ret = (float*)ret;
+			float *indata =new float [width*height*count];
+			float *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(float));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doTrilateralfilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(float*)retraw->Data+width*height,sizeof(float)*width*height);
+			delete srcraw;
+			delete retraw;
+	}
+		break;
+
+
+	}
+
+
+	return true;
+
+}
+
 //extern void * doMultiOstuI (ImageVolume &src,MultiOstuI &para)
 //{
 //	Raw &indata =*(Raw *)ImageVolume2Raw(src);
@@ -286,7 +528,18 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 		Raw *indata=(Raw *)ImageVolume2Raw(src);
 		Raw *outdata=(Raw *)ImageVolume2Raw(ret);
 		OTSU *test =new OTSU();
-		test->Otsu(*indata);
+		if (para.method==1)
+		{
+			test->Otsu_MultiVal(*indata,para.classnum);
+			test->Output(*indata,*outdata);
+		} 
+		else
+		{
+			test->Otsu_MultiVal(*indata);
+			test->Output(*indata,*outdata);
+
+		}
+
 		ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 		memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
 		return true;
@@ -1396,9 +1649,10 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 	}
 
 	Raw  *ret = new Raw(src->getXsize(),src->getZsize(),src->getYsize(),datatp);
+	Raw *src_bak =new Raw(*src);
 	delete src;
 	src =new  Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),datatp);
-	Raw *src_bak =new Raw(*src);
+
 	//memcpy(res->getdata() ,data, src->size()*datasize);
 	//res = ret;
 	/*int datasize = 1;

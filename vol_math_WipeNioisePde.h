@@ -15,7 +15,8 @@ private:
 public:
 	void (*ProgressChanged)(int ,int ,int ,bool &);
 	WipeNioisePde(Raw &raw ,Raw &ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &));
-	WipeNioisePde(Raw *raw ,Raw *ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &),int datatype);
+	//WipeNioisePde(Raw *raw ,Raw *ret,int iter,int time,PIXTYPE value,int method,void(*ProgressChanged)(int,int,int,bool &),int datatype);
+	WipeNioisePde(Raw *raw ,Raw *ret,int const iter,int const time,const PIXTYPE value,const int method,void(*ProgressChanged)(int,int,int,bool &),const int datatype);
 
 	WipeNioisePde();
 	WipeNioisePde(Raw &raw ,int time,PIXTYPE value,int method);

@@ -88,7 +88,7 @@ void testprocess()
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	unsigned char  *result = indata; 
-	test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));
 	unsigned char **slice =new unsigned char *[n];
 	for (int k = 0; k < n; k++)
 	{
@@ -103,37 +103,43 @@ void testprocess()
 	//Raw  * ret = testinterface1(para);
 	//testinterface1(para);
 	unsigned char * outdata = new unsigned char[l*m*n]; 
-	ImageVolume *src = new ImageVolume(l,m,n,1,indata);
-	ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
+	void** slice1=(void**)slice;
+	void *outdata1=(void *)outdata;
+	//ImageVolume *src = new ImageVolume(l,m,n,1,indata);
+	//ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
-	test.writeImagesesmicarray(ret->Data ,ret->Width,ret->Height,ret->Depth);
+	TrilateralfilterI gs(3,3,15);
+	doTrilateralFilterFileMode(slice1,l,m,n,outdata1,gs,1);
+	test.writeImagesesmicarray(outdata1 ,l,m,n);
 }
 void testbigdata()
 {
 	//int l = 989, m = 1241, total = 500, n = 10;
-	//int l = 281, m = 481, total = 10, n = 10;
-	int l = 4338, m = 3753, total = 4, n = 3;
+	int l = 281, m = 481, total = 10, n = 3;
+	//int l = 4338, m = 3753, total = 4, n = 3;
 
 	unsigned char * indata = new unsigned char [l*m*n];
 	unsigned char * outdata = new unsigned char[l*m*n]; 
-	for (int i=0; i < total-2 ; i++)
+	for (int i=0; i < total-n+1 ; i++)
 	{
 		RawImage test;
 		
 		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
-		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i);
-		test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i,n);
+		test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i,n);
+		//test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i,n);
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 
 
-		GuassFilterI gs(3,20);
-		doGuassFilterIY(src,ret,gs);
-		//AnistropicI ani(3,30,1,15);
+		//GuassFilterI gs(3,20);
+		//doGuassFilterIY(src,ret,gs);
+		//AnistropicI ani(3,30,1,10);
 		//doAnistropicIY(src,ret,ani);
+		MultiOstuI mutilostu(2,1);
+		doMultiOstuI(src,ret,mutilostu);
 		//TrilateralfilterI tri(15,3.0,3.0);
 		//doTrilateralfilterIY(src,ret,tri);
 		//lowPassI lowpass(1000);
@@ -168,7 +174,8 @@ int main(int argc, char* argv[])
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
-	 testbigdata();
+	 //testbigdata();
+	testprocess();
 	 _CrtDumpMemoryLeaks();
 	// _CrtDumpMemoryLeaks;
 	//atexit(Exit);

@@ -35,7 +35,10 @@ public:
 	~Raw2D(void);		// destructor; releases memory
 
 	int size() const { return xsize*ysize; }
-
+	PIXTYPE * getdata()
+	{
+		return data;	
+	}
 	/// \brief Swap data with img
 	Raw2D& swap(Raw2D& img)
 	{

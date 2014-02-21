@@ -215,12 +215,12 @@ void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,i
 	}
 	if (i==0)
 	{
-		fseek(op,l*m*100+l*m*i*winsize,SEEK_SET);
+		fseek(op,l*m*500+l*m*i*winsize,SEEK_SET);
 		fread(buf,sizeof(unsigned char),l*m*winsize,op);
 	} 
 	else
 	{
-		fseek(op,l*m*100+l*m*i*winsize-l*m*2L,SEEK_SET);
+		fseek(op,l*m*500+l*m*i*winsize-l*m*(winsize-1),SEEK_SET);
 		fread(buf,sizeof(unsigned char),l*m*winsize,op);
 	}
 

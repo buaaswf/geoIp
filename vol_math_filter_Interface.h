@@ -181,16 +181,17 @@ struct lowPassI
 };
 struct MultiOstuI
 {
-	int classnum; //expexted numbers
 	int method;
+	int classnum; //expexted numbers
 	/*
 	1\user write the number 
-	2\algarithm compute the number
+	2\algorithm compute the number
 	*/
-	MultiOstuI(int classnum,int method)
+	MultiOstuI(int method,int classnum=1)
 	{
-		this->classnum=classnum;
 		this->method=method;
+		this->classnum=classnum;
+		
 	}
 };
 
@@ -258,6 +259,9 @@ extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);
 extern void *doGuassFilterI (Process &);
 bool doGuassFilterI (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
+bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype);
+bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype);
+bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype);
 extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
 bool  doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);

@@ -563,14 +563,16 @@ int OTSU::Otsu(Raw2D &image){
 	double Pix_val;//像素值统计
 	// 生成直方图,并统计出最大值、最小值
 	for(i=0;i<size;i++){
-		pix=image.getXY(i);
+		pix=(int)image.getXY(i);
 		Pix_array[pix]++;
 		Min_pix=Min_pix<pix?Min_pix:pix;
 		Max_pix=Max_pix>pix?Max_pix:pix;
 	}
+	t=Min_pix;
 	//直方图平滑
 	for(i=Min_pix;i<=Max_pix;i++){
         Pix_val=0.0;
+		cout<<Pix_array[i]<<"  ";
 		for(j=-2;j<=2;j++){
             k=i+j;
 			k=k<Min_pix?Min_pix:k;//下界越界处理
@@ -578,6 +580,7 @@ int OTSU::Otsu(Raw2D &image){
 			Pix_val+=Pix_array[k];
         }
 		Pix_array[i]=(int)(Pix_val/5.0+0.5);
+		if(i/10==0)cout<<endl;
 	}
 	step=(Max_pix-Min_pix)/20;//计算步长
 	for(k=1;k<=20;k++){
@@ -589,6 +592,7 @@ int OTSU::Otsu(Raw2D &image){
 			Pix_val+=i*Pix_array[i];
 		}
 		w1=pix_number/size;//前景像素点数占整幅图像的比例
+		cout<<"k="<<k<<" w1="<<w1<<" pix_number="<<pix_number;
 		if(pix_number) u1=Pix_val/pix_number;//计算前景的平均灰度
 		else u1=Min_pix;
 		w2=1-w1;//背景素点数占整幅图像的比例
@@ -600,6 +604,7 @@ int OTSU::Otsu(Raw2D &image){
 		}
 		if(pix_number) u2=Pix_val/pix_number;//计算背景的平均灰度
 		else u2=Max_pix;
+		cout<<" s="<<s<<endl;
         s=w1*w2*(u1-u2)*(u1-u2);
 		if(M_s<=s){
 			M_s=s;
@@ -750,6 +755,13 @@ void OTSU::Otsu_MultiVal(Raw2D &image,int t_number){
 		}
 	}while(l);
 	delete []ss;
+}
+
+void OTSU::SaveImage(Raw2D &image){
+	FILE *f=NULL;
+	f=fopen("img\\test.jpg","wb");
+	fwrite(image.getdata(),sizeof(unsigned char),image.size(),f);
+	fclose(f);//关闭文件
 }
 void OTSU::Otsu_MultiVal(Raw2D &image){
 	int t;//阀值
