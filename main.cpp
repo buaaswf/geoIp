@@ -138,7 +138,7 @@ void testbigdata()
 		//doGuassFilterIY(src,ret,gs);
 		//AnistropicI ani(3,30,1,10);
 		//doAnistropicIY(src,ret,ani);
-		MultiOstuI mutilostu(2,1);
+		MultiOstuI mutilostu(1,3);
 		doMultiOstuI(src,ret,mutilostu);
 		//TrilateralfilterI tri(15,3.0,3.0);
 		//doTrilateralfilterIY(src,ret,tri);
@@ -174,8 +174,8 @@ int main(int argc, char* argv[])
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
-	 //testbigdata();
-	testprocess();
+	 testbigdata();
+	//testprocess();
 	 _CrtDumpMemoryLeaks();
 	// _CrtDumpMemoryLeaks;
 	//atexit(Exit);

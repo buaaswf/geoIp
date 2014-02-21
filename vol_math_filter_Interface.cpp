@@ -256,6 +256,17 @@ bool doGuassFilterI (ImageVolume * src, ImageVolume *ret,GuassFilterI &para)
 	return true;
 
 }
+
+/**
+ \brief	Executes the guass filter iy operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para)
 {
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
@@ -270,6 +281,21 @@ bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para)
 	delete outdata;
 	return true;
 }
+
+/**
+ \brief	Executes the guass filter file mode operation.
+
+ \param [in,out]	srco	If non-null, the srco.
+ \param	width				The width.
+ \param	height				The height.
+ \param	count				Number of.
+ \param [in,out]	reto	If non-null, the reto.
+ \param [in,out]	para	The para.
+ \param	datatype			The datatype.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGuassFilterFileMode(void **srco,int width,int height ,int count,void * reto,GuassFilterI &para,int datatype)
 {
 	/*
@@ -369,6 +395,18 @@ bool doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI
 	 return true;
 
 }
+
+/**
+ \brief	Executes the trilateral filter interface for y direction  operation.
+		It will be used always,unless need to be X special
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para)
 {
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
@@ -384,6 +422,22 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 	 return true;
 
 }
+
+/**
+ \brief	Executes the trilateral filter file mode operation.
+
+ \param [in,out]	srco	If non-null, the srco.
+ \param	width				The width.
+ \param	height				The height.
+ \param	count				Number of slices read in .note:Trilateral filter the window is 
+							adaptive depend on the data variance.but if for the Y direction 
+							the slices number turn out to be more than 10,it will be ok,else maybe fails.
+ \param [in,out]	reto	If non-null, the reto.
+ \param [in,out]	para	The Trilateral filter para.
+ \param	datatype			The datatype.
+
+ \return	true if it succeeds, false if it fails.
+ */
 
 bool doTrilateralFilterFileMode(void **srco,int width,int height ,int count,void * reto,TrilateralfilterI &para,int datatype)
 {
@@ -542,6 +596,10 @@ bool doTrilateralFilterFileMode(void **srco,int width,int height ,int count,void
 
 		ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 		memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
+		delete test;
+		delete indata;
+		delete outdata;
+		delete res;
 		return true;
 
 
@@ -883,19 +941,18 @@ void * singleAnistropicFilterSipl(void * para)
 	delete pde;
 	return NULL;
 }
-//bool single(Raw *src, Raw *ret, int size,int position)
-//{
-//		PIXTYPE *data=ret->getdata() + position;
-//		Raw * d=new Raw(src->getXsize(),src->getYsize(),size,data,true);
-//		raw.push_back(d);
-//		int ret;
-//		TrilateralfilterI *p=(TrilateralfilterI*)para;
-//		parms[i]=TrilateralfilterPSipl(src,raw[i],p->sigmaC,i);
-//		pthread_attr_t *attr;
-//		ret=pthread_create(&threads[i],NULL,singleTrilateralfilterSipl,&parms[i]);
-//		cout <<i<<endl;
-//
-//}
+
+/**
+ \brief	Multi thread.
+
+ \param	method				The method.
+ \param	threadcount			The threadcount.
+ \param [in,out]	src 	Source for the.
+ \param [in,out]	para	If non-null, the para.
+
+ \return	.
+ */
+
 Raw & MultiThread(int method,int threadcount,Raw &src,void *para)
 {
 	//divide into slices
@@ -1192,6 +1249,18 @@ void  MultiThreadsipl(int method,int threadcount,Raw &src,void *para)
 
 	*/
 }
+
+/**
+ \brief	Multi threadptr,paa by pointer.
+
+ \param	method				The method.
+ \param	datatype			The datatype.
+ \param	threadcount			The threadcount.
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	If non-null, the para.
+ */
+
 void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,void *para)
 {
 	//divide into slices
@@ -1427,6 +1496,16 @@ void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,v
 
 	*/
 }
+
+/**
+ \brief	Multi threads y coordinate.
+
+ \param	method				The method.
+ \param	threadcount			The threadcount.
+ \param [in,out]	src 	Source for the input data to be filtered.
+ \param [in,out]	para	If non-null, the para.
+ */
+
 void  MultiThreadsY(int method,int threadcount,Raw &src,void *para)
 {
 	//divide into slices
@@ -1595,23 +1674,28 @@ void  MultiThreadsY(int method,int threadcount,Raw &src,void *para)
 	delete  ret;
 
 	/*
-	1\trilaterfilter
-	2\anistropic
-	3\bilateralfilter
+	1\trilateral filter
+	2\anisotropic
+	3\bilateral filter
 	4\guass
 
 	*/
 }
 
 /**
- \brief	Multi threads yptr.
+ \brief	Multi threads y ptr.
 
- \param	method				The method.
- \param	datatype			The datatype.
- \param	threadcount			The threadcount.
- \param [in,out]	src 	If non-null, source for the.
- \param [in,out]	res 	If non-null, the resource.
- \param [in,out]	para	If non-null, the para.
+ \param	method				The method:four filers: gauss,anisotropic,trilateral,bilateral.
+							 1\trilateral filter
+							 2\anisotropic
+							 3\bilateral filter
+							 4\guass filter
+ \param	datatype			The datatype include three data type .
+ \param	threadcount			The threadcount for multi thread.
+ \param [in,out]	src 	If non-null, source for the data.
+ \param [in,out]	res 	If non-null, the resource for the return data,the data space
+							 should will allocated in advance.
+ \param [in,out]	para	If non-null, the interface para.
  in use 20140218
  */
 
@@ -1621,6 +1705,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 	//create+join
 	//single
 	int datasize = 1;
+	//tell the datatype,and determine the number max size to avoid overflow .
 	if(datatype == 1)
 	{
 		datasize = 1;
@@ -1680,7 +1765,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 		int zleft = src->getZsize()%threadcount;
 		switch (method)
 		{
-		case 1 :
+		case 1 ://Trilateral filter
 			{
 				
 				vector<TrilateralfilterPSipl>parms;
@@ -1723,7 +1808,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 
 			}//case 1
 			break;
-		case 2:
+		case 2://anisotropic filter
 			{
 					vector<AnistropicPsipl> parms; 
 					parms.resize(threadcount+1);
@@ -1766,7 +1851,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 
 					break;
 		
-		case 3:
+		case 3://bilteral filter
 			{
 					vector<BilateralFilterPSipl>parms;
 					parms.resize(threadcount+1);
@@ -1816,7 +1901,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 			}//case 3
 			break;
 			
-		case 4:
+		case 4://gauss filter
 			{
 				
 					vector<GuassFilterPSipl>parms;parms.resize(threadcount+1);
@@ -1914,9 +1999,9 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 	delete src;
 	delete src_bak;
 	/*
-	1\trilaterfilter
-	2\anistropic
-	3\bilateralfilter
+	1\trilateral filter
+	2\anisotropic
+	3\bilateral filter
 	4\guass
 
 	*/

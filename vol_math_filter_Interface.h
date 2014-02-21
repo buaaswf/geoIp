@@ -82,6 +82,11 @@ struct GeoBodyDataStruct
 	//		this->z = z;
 	//	}
 	//};
+
+/**
+ \brief	Anisotropic filter interface parameter 
+ */
+
 struct  AnistropicII
 {
 	int time;
@@ -187,14 +192,21 @@ struct MultiOstuI
 	1\user write the number 
 	2\algorithm compute the number
 	*/
-	MultiOstuI(int method,int classnum=1)
+	MultiOstuI(int method,int classnum)
 	{
 		this->method=method;
 		this->classnum=classnum;
 		
 	}
 };
+struct WaterShedsI
+{
 
+	WaterShedsI()
+	{
+
+	}
+};
 //=======================================================================================================================================
 //2014 -1-21add by buaa songwf :
 // big data multi thread process interface add a
@@ -247,9 +259,53 @@ struct Process
 	}
 
 };
+
+/**
+ \brief	Executes the anistropic i operation.
+
+ \param [in,out]	src		  	Source for the.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void * doAnistropicI (ImageVolume &src,AnistropicI &);
+
+/**
+ \brief	Executes the anistropic i operation.
+
+ \param [in,out]	src		  	If non-null, source for the.
+ \param [in,out]	ret		  	If non-null, the ret.
+ \param [in,out]	parameter3	The third parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void * doAnistropicI (Raw *src, Raw *ret, AnistropicII &);
-extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
+
+/**
+ \brief	Executes the anisotropic i operation. for direction x multi 
+		thread segment the slices from x direction 
+
+ \param [in,out]	src 	If non-null, source for the input data.
+ \param [in,out]	ret 	If non-null, the ret for the output data.
+ \param [in,out]	para	The para for interface.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
+extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para);
+
+/**
+ \brief	Executes the anisotropic interface y operation for y direction .
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
 extern void * doAnistropicI (Process &);
 extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
@@ -266,6 +322,7 @@ extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
 bool  doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para);
+bool doMWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para);
 bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &);
 extern void *doAnistropicI2D (Image2D &src,AnistropicI &);
 extern void *doBilateralI2D (Image2D&, BilateralFilterI &);

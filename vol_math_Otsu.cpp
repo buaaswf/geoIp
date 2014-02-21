@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include<algorithm>
 #include "vol_math_Otsu.h"
 
 using namespace std;
@@ -17,7 +18,6 @@ int Max_number(struct Point_3 *p,int n){
 	}
     return number;
 }
-
 void order(int *p,int n){
      int i,j,k;
 	 for(i=0;i<n-1;i++){
@@ -253,6 +253,7 @@ void OTSU::Otsu_MultiVal(Raw &image,int t_number){
 	do{//多阀值OTSU分割算法
 		//单阀值Otsu算法步骤
 		t=Otsu(image,Min_pix,Max_pix);//计算出分割阀值t
+		//cout<<"t="<<t<<endl;
 		arrays.push_back((unsigned char)t);//储存阈值
 		l--;
 		if(l){
@@ -287,7 +288,6 @@ void OTSU::Otsu_MultiVal(Raw &image,int t_number){
 		   else u2=Max_pix;
 
 		   //储存方差与上下界
-		   cout<<"s1="<<s1<<" s2="<<s2<<endl;
 		   for(i=0;i<t_number;i++){
 			    if((ss+i)->Min_val==Min_pix && (ss+i)->Max_val==Max_pix){
 					if(s1<s2){
@@ -306,7 +306,6 @@ void OTSU::Otsu_MultiVal(Raw &image,int t_number){
 		   }
 		   //赋值
 		   j=i-1;
-		   cout<<"j="<<j<<endl;
 		   if(s1<s2){		
 			   (ss+j)->Max_val=t;//改变上界	
 			   (ss+j)->Min_val=Min_pix;//改变下界
@@ -419,12 +418,13 @@ void OTSU::Otsu_MultiVal(Raw &image){
 	}
 	else arrays.push_back(Otsu(image));
 }
-void OTSU::SaveImage(Raw &image){
+void OTSU::SaveImage(){
 	int size=image.size();
 	int i,j,k,step;
 	FILE *f=NULL;
 	unsigned char val;
 	k=arrays.size();//阈值个数
+	sort(arrays.begin(),arrays.end());//order
 	if(k==0)return;
 	else if(k==1){
 		for( i=0;i<size;i++){
@@ -450,26 +450,33 @@ void OTSU::SaveImage(Raw &image){
 	fwrite(image.getdata(),sizeof(unsigned char),size,f);
 	fclose(f);//关闭文件
 }
+void OTSU::SaveImage(Raw &dest){
+	FILE *f=NULL;
+	f=fopen("img\\Image.raw","wb");
+	fwrite(dest.getdata(),sizeof(unsigned char),dest.size(),f);
+	fclose(f);//关闭文件
+}
 void OTSU::Output(Raw &image,Raw &dest){
 	int k,m,n,size;
 	float val;
 	//图像大小
 	size=image.size();
 	m=arrays.size();//阈值个数
+	sort(arrays.begin(),arrays.end());//order
 	if(m>1){//多阈值处理
 		//遍历
 		for(k=0;k<size;k++){
-			val=image.getXYZ(k);//获得图像的像素值的大小		
+			val=image.getXYZ(k);//获得图像的像素值的大小	
 			if(val<arrays.at(0)) {	
-				dest.putXYZ(k,1);	
+				dest.putXYZ(k,0);
 			}	
-			else if(val>=arrays.at(m-1)){		
-				dest.putXYZ(k,m+1);	
+			else if(val>=arrays.at(m-1)){	
+				dest.putXYZ(k,arrays.at(m-1));	
 			}	
 			else{//中间的类	
 				for(n=1;n<m;n++){		
 					if(val>=arrays.at(n-1) && val<arrays.at(n)){			
-						dest.putXYZ(k,n+1);	
+						dest.putXYZ(k,arrays.at(n-1));	
 					}		
 				}//for	
 			}//else
@@ -756,11 +763,43 @@ void OTSU::Otsu_MultiVal(Raw2D &image,int t_number){
 	}while(l);
 	delete []ss;
 }
-
-void OTSU::SaveImage(Raw2D &image){
+/*
+void OTSU::SaveImage(){
+	int size=image.size();
+	int i,j,k,step;
+	FILE *f=NULL;
+	unsigned char val;
+	k=arrays.size();//阈值个数
+	sort(arrays.begin(),arrays.end());//order
+	if(k==0)return;
+	else if(k==1){
+		for( i=0;i<size;i++){
+			val=image.getXY(i);
+			if(val<arrays.at(0)) image.putXY(i,0);
+			else  image.putXYZ(i,255);
+		}
+	}
+	else{
+		step=(int)(250/k);//步长
+		for( i=0;i<size;i++){
+			val=image.getXY(i);
+			if(val<arrays.at(0)) image.putXY(i,0);
+			else if(val>=arrays.at(k-1)) image.putXY(i,255);	
+			else{
+				for(j=1;j<k;j++){
+					if(val>=arrays.at(j-1) && val<arrays.at(j)) image.putXY(i,step*j);	
+				}
+			}
+		}	
+	}
+	f=fopen("img\\Image.raw","wb");
+	fwrite(image.getdata(),sizeof(unsigned char),size,f);
+	fclose(f);//关闭文件
+}*/
+void OTSU::SaveImage(Raw2D &dest){
 	FILE *f=NULL;
 	f=fopen("img\\test.jpg","wb");
-	fwrite(image.getdata(),sizeof(unsigned char),image.size(),f);
+	fwrite(dest.getdata(),sizeof(unsigned char),dest.size(),f);
 	fclose(f);//关闭文件
 }
 void OTSU::Otsu_MultiVal(Raw2D &image){
@@ -870,6 +909,7 @@ void Output(Raw2D &image_2D,Raw2D &dest){
 	//图像大小
 	size=image_2D.size();
 	m=arrays.size();//阈值个数
+	sort(arrays.begin(),arrays.end());//order
 	if(m>1){//多阈值处理
 		//遍历
 		for(k=0;k<size;k++){
@@ -892,7 +932,7 @@ void Output(Raw2D &image_2D,Raw2D &dest){
 	else{//单阈值处理
 		//遍历
 		for(k=0;k<size;k++){		
-			val=image_2D.getXYZ(k);//获得图像的像素值的大小		
+			val=image_2D.getXY(k);//获得图像的像素值的大小		
 			if(val<arrays.at(0)) dest.putXY(k,1);	
 			else  dest.putXY(k,2);	
 		}//for
