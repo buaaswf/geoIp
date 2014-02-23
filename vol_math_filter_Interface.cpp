@@ -5,16 +5,120 @@
 using namespace std;
 extern size_t  globalProgressChanged = 0;
 extern size_t volatile progressStep = 0;
+void (*progress)(int type,int total ,int step,bool &cancled);
 Raw& MultiThread(int method,int threadcount,Raw &src,void *para);
 void MultiThreadsipl(int method,int threadcount,Raw &src,void *para);
 void MultiThreadsY(int method,int threadcount,Raw &src,void *para);
 void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,void *para);
 void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,void *para);
-void progress(int type,int total ,int step,bool &cancled)
+bool doGuassFilterFileMode(void **srco,int width,int height ,int count,void * reto,GuassFilterI &para,
+	int datatype,void(*ProgressChanged)(int,int,int,bool &))
 {
+	progress=ProgressChanged;
+		/*
+	datatype
+	1:unsigned char
+	2:unsigned short
+	3:float
 
-	//printf(" %f\n",(float)step*100/total);
+	*/
+	switch (datatype)
+	{
+	case 1:
+		{
+			unsigned char **src=(unsigned char **)srco;
+			unsigned char *ret = (unsigned char*)reto;
+			unsigned char *indata =new unsigned char [width*height*count];
+			unsigned char *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned char));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doGuassFilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned char*)retraw->Data+width*height,sizeof(unsigned char)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 2:
+		{
+			unsigned short **src=(unsigned short **)srco;
+			unsigned short *ret = (unsigned short*)reto;
+			unsigned short *indata =new unsigned short [width*height*count];
+			unsigned short *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned short));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doGuassFilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned short*)retraw->Data+width*height,sizeof(unsigned short)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 3:
+
+		{
+			float **src=(float **)src;
+			float *ret = (float*)ret;
+			float *indata =new float [width*height*count];
+			float *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(float));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doGuassFilterIY(srcraw,retraw,para);
+
+			memcpy(ret,(float*)retraw->Data+width*height,sizeof(float)*width*height);
+			delete srcraw;
+			delete retraw;
+	}
+		break;
+
+
+	}
+
+
+	return true;
+	return true;
 }
+bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,
+		int datatype,void(*ProgressChanged)(int,int,int,bool &));
+bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,
+	int datatype,void(*ProgressChanged)(int,int,int,bool &));
+extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,
+	void(*ProgressChanged)(int,int,int,bool &));
+bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,
+	void(*ProgressChanged)(int,int,int,bool &))
+{
+	return true;
+}
+bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,
+	void(*ProgressChanged)(int,int,int,bool &));
+bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,
+	void(*ProgressChanged)(int,int,int,bool &));
+bool doMWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,
+	void(*ProgressChanged)(int,int,int,bool &));
+bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &,
+	void(*ProgressChanged)(int,int,int,bool &));
+//void progress(int type,int total ,int step,bool &cancled)
+//{
+//
+//	//printf(" %f\n",(float)step*100/total);
+//}
+
+
 void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 {
 	//int method,int threadcount,Raw &src,void *para

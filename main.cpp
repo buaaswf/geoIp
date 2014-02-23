@@ -11,7 +11,11 @@
 #include <crtdbg.h>
 #include "KDetectMemoryLeak.h"
 
+void p(int type,int total ,int step,bool &cancled)
+{
 
+	printf(" %f\n",(float)step*100/total);
+}
 ImageVolume * testinterface()
 {
 	int l = 4338, m = 3353, n = 3;
@@ -109,14 +113,19 @@ void testprocess()
 	//ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
-	TrilateralfilterI gs(3,3,15);
-	doTrilateralFilterFileMode(slice1,l,m,n,outdata1,gs,1);
+	//TrilateralfilterI gs(3,3,15);
+	//doTrilateralFilterFileMode(slice1,l,m,n,outdata1,gs,1);
+	GuassFilterI gs(3,3);
+	bool flag=false;
+	//p(1,2,3,flag);
+	doGuassFilterFileMode(slice1,l,m,n,outdata1,gs,1,p);
+	//(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
 	test.writeImagesesmicarray(outdata1 ,l,m,n);
 }
 void testbigdata()
 {
-	//int l = 989, m = 1241, total = 500, n = 10;
-	int l = 281, m = 481, total = 10, n = 3;
+	int l = 989, m = 1241, total = 9, n = 3;
+	//int l = 281, m = 481, total = 300, n = 3;
 	//int l = 4338, m = 3753, total = 4, n = 3;
 
 	unsigned char * indata = new unsigned char [l*m*n];
@@ -125,9 +134,9 @@ void testbigdata()
 	{
 		RawImage test;
 		
-		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i);
+		test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i,n);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
-		test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i,n);
+		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i,n);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i,n);
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
@@ -138,10 +147,10 @@ void testbigdata()
 		//doGuassFilterIY(src,ret,gs);
 		//AnistropicI ani(3,30,1,10);
 		//doAnistropicIY(src,ret,ani);
-		MultiOstuI mutilostu(1,3);
-		doMultiOstuI(src,ret,mutilostu);
-		//TrilateralfilterI tri(15,3.0,3.0);
-		//doTrilateralfilterIY(src,ret,tri);
+		//MultiOstuI mutilostu(1,3);
+		//doMultiOstuI(src,ret,mutilostu);
+		TrilateralfilterI tri(15,3.0,3.0);
+		doTrilateralfilterIY(src,ret,tri);
 		//lowPassI lowpass(1000);
 		//dolowPassI(src,ret,lowpass);
 
@@ -174,8 +183,8 @@ int main(int argc, char* argv[])
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
-	 testbigdata();
-	//testprocess();
+	 //testbigdata();
+	testprocess();
 	 _CrtDumpMemoryLeaks();
 	// _CrtDumpMemoryLeaks;
 	//atexit(Exit);
