@@ -331,7 +331,7 @@ extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &par
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,void(*ProgressChanged)(int,int,int,bool &));
-bool doMWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void(*ProgressChanged)(int,int,int,bool &));
+extern bool doWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &,void(*ProgressChanged)(int,int,int,bool &));
 extern void *doAnistropicI2D (Image2D &src,AnistropicI &);
 extern void *doBilateralI2D (Image2D&, BilateralFilterI &);

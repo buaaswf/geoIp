@@ -11,107 +11,8 @@ void MultiThreadsipl(int method,int threadcount,Raw &src,void *para);
 void MultiThreadsY(int method,int threadcount,Raw &src,void *para);
 void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,void *para);
 void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,void *para);
-bool doGuassFilterFileMode(void **srco,int width,int height ,int count,void * reto,GuassFilterI &para,
-	int datatype,void(*ProgressChanged)(int,int,int,bool &))
-{
-	progress=ProgressChanged;
-		/*
-	datatype
-	1:unsigned char
-	2:unsigned short
-	3:float
-
-	*/
-	switch (datatype)
-	{
-	case 1:
-		{
-			unsigned char **src=(unsigned char **)srco;
-			unsigned char *ret = (unsigned char*)reto;
-			unsigned char *indata =new unsigned char [width*height*count];
-			unsigned char *ptrin= indata;
-			for (int i = 0; i < count; i++)
-			{
-				memcpy(ptrin,src[i],width*height*sizeof(unsigned char));
-				ptrin += width*height;
-			}
-			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
-			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
-			doGuassFilterIY(srcraw,retraw,para);
-
-			memcpy(ret,(unsigned char*)retraw->Data+width*height,sizeof(unsigned char)*width*height);
-			delete srcraw;
-			delete retraw;
-		}
-		break;
-	case 2:
-		{
-			unsigned short **src=(unsigned short **)srco;
-			unsigned short *ret = (unsigned short*)reto;
-			unsigned short *indata =new unsigned short [width*height*count];
-			unsigned short *ptrin= indata;
-			for (int i = 0; i < count; i++)
-			{
-				memcpy(ptrin,src[i],width*height*sizeof(unsigned short));
-				ptrin += width*height;
-			}
-			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
-			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
-			doGuassFilterIY(srcraw,retraw,para);
-
-			memcpy(ret,(unsigned short*)retraw->Data+width*height,sizeof(unsigned short)*width*height);
-			delete srcraw;
-			delete retraw;
-		}
-		break;
-	case 3:
-
-		{
-			float **src=(float **)src;
-			float *ret = (float*)ret;
-			float *indata =new float [width*height*count];
-			float *ptrin= indata;
-			for (int i = 0; i < count; i++)
-			{
-				memcpy(ptrin,src[i],width*height*sizeof(float));
-				ptrin += width*height;
-			}
-			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
-			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
-			doGuassFilterIY(srcraw,retraw,para);
-
-			memcpy(ret,(float*)retraw->Data+width*height,sizeof(float)*width*height);
-			delete srcraw;
-			delete retraw;
-	}
-		break;
 
 
-	}
-
-
-	return true;
-	return true;
-}
-bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,
-		int datatype,void(*ProgressChanged)(int,int,int,bool &));
-bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,
-	int datatype,void(*ProgressChanged)(int,int,int,bool &));
-extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,
-	void(*ProgressChanged)(int,int,int,bool &));
-bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,
-	void(*ProgressChanged)(int,int,int,bool &))
-{
-	return true;
-}
-bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,
-	void(*ProgressChanged)(int,int,int,bool &));
-bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,
-	void(*ProgressChanged)(int,int,int,bool &));
-bool doMWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,
-	void(*ProgressChanged)(int,int,int,bool &));
-bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &,
-	void(*ProgressChanged)(int,int,int,bool &));
 //void progress(int type,int total ,int step,bool &cancled)
 //{
 //
@@ -311,13 +212,25 @@ bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para)
 {
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
 	Raw *outdata=(Raw *)ImageVolume2Raw(ret);
-	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
-	//	return ret;
+
 	MultiThreadptr(3,src->PixelType,para.threadcount,indata,outdata,(void *)&para);
-	 //return indata;
+	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 	memcpy((unsigned char*)ret->Data,outdata->getdata(),outdata->size()*sizeof(unsigned char));
+	delete res;
+	delete outdata;
 	 return true;
 
+}
+bool doBilateralIY(ImageVolume * src, ImageVolume *ret,BilateralFilterI &para)
+{
+	Raw *indata=(Raw *)ImageVolume2Raw(src);
+	Raw *outdata=(Raw *)ImageVolume2Raw(ret);
+	MultiThreadsYptr(3,src->PixelType,para.threadcount,indata,outdata,(void *)&para);
+	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
+	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
+	delete res;
+	delete outdata;
+	return true;
 }
 extern void *doGuassFilterI (Process & para)
 {
@@ -2109,4 +2022,78 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 	4\guass
 
 	*/
+}
+
+/**
+ \brief	Executes the guass filter file mode operation.for progress
+
+ \param [in,out]	srco		   	If non-null, the srco.
+ \param	width					   	The width.
+ \param	height					   	The height.
+ \param	count					   	Number of.
+ \param [in,out]	reto		   	If non-null, the reto.
+ \param [in,out]	para		   	The para.
+ \param	datatype				   	The datatype.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
+bool doGuassFilterFileMode(void **srco,int width,int height ,int count,void * reto,GuassFilterI &para,
+	int datatype,void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress=ProgressChanged;
+	return doGuassFilterFileMode(srco,width,height,count,reto,para,
+		datatype);
+}
+bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,
+	int datatype,void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress=ProgressChanged;
+	return doAnistropicFilterFileMode(src, width,height ,count,ret,para,
+		datatype);
+}
+bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,
+	int datatype,void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress=ProgressChanged;
+	return doTrilateralFilterFileMode(src, width,height ,count,ret,para,
+		datatype);
+}
+extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,
+	void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress=ProgressChanged;
+	return doAnistropicIY(src,ret,para);
+
+}
+bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,
+	void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress= ProgressChanged;
+	return doGuassFilterIY(src,ret,para);
+}
+bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,
+	void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress =ProgressChanged;
+	return doTrilateralfilterIY(src,ret,para);
+}
+bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,
+	void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress=ProgressChanged;
+	return doMultiOstuI(src,ret,para);
+}
+//bool doWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,
+//	void(*ProgressChanged)(int,int,int,bool &))
+//{
+//	progress=ProgressChanged;
+//	return doWaterSheds(src,ret,para);
+//}
+bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &para,
+	void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress =ProgressChanged;
+	return dolowPassI(src,ret,para);
 }
