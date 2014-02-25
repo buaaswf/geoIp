@@ -232,6 +232,78 @@ bool doBilateralIY(ImageVolume * src, ImageVolume *ret,BilateralFilterI &para)
 	delete outdata;
 	return true;
 }
+bool doBilateralFilterFileMode(void **srco,int width,int height ,int count,void * reto,BilateralFilterI &para,int datatype)
+{
+	switch (datatype)
+	{
+	case 1:
+		{
+			unsigned char **src=(unsigned char **)srco;
+			unsigned char *ret = (unsigned char*)reto;
+			unsigned char *indata =new unsigned char [width*height*count];
+			unsigned char *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned char));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doBilateralIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned char*)retraw->Data+width*height,sizeof(unsigned char)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 2:
+		{
+			unsigned short **src=(unsigned short **)srco;
+			unsigned short *ret = (unsigned short*)reto;
+			unsigned short *indata =new unsigned short [width*height*count];
+			unsigned short *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(unsigned short));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doBilateralIY(srcraw,retraw,para);
+
+			memcpy(ret,(unsigned short*)retraw->Data+width*height,sizeof(unsigned short)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+	case 3:
+
+		{
+			float **src=(float **)src;
+			float *ret = (float*)ret;
+			float *indata =new float [width*height*count];
+			float *ptrin= indata;
+			for (int i = 0; i < count; i++)
+			{
+				memcpy(ptrin,src[i],width*height*sizeof(float));
+				ptrin += width*height;
+			}
+			ImageVolume *srcraw = new ImageVolume(width,height,count,1,indata);
+			ImageVolume *retraw = new ImageVolume(width,height,count,1,ret);
+			doBilateralIY(srcraw,retraw,para);
+
+			memcpy(ret,(float*)retraw->Data+width*height,sizeof(float)*width*height);
+			delete srcraw;
+			delete retraw;
+		}
+		break;
+
+
+	}
+
+
+	return true;
+}
 extern void *doGuassFilterI (Process & para)
 {
 	 PIXTYPE ** in = para.slices;
@@ -2078,6 +2150,12 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 {
 	progress =ProgressChanged;
 	return doTrilateralfilterIY(src,ret,para);
+}
+bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para,
+	void(*ProgressChanged)(int,int,int,bool &))
+{
+	progress =ProgressChanged;
+	return doBilateralIY(src,ret,para);
 }
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,
 	void(*ProgressChanged)(int,int,int,bool &))

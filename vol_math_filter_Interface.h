@@ -295,7 +295,11 @@ extern void * doAnistropicI (Raw *src, Raw *ret, AnistropicII &);
  */
 
 extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para);
-
+extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
+extern void * doAnistropicI (Process &);
+extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
+extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);
+extern void *doGuassFilterI (Process &);
 /**
  \brief	Executes the anisotropic interface y operation for y direction .
 
@@ -307,19 +311,17 @@ extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para
  */
 
 extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
-extern void * doAnistropicI (Process &);
-extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
+
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
 bool  doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
-extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);
-extern void *doGuassFilterI (Process &);
+bool  doBilateralIY (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
 bool doGuassFilterI (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
 bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype);
 bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype);
 bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype);
-extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
-bool  doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
+bool doBilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype);
+bool doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para);
 bool doMWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para);
@@ -327,11 +329,12 @@ bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &);
 bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
 bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
-extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*ProgressChanged)(int,int,int,bool &));
+bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,void(*ProgressChanged)(int,int,int,bool &));
-extern bool doWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void(*ProgressChanged)(int,int,int,bool &));
+bool doWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void(*ProgressChanged)(int,int,int,bool &));
+bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &,void(*ProgressChanged)(int,int,int,bool &));
 extern void *doAnistropicI2D (Image2D &src,AnistropicI &);
 extern void *doBilateralI2D (Image2D&, BilateralFilterI &);
