@@ -180,18 +180,20 @@ void ThreeDim_Bilateral::applySipl(int iter)
 
 	if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
 	{
-		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2,src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*iter-ret->getXsize()*ret->getYsize(),true);
+		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2,
+			src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*iter-ret->getXsize()*ret->getYsize(),false);
 	} 
 	else if ( (iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize())|| 
 		((iter+1)*ret->getZsize() >=  src->getZsize() && iter !=0 ))
 	{
 		if ( iter ==0 )
 		{
-			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata(),true);
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata(),false);
 		} 
 		else //if(((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 ))
 		{
-			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),true);
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,
+				src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),false);
 		}
 		//else if((iter+1) * (src->getZsize()/(iter+1))  >=  src->getZsize())
 		//{
@@ -200,7 +202,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 	}
 	else 
 	{
-		temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),true);
+		temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),false);
 	}
 
 	float Maxvar;
@@ -277,7 +279,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 					{
 						ret->put(i,j,k,temp->get(i,j,k));
 					}
-						
+
 				}//if..
 			}//i..
 
@@ -286,6 +288,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 	}//j..
 	//src = *temp;
 	//return *temp;
+	delete temp;
 
 
 }
@@ -312,12 +315,21 @@ bool ThreeDim_Bilateral::isInsideBoundaries(int m,int n, int l){
 
 ThreeDim_Bilateral::~ThreeDim_Bilateral( void )
 {
-	delete src;
-	delete ret;
-	delete temp;
-	//double kernelRadius;
-	delete []kernelD;
-	kernelD = NULL;
+
+	int kernelSize = this->kernelRadius * 2 + 1;
+
+	for(int i=0; i<kernelSize;i++)
+	{
+
+		for(int j=0; j<kernelSize;j++)
+		{
+			delete kernelD[i][j];
+		}
+		delete kernelD[i];
+		
+	}
+	delete kernelD;
+	kernelD =NULL;
 	delete [] gaussSimilarity;
 
 }

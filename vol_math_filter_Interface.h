@@ -329,6 +329,7 @@ bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &);
 bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
 bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
+bool doBilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,BilateralFilterI &para,int datatype, void(*ProgressChanged)(int,int,int,bool &));
 bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,void(*ProgressChanged)(int,int,int,bool &));
