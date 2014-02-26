@@ -22,33 +22,33 @@ RawArray:raw array or raw2D array
 
 
 class Raw;
-//for test ,int algrithms is not usefull///
+//for test ,long long algorithms is not usefull///
 class RawImage
 {
 public:
-	int length;
-	int width;
-	int height;
+	long long length;
+	long long width;
+	long long height;
 public:
 	PIXTYPE * buf;
-	RawImage(int length,int height,int width);
+	RawImage(long long length,long long height,long long width);
 	RawImage(void);
-	int getlength()
+	long long getlength()
 	{
 		return (height*length*width);
 	}
 	~RawImage(void);
-	void readImage( unsigned char * buf,char const *file ,int size);
-	void readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i,int winsize);
-	void readImagesi(short  * buf,char const *file ,int size);
-	void readStream(short *buf,char const *file,int size);
+	void readImage( unsigned char * buf,char const *file ,long long size);
+	void readImagerecursive( unsigned char * buf,char const *file ,long long l,long long m,long long i,long long winsize);
+	void readImagesi(short  * buf,char const *file ,long long size);
+	void readStream(short *buf,char const *file,long long size);
 	void writeImagecolon(Raw& destImg);
 	void writeImage(Raw& destImg);
 	void writeImagesesmic(Raw &destImg);
-	void readImage2(float * buf,char const *file ,int size);
+	void readImage2(float * buf,char const *file ,long long size);
 	float * buf2float(unsigned char *buf);
-	void writeImagesesmicarray(void * src, int l ,int m, int n);
-	void writeImageSesmicRecursive(void * src, int l ,int m, int n);
+	void writeImagesesmicarray(void * src, long long l ,long long m, long long n);
+	void writeImageSesmicRecursive(void * src, long long l ,long long m, long long n);
 	void save();
 };
 
@@ -56,42 +56,42 @@ public:
 
 class Raw  {
 private:   			//-----------------DATA----------------- 
-	int xsize;		// # of pixels per scanline,
-	int ysize;		// # of scanlines in this Raw.
-	int zsize;
+	long long  xsize;		// # of pixels per scanline,
+	long long  ysize;		// # of scanlines in this Raw.
+	long long zsize;
 	PIXTYPE *data;		// 1D array of PIXTYPE that are accessed as a 2D array.
 	bool is_shared;
 public:				//---------------init fcns-------------
-	Raw(int,int,int,PIXTYPE*,bool=false);	
+	Raw(long long,long long,long long,PIXTYPE*,bool=false);	
 	Raw(ImageVolume &src);
 	Raw(const Raw& src,bool=false);
-	Raw(int,int,int);
+	Raw(long long,long long,long long);
 	Raw(void);// constructor for 'empty' Raws
 	~Raw(void);		// destructor; releases memory
 
 	Raw& set_shared(bool);
 
-	void sizer(int ixsize, int iysize,int izsize);		// get mem for rectangle of pixels
+	void sizer(long long ixsize, long long iysize,long long izsize);		// get mem for rectangle of pixels
 	void sizer(Raw* src);					// get same amt. of mem as 'src'
-	inline int getXsize(void) {return xsize;};		// get # pixels per scanline
-	inline int getYsize(void) {return ysize;};		// get # of scanlines.
-	inline int getZsize(void) {return zsize;};		//get # of RawImage numbers
-	int wipecopy(Raw* src);			// copy, even with size mismatch change from bool swf 2013 4 16
-	size_t size(){return xsize*ysize*zsize;};
+	inline long long getXsize(void) {return xsize;};		// get # pixels per scanline
+	inline long long getYsize(void) {return ysize;};		// get # of scanlines.
+	inline long long getZsize(void) {return zsize;};		//get # of RawImage numbers
+	long long wipecopy(Raw* src);			// copy, even with size mismatch change from bool swf 2013 4 16
+	long long size(){return xsize*ysize*zsize;};
 
-	inline void put(int ix, int iy,int iz, PIXTYPE val)
+	inline void put(long long ix, long long iy,long long iz, PIXTYPE val)
 	{	// write 'val' at location ix,iy.iz.
 		data[ix + xsize*iy+xsize*ysize*iz] = val; 
 	};
-	inline PIXTYPE get(int ix, int iy,int iz) {	// read the value at ix,iy.
-		int index=ix + xsize*iy+xsize*ysize*iz;
+	inline PIXTYPE get(long long ix, long long iy,long long iz) {	// read the value at ix,iy.
+		long long index=ix + xsize*iy+xsize*ysize*iz;
 		return(data[index]); 
 	};
 	PIXTYPE *getdata(){return data;};
-	PIXTYPE getXYZ(int ixyz){		// read value at 1D address ixyz
+	PIXTYPE getXYZ(long long ixyz){		// read value at 1D address ixyz
 		return data[ixyz];
 	};
-	inline void putXYZ(int ixyz,PIXTYPE val){// write value at 1D address ixy
+	inline void putXYZ(long long ixyz,PIXTYPE val){// write value at 1D address ixy
 		data[ixyz] = val;
 	};
 
@@ -111,16 +111,16 @@ public:				//---------------init fcns-------------
 
 	inline Raw& operator+=(const Raw &volume)
 	{
-		for (int i = 0; i<size(); ++i)
+		for (long long i = 0; i<size(); ++i)
 		{
 			this->data[i] += volume.data[i];
 		}
 		return *this;
 	}
-	
+
 	Raw& operator+=(const PIXTYPE val)
 	{
-		for (int i = 0; i < size(); ++i)
+		for (long long i = 0; i < size(); ++i)
 		{
 			this->data[i] += val;
 		}
@@ -138,7 +138,7 @@ public:				//---------------init fcns-------------
 	}
 	Raw& operator-=(const Raw &volume)
 	{
-		for (int i = 0; i < size(); ++i)
+		for (long long i = 0; i < size(); ++i)
 		{
 			this->data[i] -= volume.data[i];
 		}
@@ -146,7 +146,7 @@ public:				//---------------init fcns-------------
 	}
 	Raw& operator-=(const PIXTYPE val)
 	{
-		for (int i = 0; i< size(); ++i)
+		for (long long i = 0; i< size(); ++i)
 		{
 			this->data[i] -= val;
 		}
@@ -155,7 +155,7 @@ public:				//---------------init fcns-------------
 	Raw operator -(const Raw &volume)
 	{
 		return Raw(*this, true) -= volume;
-	
+
 	}
 	Raw operator -(const PIXTYPE val)
 	{
@@ -164,14 +164,14 @@ public:				//---------------init fcns-------------
 	}
 	Raw& operator *=(const Raw& img)
 	{
-		for (int i = 0; i < size(); ++i)
+		for (long long i = 0; i < size(); ++i)
 			this->data[i] *= img.data[i];
 		return *this;
 	}
 
 	Raw& operator *=(const PIXTYPE val)
 	{
-		for (int i = 0; i < size(); ++i)
+		for (long long i = 0; i < size(); ++i)
 			this->data[i] *= val;
 		return *this;
 	}
@@ -188,14 +188,14 @@ public:				//---------------init fcns-------------
 
 	Raw& operator /=(const Raw& img)
 	{
-		for (int i = 0; i < size(); ++i)
+		for (long long i = 0; i < size(); ++i)
 			this->data[i] /= img.data[i];
 		return *this;
 	}
 
 	Raw& operator/=(const PIXTYPE val)
 	{
-		for (int i = 0; i < size(); ++i)
+		for (long long i = 0; i < size(); ++i)
 			this->data[i] /= val;
 		return *this;
 	}
@@ -218,30 +218,30 @@ public:				//---------------init fcns-------------
 class RawArray {
 public:
 	Raw *z;	// dynam. allocated space for a set of Raw objects.
-	int rawNum;	// # of Raw objects stored.
+	long long rawNum;	// # of Raw objects stored.
 
 public:							
 	RawArray(void);// 'empty' RawArray constructor.
-	RawArray(int rawNum,Raw *src);//swf add for read data 
+	RawArray(long long rawNum,Raw *src);//swf add for read data 
 	~RawArray(void);	// destructor.
-	void sizer(int ixsize, int iysize, int izsize,int irawNum); // reserve memory
+	void sizer(long long ixsize, long long iysize, long long izsize,long long irawNum); // reserve memory
 	void sizer(RawArray* src);			// get same amt. of mem as 'src
-	int getrawNum(void) {				// return # of Raw's we hold;
+	long long getrawNum(void) {				// return # of Raw's we hold;
 		return(rawNum); 
 	};
-	int getYsize() {					// # of Raw1D's in zval-th Raw;
+	long long getYsize() {					// # of Raw1D's in zval-th Raw;
 		return(z[0].getYsize()); 
 	};
-	int getXsize(){						// # of pixels on yval,zval-th line
+	long long getXsize(){						// # of pixels on yval,zval-th line
 		return(z[0].getXsize()); 
 	};
-	int getZsize(){
+	long long getZsize(){
 		return (z[0].getZsize());}
 
-	PIXTYPE get(int ix, int iy, int iz,int rawNum) {
+	PIXTYPE get(long long ix, long long iy, long long iz,long long rawNum) {
 		return(z[rawNum].get(ix,iy,iz));	// write 'val' at location ix,iy,iz. 
 	};
-	void put(int ix, int iy, int iz,int rawNum,  PIXTYPE val) { 
+	void put(long long ix, long long iy, long long iz,long long rawNum,  PIXTYPE val) { 
 		z[rawNum].put(ix,iy,iz,val);		//write 'val' at location ix,iy,iz.
 	};
 	void wipecopy(RawArray& src);			// copy, resize as needed.
@@ -250,16 +250,16 @@ public:
 class RawND
 {
 private:   			//-----------------DATA----------------- 
-	unsigned int xsize, ysize, zsize, _spectrum;
+	unsigned long long xsize, ysize, zsize, _spectrum;
 	bool _is_shared;
 	//vector <PIXTYPE> *data;	
 	
 	//vector<bool> *data2;
 	// 1D array of PIXTYPE that are accessed as a 2D array.
 public:				//---------------init fcns-------------
-	RawND(unsigned int,unsigned int,unsigned int,unsigned int ,PIXTYPE*,bool=false);	
+	RawND(unsigned long long,unsigned long long,unsigned long long,unsigned long long ,PIXTYPE*,bool=false);	
 	RawND( RawND& src,bool=false);
-	RawND(int,int,int,bool=false);
+	RawND(long long,long long,long long,bool=false);
 	RawND(void);// constructor for 'empty' Raws
 	~RawND(void);		// destructor; releases memory
 	RawND& set_shared(bool);
@@ -273,11 +273,11 @@ void *  ImageVolume2Raw(ImageVolume &src);
 
 void *  ImageVolume2Raw(ImageVolume *src);
 
-void *  Raw2ImageVolume(Raw  &src,int type);
+void *  Raw2ImageVolume(Raw  &src,long long type);
 
 Raw2D Image2D2Raw2D(Image2D &src);
 
-void * Raw2D2Image2D(Raw2D &src,int type);
+void * Raw2D2Image2D(Raw2D &src,long long type);
 void *  ImageVolume2Raw(ImageVolume *src);
 
 

@@ -8,7 +8,7 @@ RawImage is to change the all the three data types to double or float
 //=====================================================================================================
 char* double2char(float *buf, long length)
 {
-	int i=0;
+	long long i=0;
 	char *imgf=new char[length];
 	while(i < length)
 	{
@@ -17,12 +17,12 @@ char* double2char(float *buf, long length)
 	return imgf;
 }
 
-RawImage::RawImage(int length,int height,int width)
+RawImage::RawImage(long long length,long long height,long long width)
 {
 	this->height=height;
 	this->length=length;
 	this->width=width;
-	int length1=this->getlength();
+	long long length1=this->getlength();
 	this->buf=new PIXTYPE[length1];
 }
 RawImage::RawImage()
@@ -33,7 +33,7 @@ RawImage::RawImage()
 	this->buf=NULL;
 
 }
-void RawImage::readImage(unsigned char * buf,char const *file ,int size)
+void RawImage::readImage(unsigned char * buf,char const *file ,long long size)
 {
 	FILE * op=fopen(file,"rb");
 	if(op==NULL)
@@ -47,7 +47,7 @@ void RawImage::readImage(unsigned char * buf,char const *file ,int size)
 	fclose(op);
 	printf("read is ok\n");
 }
-void RawImage::readImage2(float * buf,char const *file ,int size)
+void RawImage::readImage2(float * buf,char const *file ,long long size)
 {
 	FILE * op=fopen(file,"rb");
 	if(op==NULL)
@@ -61,19 +61,19 @@ void RawImage::readImage2(float * buf,char const *file ,int size)
 	fclose(op);
 	printf("read is ok\n");
 }
-void RawImage::readStream(short* buf,char const *filename,int size)
+void RawImage::readStream(short* buf,char const *filename,long long size)
 {
-	int lx=0,ly=0,lz=0;
+	long long lx=0,ly=0,lz=0;
 	ifstream file;
 	file.open(filename, ios::out | ios::app | ios::binary);
 	if (!file.is_open()) {
 		cout<< "The file open failed, Please check it and try again"<< endl;
 		exit(0);
 	}
-	file.read(reinterpret_cast<char *>(&lx),sizeof(int));
-	file.read(reinterpret_cast<char *>(&ly),sizeof(int));
-	file.read(reinterpret_cast<char *>(&lz),sizeof(int));
-	//cout<<sizeof(int)<<endl;
+	file.read(reinterpret_cast<char *>(&lx),sizeof(long long));
+	file.read(reinterpret_cast<char *>(&ly),sizeof(long long));
+	file.read(reinterpret_cast<char *>(&lz),sizeof(long long));
+	//cout<<sizeof(long long)<<endl;
 	//cout<<sizeof(short)<<endl;
 	//cout<<"lx="<<lx<<",ly="<<ly<<",lz="<<lz<<endl;
 	//file.seekg(24L+512*512*345*sizeof(short),ios::beg);//+512*512*345*sizeof(short)
@@ -82,7 +82,7 @@ void RawImage::readStream(short* buf,char const *filename,int size)
 
 
 }
-void RawImage::readImagesi(short  * buf,char const *file ,int size)
+void RawImage::readImagesi(short  * buf,char const *file ,long long size)
 {
 	FILE * op=fopen(file,"rb");
 	if(op==NULL)
@@ -91,7 +91,7 @@ void RawImage::readImagesi(short  * buf,char const *file ,int size)
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
 	fseek(op,24L+43253760L,SEEK_SET);
-	fread((char *)buf,sizeof(signed int ),size,op);
+	fread((char *)buf,sizeof(signed long long ),size,op);
 
 	fclose(op);
 	printf("read is ok\n");
@@ -101,7 +101,7 @@ void RawImage::writeImagecolon(Raw &destImg)
 	FILE *p=fopen("F:\\3Dlevel.raw","wb");
 	//char* data = double2char(destImg.getdata(), destImg.size());
 	PIXTYPE *data=destImg.getdata();
-	//for (int i=0;i<destImg.getXsize()*destImg.getYsize()*destImg.getZsize();i++)
+	//for (long long i=0;i<destImg.getXsize()*destImg.getYsize()*destImg.getZsize();i++)
 	//{
 
 	//	if (data[i]<1)
@@ -111,11 +111,11 @@ void RawImage::writeImagecolon(Raw &destImg)
 	//	else data[i]=0;
 
 	//}
-	for (int i=0;i<destImg.getZsize();i++)
+	for (long long i=0;i<destImg.getZsize();i++)
 	{
-		for (int j=0;j<destImg.getYsize();j++)
+		for (long long j=0;j<destImg.getYsize();j++)
 		{
-			for (int k=0;k<destImg.getXsize();k++)
+			for (long long k=0;k<destImg.getXsize();k++)
 			{
 				PIXTYPE *val=&data[i*destImg.getXsize()*destImg.getYsize()+j*destImg.getXsize()+k];
 				if(k<451 &&k> 45 && j>162 &&j <391)
@@ -167,7 +167,7 @@ void RawImage::writeImagesesmic(Raw &destImg)
 	delete[] data;
 	printf("write is ok");
 }
-void RawImage::writeImagesesmicarray(void * src, int l ,int m, int n)
+void RawImage::writeImagesesmicarray(void * src, long long l ,long long m, long long n)
 {
 	FILE *p;
 	if((p=fopen("F:\\sesmic.raw","wb"))==NULL)  //"ab+"append
@@ -177,7 +177,7 @@ void RawImage::writeImagesesmicarray(void * src, int l ,int m, int n)
 	}
 	//= new unsigned char [l *m*n];
 	//unsigned char *  data =(unsigned char *) src;
-	fwrite(src, sizeof(unsigned char), l*m*n, p);
+	fwrite(src, sizeof(unsigned char), l*m, p);
 	fclose(p);
 	fflush(stdout);
 
@@ -188,7 +188,7 @@ float* RawImage::buf2float(unsigned char *buf)
 {
 	unsigned char *p;
 	p=buf;
-	int i=0;
+	long long i=0;
 	long length=this->getlength();
 	float *imgf=new float[length];
 	while(p)
@@ -206,7 +206,7 @@ RawImage::~RawImage(void)
 }
 
 
-void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,int m,int i ,int winsize)
+void RawImage::readImagerecursive( unsigned char * buf,char const *file ,long long l,long long m,long long i ,long long winsize)
 {
 	FILE * op=fopen(file,"rb");
 	if(op==NULL)
@@ -229,7 +229,7 @@ void RawImage::readImagerecursive( unsigned char * buf,char const *file ,int l,i
 	printf("read is ok\n");
 }
 
-void RawImage:: writeImageSesmicRecursive(void * src, int l ,int m, int n)
+void RawImage:: writeImageSesmicRecursive(void * src, long long l ,long long m, long long n)
 {
 
 	FILE *p;
@@ -265,7 +265,7 @@ Raw::Raw(void)
 	is_shared = false;
 	data=NULL;
 }
-Raw::Raw(int xsize,int ysize,int zsize,PIXTYPE *y,bool share)
+Raw::Raw(long long xsize,long long ysize,long long zsize,PIXTYPE *y,bool share)
 {
 	//float i=0.0f;
 	this->xsize=xsize;
@@ -281,7 +281,7 @@ Raw::Raw(int xsize,int ysize,int zsize,PIXTYPE *y,bool share)
 		memcpy(this->data,y,sizeof(PIXTYPE)*size());
 	}
 }
-Raw::Raw(int xsize,int ysize,int zsize)
+Raw::Raw(long long xsize,long long ysize,long long zsize)
 {
 	this->xsize=xsize;
 	this->ysize=ysize;
@@ -319,7 +319,7 @@ Raw& Raw::set_shared(bool _is_shared)
 	return *this;
 }
 
-void Raw::sizer(int ixsize, int iysize,int izsize) {
+void Raw::sizer(long long ixsize, long long iysize,long long izsize) {
 	if(data!=NULL)
 		delete [] this->data;
 	data=NULL;
@@ -330,7 +330,7 @@ void Raw::sizer(int ixsize, int iysize,int izsize) {
 }
 
 void Raw::sizer(Raw* src) {
-	int ix, iy,iz;
+	long long ix, iy,iz;
 
 	ix = src->getXsize();
 	iy = src->getYsize();
@@ -338,9 +338,9 @@ void Raw::sizer(Raw* src) {
 	sizer(ix,iy,iz);
 }
 
-int Raw::wipecopy(Raw* src) {
-	int out=1;
-	int i,imax;	
+long long Raw::wipecopy(Raw* src) {
+	long long out=1;
+	long long i,imax;	
 
 	if(getYsize() != src->getYsize() || getXsize()!=src->getXsize()) { // resize to fit 'src'.
 		sizer(src);
@@ -358,7 +358,7 @@ Raw operator /(const PIXTYPE val, const Raw &volume)
 {
 	Raw res(volume);
 
-	for (int i = 0; i < res.size(); i ++ )
+	for (long long i = 0; i < res.size(); i ++ )
 	{
 		res.data[i]= val/volume.data[i];
 	}
@@ -368,7 +368,7 @@ Raw operator /(const PIXTYPE val, const Raw &volume)
 }
 
 //=====================================================================================================
-RawArray::RawArray(int rawNum,Raw *src)
+RawArray::RawArray(long long rawNum,Raw *src)
 {
 	this->rawNum=rawNum;
 	this->z=src;
@@ -384,8 +384,8 @@ RawArray::~RawArray(void)
 	z=NULL;
 	//cout<<"RawArray is deconstruct"<<endl;
 }
-void RawArray::sizer(int ixsize, int iysize, int izsize,int rawNum) {
-	int ii;
+void RawArray::sizer(long long ixsize, long long iysize, long long izsize,long long rawNum) {
+	long long ii;
 	if(z!=NULL)
 		delete[]this->z;
 	z = new Raw[rawNum];			// make room for the 2D objects,
@@ -401,7 +401,7 @@ void RawArray::sizer(RawArray* src)
 
 }
 void RawArray::wipecopy(RawArray& src) {
-	int k,kmax;
+	long long k,kmax;
 
 	if(&src==NULL)return;
 	if(src.rawNum==0) return;		// ignore empty inputs.
@@ -422,7 +422,7 @@ void *  ImageVolume2Raw(ImageVolume &src)
 	{
 		unsigned char* datSrc = (unsigned char*)(src.Data);
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.GetLength();i++)
+		for (long long i=0;i<src.GetLength();i++)
 		{
 			data[i]=(PIXTYPE)datSrc[i];
 		}
@@ -432,7 +432,7 @@ void *  ImageVolume2Raw(ImageVolume &src)
 
 		unsigned short * datSrc = (unsigned short *)(src.Data);
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.GetLength();i++)
+		for (long long i=0;i<src.GetLength();i++)
 		{
 			data[i]=(PIXTYPE)datSrc[i];
 		}
@@ -444,7 +444,7 @@ void *  ImageVolume2Raw(ImageVolume &src)
 
 		float* datSrc = (float*)(src.Data);
 
-		for (int i=0;i<src.GetLength();i++)
+		for (long long i=0;i<src.GetLength();i++)
 		{
 			data[i]=(PIXTYPE)datSrc[i];
 		}
@@ -464,7 +464,7 @@ void *  ImageVolume2Raw(ImageVolume *src)
 	{
 		unsigned char* datSrc = (unsigned char*)(src->Data);
 		//PIXTYPE *data= new PIXTYPE[src->GetLength()];
-		for (int i=0;i<src->GetLength();i++)
+		for (long long i=0;i<src->GetLength();i++)
 		{
 			data[i]=(PIXTYPE)datSrc[i];
 		}
@@ -474,7 +474,7 @@ void *  ImageVolume2Raw(ImageVolume *src)
 
 		unsigned short * datSrc = (unsigned short *)(src->Data);
 		//PIXTYPE *data= new PIXTYPE[src->GetLength()];
-		for (int i=0;i<src->GetLength();i++)
+		for (long long i=0;i<src->GetLength();i++)
 		{
 			data[i]=(PIXTYPE)datSrc[i];
 		}
@@ -486,7 +486,7 @@ void *  ImageVolume2Raw(ImageVolume *src)
 
 		float* datSrc = (float*)(src->Data);
 
-		for (int i=0;i<src->GetLength();i++)
+		for (long long i=0;i<src->GetLength();i++)
 		{
 			data[i]=(PIXTYPE)datSrc[i];
 		}
@@ -501,7 +501,7 @@ void *  ImageVolume2Raw(ImageVolume *src)
 	return ret;
 
 }
-void *  Raw2ImageVolume(Raw  &src,int type)
+void *  Raw2ImageVolume(Raw  &src,long long type)
 {
 	PIXTYPE *datSrc = (PIXTYPE *)(src.getdata());
 
@@ -510,7 +510,7 @@ void *  Raw2ImageVolume(Raw  &src,int type)
 		unsigned char *data= new unsigned char[src.size()];
 
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i = 0; i < src.size();i++)
+		for (long long i = 0; i < src.size();i++)
 		{
 			data[i] =(unsigned char) datSrc[i];
 		}
@@ -526,7 +526,7 @@ void *  Raw2ImageVolume(Raw  &src,int type)
 		unsigned short *data =new unsigned short[src.size()];
 		PIXTYPE  * datSrc = (src.getdata());
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
+		for (long long i=0;i<src.size();i++)
 		{
 			data[i]=datSrc[i];
 		}
@@ -543,7 +543,7 @@ Raw2D Image2D2Raw2D(Image2D &src)
 	{
 		unsigned char* datSrc = (unsigned char*)(src.data);
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.GetLength();i++)
+		for (long long i=0;i<src.GetLength();i++)
 		{
 			data[i]=datSrc[i];
 		}
@@ -553,7 +553,7 @@ Raw2D Image2D2Raw2D(Image2D &src)
 
 		unsigned short * datSrc = (unsigned short *)(src.data);
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.GetLength();i++)
+		for (long long i=0;i<src.GetLength();i++)
 		{
 			data[i]=datSrc[i];
 		}
@@ -565,7 +565,7 @@ Raw2D Image2D2Raw2D(Image2D &src)
 
 		short* datSrc = (short*)(src.data);
 
-		for (int i=0;i<src.GetLength();i++)
+		for (long long i=0;i<src.GetLength();i++)
 		{
 			data[i]=datSrc[i];
 		}
@@ -577,14 +577,14 @@ Raw2D Image2D2Raw2D(Image2D &src)
 	Raw2D *ret=new Raw2D(src.width,src.height,data);
 	return *ret;
 }
-void * Raw2D2Image2D(Raw2D &src,int type)
+void * Raw2D2Image2D(Raw2D &src,long long type)
 {
 	PIXTYPE *data= new PIXTYPE[src.size()];
 	if (type==1)
 	{
 		unsigned char* datSrc = new unsigned char [src.size()];//(unsigned char*)(src.data);
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
+		for (long long i=0;i<src.size();i++)
 		{
 			datSrc[i]=(unsigned char)src.getXY(i);
 		}
@@ -596,7 +596,7 @@ void * Raw2D2Image2D(Raw2D &src,int type)
 
 		unsigned short * datSrc = new unsigned short [src.size()];//(unsigned short *)(src.data);
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
-		for (int i=0;i<src.size();i++)
+		for (long long i=0;i<src.size();i++)
 		{
 			datSrc[i]=src.getXY(i);
 		}
@@ -609,7 +609,7 @@ void * Raw2D2Image2D(Raw2D &src,int type)
 
 		float* datSrc = new float [src.size()]; //(short*)(src.data);
 
-		for (int i=0;i<src.size();i++)
+		for (long long i=0;i<src.size();i++)
 		{
 			datSrc[i]=src.getXY(i);
 		}

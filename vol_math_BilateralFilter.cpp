@@ -159,3 +159,12 @@ bool BilateralFilter::isInsideBoundaries(int m,int n){
 	else 
 		return false;
 }
+
+BilateralFilter::~BilateralFilter( void )
+{
+
+	
+	
+	delete [] gaussSimilarity;
+	gaussSimilarity = NULL;
+}

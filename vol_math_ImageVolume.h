@@ -2,7 +2,7 @@
 #define IMAGEVOLUME_H
 #include <stdio.h>
 #include <string.h>
-#define IMAGE_INDEXTYPE size_t
+#define IMAGE_INDEXTYPE long long
 const int PixelType_8bit = 1;
 const int PixelType_16bit = 2;
 const int PixelType_32bit = 3;

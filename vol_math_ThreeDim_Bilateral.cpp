@@ -40,7 +40,8 @@ ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double
 		}
 	}
 
-
+	//delete kernelD;
+	//kernelD = NULL;
 	gaussSimilarity = new double[256];
 	for (int i = 0; i < 256; i++) {
 		gaussSimilarity[i] = exp((double)-((i) /twoSigmaRSquared));
@@ -158,24 +159,50 @@ void ThreeDim_Bilateral::applySipl(int iter)
 	globalProgressChanged = src->size();
 	// ~i=y j=x 
 	//Raw * temp;
-	if (iter > 0 && (iter+1)*ret->getZsize() < src->getZsize())
-	{
-		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize()+2* (int)kernelRadius,src->getdata() +\
-			iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
-	}
-	else if (iter == 0 || (iter+1)*ret->getZsize() == src->getZsize())
-	{
-		if ( iter == 0)
-		{
-			this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata());
-		} 
-		else
-		{
-			this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata() +\
-				iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
-		}
+	//if (iter > 0 && (iter+1)*ret->getZsize() < src->getZsize())
+	//{
+	//	this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize()+2* (int)kernelRadius,src->getdata() +\
+	//		iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
+	//}
+	//else if (iter == 0 || (iter+1)*ret->getZsize() == src->getZsize())
+	//{
+	//	if ( iter == 0)
+	//	{
+	//		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata());
+	//	} 
+	//	else
+	//	{
+	//		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata() +\
+	//			iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
+	//	}
 
+	//}
+
+	if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
+	{
+		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2,src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*iter-ret->getXsize()*ret->getYsize(),true);
+	} 
+	else if ( (iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize())|| 
+		((iter+1)*ret->getZsize() >=  src->getZsize() && iter !=0 ))
+	{
+		if ( iter ==0 )
+		{
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata(),true);
+		} 
+		else //if(((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 ))
+		{
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),true);
+		}
+		//else if((iter+1) * (src->getZsize()/(iter+1))  >=  src->getZsize())
+		//{
+		//	temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata()+src->size()-ret->getXsize()*ret->getYsize()*(1+ret->getZsize()),true);
+		//}
 	}
+	else 
+	{
+		temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),true);
+	}
+
 	float Maxvar;
 	if ( sizeof (PIXTYPE) == 1)
 	{
@@ -281,4 +308,16 @@ bool ThreeDim_Bilateral::isInsideBoundaries(int m,int n, int l){
 		return true;
 	else 
 		return false;
+}
+
+ThreeDim_Bilateral::~ThreeDim_Bilateral( void )
+{
+	delete src;
+	delete ret;
+	delete temp;
+	//double kernelRadius;
+	delete []kernelD;
+	kernelD = NULL;
+	delete [] gaussSimilarity;
+
 }

@@ -18,7 +18,8 @@ void p(int type,int total ,int step,bool &cancled)
 }
 ImageVolume * testinterface()
 {
-	int l = 4338, m = 3353, n = 3;
+	//int l = 4338, m = 3353, n = 3;
+	int l = 989, m = 1241, n =3; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -88,7 +89,7 @@ Raw * testinterface1(Process &src)
 }
 void testprocess()
 {
-	int l = 281, m = 481, n = 2000;
+	int l = 281, m = 481,total =3, n = 3;
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	unsigned char  *result = indata; 
@@ -113,14 +114,16 @@ void testprocess()
 	//ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
-	TrilateralfilterI gs(3,3,15);
-	doTrilateralFilterFileMode(slice1,l,m,n,outdata1,gs,1);
+	//TrilateralfilterI gs(3,3,15);
+	//doTrilateralFilterFileMode(slice1,l,m,n,outdata1,gs,1);
+	BilateralFilterI bila(3,3,4);
+	doBilateralFilterFileMode(slice1,l,m,n,outdata1,bila,1);
 	//GuassFilterI gs(3,3);
 	//bool flag=false;
 	//p(1,2,3,flag);
 	//doGuassFilterFileMode(slice1,l,m,n,outdata1,gs,1,p);
 	//(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
-	test.writeImagesesmicarray(outdata1 ,l,m,n);
+	test.writeImageSesmicRecursive(outdata1 ,l,m,n);
 }
 void testbigdata()
 {
@@ -149,8 +152,11 @@ void testbigdata()
 		//doAnistropicIY(src,ret,ani);
 		//MultiOstuI mutilostu(1,3);
 		//doMultiOstuI(src,ret,mutilostu);
-		TrilateralfilterI tri(4,1.0,3.0);
-		doTrilateralfilterIY(src,ret,tri);
+		
+		//TrilateralfilterI tri(4,1.0,3.0);
+		//doTrilateralfilterIY(src,ret,tri);
+		BilateralFilterI bila(3,3,4);
+		doBilateralIY(src, ret, bila);
 		//lowPassI lowpass(1000);
 		//dolowPassI(src,ret,lowpass);
 

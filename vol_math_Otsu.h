@@ -74,7 +74,7 @@ public:
 	void Output(Raw &image,Raw &dest);
 	//Îö¹¹º¯Êý
 	~OTSU(){
-	  arrays.~vector<unsigned char>(); 
+	  //arrays.~vector<unsigned char>(); 
 	}
 };
 #endif

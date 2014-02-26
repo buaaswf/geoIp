@@ -320,7 +320,7 @@ bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
 bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype);
 bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype);
 bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype);
-bool doBilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype);
+bool doBilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,BilateralFilterI &para,int datatype);
 bool doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para);

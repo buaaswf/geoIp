@@ -967,6 +967,7 @@ void * singleBilateralSipl( void *para)
 	Raw *outdata = p->ret;
 	ThreeDim_Bilateral  *bila=new ThreeDim_Bilateral(indata,*outdata,p->sigmaD,p->sigmaR,progress);
 	bila->applySipl(p->iter);
+	delete bila;
 	return NULL;
 
 }
@@ -1975,17 +1976,17 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 						}
 					}//for..
 
-					for(int i = 0;i <=threadcount;i++)
+					for(int i = 0;i <threadcount;i++)
 					{
 						pthread_join(threads[i], NULL);
 					}
 
 				//}
 
-				for(int i = 0;i < threadcount;i++)
-				{
-					pthread_join(threads[i], NULL);
-				}
+				//for(int i = 0;i < threadcount;i++)
+				//{
+				//	pthread_join(threads[i], NULL);
+				//}
 		
 			}//case 3
 			break;
