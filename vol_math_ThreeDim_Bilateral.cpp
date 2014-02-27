@@ -180,19 +180,20 @@ void ThreeDim_Bilateral::applySipl(int iter)
 
 	if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
 	{
-		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2,
-			src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*iter-ret->getXsize()*ret->getYsize(),false);
+		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2*kernelRadius,
+			src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*iter
+			-(ret->getXsize()*ret->getYsize()*(int)kernelRadius),false);
 	} 
 	else if ( (iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize())|| 
-		((iter+1)*ret->getZsize() >=  src->getZsize() && iter !=0 ))
+		((iter+1)*ret->getZsize() >=  src->getZsize() && iter !=0 )) 
 	{
 		if ( iter ==0 )
 		{
-			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata(),false);
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+kernelRadius,src->getdata(),false);
 		} 
 		else //if(((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 ))
 		{
-			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+kernelRadius,
 				src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),false);
 		}
 		//else if((iter+1) * (src->getZsize()/(iter+1))  >=  src->getZsize())
@@ -226,11 +227,11 @@ void ThreeDim_Bilateral::applySipl(int iter)
 	int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
 	int rs = 0 ;
 	bool flag = false;
-	for (int i=0;i<ret->getZsize();i++)
+	for (int i = 0;i < temp->getZsize();i++)
 	{
-		for (int j=0;j<ret->getYsize();j++)
+		for (int j = 0; j < temp->getYsize();j++)
 		{
-			for (int k=0; k < ret->getXsize(); k++)
+			for (int k=0; k < temp->getXsize(); k++)
 			{
 
 				rs ++;

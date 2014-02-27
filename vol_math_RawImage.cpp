@@ -177,7 +177,7 @@ void RawImage::writeImagesesmicarray(void * src, long long l ,long long m, long 
 	}
 	//= new unsigned char [l *m*n];
 	//unsigned char *  data =(unsigned char *) src;
-	fwrite(src, sizeof(unsigned char), l*m, p);
+	fwrite(src, sizeof(unsigned char), l*m*n, p);
 	fclose(p);
 	fflush(stdout);
 
@@ -253,7 +253,14 @@ Raw::Raw(ImageVolume &src)
 	this->xsize=src.Width;
 	this->ysize=src.Height;
 	this->zsize=src.Depth;
+	if(this->getdata()!=NULL)
+	{
+		delete [] this->getdata();
+		data=NULL;
+
+	}
 	this->data=new PIXTYPE[size()];
+	
 	memcpy(this->data,(PIXTYPE*)src.Data,sizeof(PIXTYPE)*size());
 
 }
@@ -295,13 +302,26 @@ Raw::Raw(const Raw & src, bool _is_shared)
 	this->xsize=src.xsize;
 	this->ysize=src.ysize;
 	this->zsize=src.zsize;
+	
 	this->is_shared = _is_shared;
 
 	if (this->is_shared == true) {
 		this->data = src.data;
 	} else {
-		this->data=new PIXTYPE[this->size()];
-		memcpy(this->data,src.data,sizeof(PIXTYPE)*size());
+		//if(this->data==NULL)
+		//{
+		//	this->data=new PIXTYPE[this->size()];
+		//	memcpy(this->data,src.data,sizeof(PIXTYPE)*size());
+
+		//}
+		//else 
+		//{
+		//	delete [] data;
+		//	data =NULL;
+			this->data=new PIXTYPE[this->size()];
+			memcpy(this->data,src.data,sizeof(PIXTYPE)*size());
+		//}
+
 	}
 }
 

@@ -810,7 +810,7 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 }
 Raw gradientlaplace(Raw &src)
 {
-	Raw *val=new Raw(src);
+	Raw *val= new Raw(src);
 	for (int i = 2; i < src.getXsize()-2; i++)
 	{
 		for (int j=2; j<src.getYsize()-2; j++)
@@ -823,8 +823,10 @@ Raw gradientlaplace(Raw &src)
 			}
 		}
 	}
-
-	return *val;
+	
+	memcpy(src.getdata(),val->getdata(),sizeof(val->size()));
+		delete val;
+	return src;
 }
 Raw gradientlaplace(Raw *src)
 {
@@ -1009,10 +1011,13 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 		Raw *_ret;
 		_ret = new Raw(gradientlaplace(*d));
 		Raw *temp;
-		_ret= new Raw(*ret);
-		temp =new Raw( *_ret**_ret);
-		_ret = new Raw(*_ret/(*temp)+1);
-		_ret =new Raw (gradientlaplace(*_ret));
+		//delete _ret;
+		//_ret= new Raw(*ret);
+		temp =new Raw( *_ret**_ret/4+1);
+		//delete _ret;
+		_ret = new Raw(*_ret/(*temp));
+		//delete _ret;
+		//_ret =new Raw (gradientlaplace(*_ret));
 			for (int i=0; i < ret->size() ; i++)
 			{
 				float t=0;
@@ -1023,7 +1028,7 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 					rs = 0;
 					ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 				}
-				if ( (t = d->getXYZ(i) - _ret->getXYZ(i)/6.0) <= 0 )
+				if ( (t = d->getXYZ(i) - _ret->getXYZ(i)/6) <= 0 )
 				{
 					ret->putXYZ(i,0);// =  *d - *dd/double(6);
 					//*s = 0;
@@ -1035,7 +1040,8 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 			}
 		//ret = d-ret/double(6);
 		d = new Raw(*ret,false); 
-
+		delete _ret;
+		delete temp;
 	}
 //	return s;
 
