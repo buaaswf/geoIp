@@ -19,6 +19,7 @@ public:
 	double similarity(int p,int s);
 	double gauss(double sigma,int x, int y);
 	double BilateralFilter::getSpatialWeight(int m, int n,int i,int j);
+	 void bilateral(Raw *temp);
 
 };
 

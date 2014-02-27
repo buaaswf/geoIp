@@ -1017,7 +1017,7 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 		//delete _ret;
 		_ret = new Raw(*_ret/(*temp));
 		//delete _ret;
-		//_ret =new Raw (gradientlaplace(*_ret));
+		_ret =new Raw (gradientlaplace(*_ret));
 			for (int i=0; i < ret->size() ; i++)
 			{
 				float t=0;
@@ -1028,14 +1028,18 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 					rs = 0;
 					ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 				}
-				if ( (t = d->getXYZ(i) - _ret->getXYZ(i)/6) <= 0 )
+				if ( t = d->getXYZ(i) - _ret->getXYZ(i)/6 <= 0 )
 				{
 					ret->putXYZ(i,0);// =  *d - *dd/double(6);
 					//*s = 0;
 				} 
-				else
+				else if((t = d->getXYZ(i) - _ret->getXYZ(i)/6) < 255)
 				{
-					ret->putXYZ(i,t);
+					ret->putXYZ(i,floor(t+ 0.5) );
+				}
+				else 
+				{
+					ret->putXYZ(i,255);
 				}
 			}
 		//ret = d-ret/double(6);

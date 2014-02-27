@@ -36,7 +36,7 @@ ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double
 			{
 				kernelD[x + center][y + center][z + center] = this->gauss(sigmaD, x, y,z);//sigmaD
 			}
-			
+
 		}
 	}
 
@@ -47,15 +47,15 @@ ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double
 		gaussSimilarity[i] = exp((double)-((i) /twoSigmaRSquared));
 	}
 
-	
+
 }
 ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,double sigmaD, double sigmaR)
 {
 	this->src=image;
-	
+
 	int sigmaMax = max(sigmaD, sigmaR);
 
-	
+
 
 
 	this->kernelRadius = 2;//ceil((double)2 * sigmaMax);//or 6
@@ -156,45 +156,301 @@ void ThreeDim_Bilateral::apply(Raw &ret) {// ~i=y j=x
 }
 void ThreeDim_Bilateral::applySipl(int iter)
 {
+
 	globalProgressChanged = src->size();
-	// ~i=y j=x 
-	//Raw * temp;
-	//if (iter > 0 && (iter+1)*ret->getZsize() < src->getZsize())
-	//{
-	//	this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize()+2* (int)kernelRadius,src->getdata() +\
-	//		iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
-	//}
-	//else if (iter == 0 || (iter+1)*ret->getZsize() == src->getZsize())
-	//{
-	//	if ( iter == 0)
-	//	{
-	//		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata());
-	//	} 
-	//	else
-	//	{
-	//		this->temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + (int)kernelRadius, src->getdata() +\
-	//			iter *src->getXsize()*src->getYsize()*ret->getZsize()-(int)kernelRadius*ret->getXsize()*ret->getYsize());
-	//	}
 
-	//}
 
+	//middle slices
 	if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
 	{
 		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2*kernelRadius,
 			src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*iter
 			-(ret->getXsize()*ret->getYsize()*(int)kernelRadius),false);
+		Raw *res=new Raw(*temp);
+		float Maxvar;
+		if ( sizeof (PIXTYPE) == 1)
+		{
+			Maxvar = 255;
+		} 
+		else if ( sizeof (PIXTYPE) == 2)
+		{
+			//qym 2014-1-10
+			//Maxvar = 65536;
+			Maxvar = 65535;
+		} 
+		else 
+		{
+			//qym 2014-1-10
+			//Maxvar = 10000000;
+			Maxvar = std::numeric_limits<float>::max();
+		}
+		//Raw *s =new Raw(*ret);
+		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+		int rs = 0 ;
+		bool flag = false;
+		for (int i = 0;i < temp->getZsize();i++)
+		{
+			for (int j = 0; j < temp->getYsize();j++)
+			{
+				for (int k=0; k < temp->getXsize(); k++)
+				{
+
+					rs ++;
+					if ( rs == interval && ProgressChanged != NULL )
+					{
+						progressStep += interval;
+						rs = 0;
+						ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+					}
+					if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
+					{
+						double sum = 0;
+						double totalWeight = 0;
+						int intensityCenter = temp->get(k,j,i);
+
+
+						int mMax = i + kernelRadius;
+						int nMax = j + kernelRadius;
+						int lMax = k + kernelRadius;
+
+						double weight;
+
+						for (int m = i-kernelRadius; m < mMax; m++) 
+						{
+							for (int n = j-kernelRadius; n < nMax; n++) 
+							{
+								for (int l = k-kernelRadius; l < lMax; l++)
+								{
+									if (this->isInsideBoundaries(l, n, m)) 
+									{
+										int intensityKernelPos = temp->get(l,n,m);
+										weight = getSpatialWeight(l,n,m,k,j,i) * similarity(intensityKernelPos,intensityCenter);
+										totalWeight += weight;
+										sum += (weight * intensityKernelPos);
+									}
+								}
+
+							}
+						}
+						float newvalue=( float)floor(sum / totalWeight);
+						if ( newvalue <= Maxvar)
+						{
+							res->put(k,j,i,newvalue);
+						} 
+						else
+						{
+							res->put(i,j,k,temp->get(i,j,k));
+						}
+
+					}//if..
+				}//i..
+				 
+			}//k..
+
+		}//j..
+		//src = *temp;
+		//return *temp;
+		for (int i = 0; i < ret->size();i++ )
+		{
+
+			ret->putXYZ( i, res->getXYZ(i + ret->getXsize()*ret->getYsize()) );
+		}
+
 	} 
+	//first and last slices 
 	else if ( (iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize())|| 
 		((iter+1)*ret->getZsize() >=  src->getZsize() && iter !=0 )) 
 	{
+		
 		if ( iter ==0 )
-		{
+		{//first
 			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+kernelRadius,src->getdata(),false);
+			Raw *res=new Raw(*temp);
+			float Maxvar;
+			if ( sizeof (PIXTYPE) == 1)
+			{
+				Maxvar = 255;
+			} 
+			else if ( sizeof (PIXTYPE) == 2)
+			{
+				//qym 2014-1-10
+				//Maxvar = 65536;
+				Maxvar = 65535;
+			} 
+			else 
+			{
+				//qym 2014-1-10
+				//Maxvar = 10000000;
+				Maxvar = std::numeric_limits<float>::max();
+			}
+			//Raw *s =new Raw(*ret);
+			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+			int rs = 0 ;
+			bool flag = false;
+			for (int i = 0;i < temp->getZsize();i++)
+			{
+				for (int j = 0; j < temp->getYsize();j++)
+				{
+					for (int k=0; k < temp->getXsize(); k++)
+					{
+
+						rs ++;
+						if ( rs == interval && ProgressChanged != NULL )
+						{
+							progressStep += interval;
+							rs = 0;
+							ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+						}
+						if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
+						{
+							double sum = 0;
+							double totalWeight = 0;
+							int intensityCenter = temp->get(k,j,i);
+
+
+							int mMax = i + kernelRadius;
+							int nMax = j + kernelRadius;
+							int lMax = k + kernelRadius;
+
+							double weight;
+
+							for (int m = i-kernelRadius; m < mMax; m++) 
+							{
+								for (int n = j-kernelRadius; n < nMax; n++) 
+								{
+									for (int l = k-kernelRadius; l < lMax; l++)
+									{
+										if (this->isInsideBoundaries(l, n, m)) 
+										{
+											int intensityKernelPos = temp->get(l,n,m);
+											weight = getSpatialWeight(l,n,m,k,j,i) * similarity(intensityKernelPos,intensityCenter);
+											totalWeight += weight;
+											sum += (weight * intensityKernelPos);
+										}
+									}
+
+								}
+							}
+							float newvalue=( float)floor(sum / totalWeight);
+							if ( newvalue <= Maxvar)
+							{
+								res->put(k,j,i,newvalue);
+							} 
+							else
+							{
+								res->put(i,j,k,temp->get(i,j,k));
+							}
+
+						}//if..
+					}//i..
+
+				}//k..
+
+			}//j..
+			//src = *temp;
+			//return *temp;
+			for (int i =0; i < ret->size(); i++)
+			{
+				rs++;
+
+				ret->putXYZ(i ,  res->getXYZ(i));
+			}
 		} 
+		//last slices
 		else //if(((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 ))
 		{
 			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+kernelRadius,
-				src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),false);
+				src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize()*(int)kernelRadius,false);
+			Raw *res=new Raw(*temp);
+			float Maxvar;
+			if ( sizeof (PIXTYPE) == 1)
+			{
+				Maxvar = 255;
+			} 
+			else if ( sizeof (PIXTYPE) == 2)
+			{
+				//qym 2014-1-10
+				//Maxvar = 65536;
+				Maxvar = 65535;
+			} 
+			else 
+			{
+				//qym 2014-1-10
+				//Maxvar = 10000000;
+				Maxvar = std::numeric_limits<float>::max();
+			}
+			//Raw *s =new Raw(*ret);
+			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+			int rs = 0 ;
+			bool flag = false;
+			for (int i = 0;i < temp->getZsize();i++)
+			{
+				for (int j = 0; j < temp->getYsize();j++)
+				{
+					for (int k=0; k < temp->getXsize(); k++)
+					{
+
+						rs ++;
+						if ( rs == interval && ProgressChanged != NULL )
+						{
+							progressStep += interval;
+							rs = 0;
+							ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+						}
+						if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
+						{
+							double sum = 0;
+							double totalWeight = 0;
+							int intensityCenter = temp->get(k,j,i);
+
+
+							int mMax = i + kernelRadius;
+							int nMax = j + kernelRadius;
+							int lMax = k + kernelRadius;
+
+							double weight;
+
+							for (int m = i-kernelRadius; m < mMax; m++) 
+							{
+								for (int n = j-kernelRadius; n < nMax; n++) 
+								{
+									for (int l = k-kernelRadius; l < lMax; l++)
+									{
+										if (this->isInsideBoundaries(l, n, m)) 
+										{
+											int intensityKernelPos = temp->get(l,n,m);
+											weight = getSpatialWeight(l,n,m,k,j,i) * similarity(intensityKernelPos,intensityCenter);
+											totalWeight += weight;
+											sum += (weight * intensityKernelPos);
+										}
+									}
+
+								}
+							}
+							float newvalue=( float)floor(sum / totalWeight);
+							if ( newvalue <= Maxvar)
+							{
+								res->put(k,j,i,newvalue);
+							} 
+							else
+							{
+								res->put(i,j,k,temp->get(i,j,k));
+							}
+
+						}//if..
+					}//i..
+
+				}//k..
+
+			}//j..
+			//src = *temp;
+			//return *temp;
+			for (int i =0; i < ret->size(); i++)
+			{
+				rs++;
+
+				ret->putXYZ(i ,  res->getXYZ(i + ret->getXsize()*ret->getYsize()));//?????
+			}
 		}
 		//else if((iter+1) * (src->getZsize()/(iter+1))  >=  src->getZsize())
 		//{
@@ -204,91 +460,98 @@ void ThreeDim_Bilateral::applySipl(int iter)
 	else 
 	{
 		temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),false);
-	}
-
-	float Maxvar;
-	if ( sizeof (PIXTYPE) == 1)
-	{
-		Maxvar = 255;
-	} 
-	else if ( sizeof (PIXTYPE) == 2)
-	{
-		//qym 2014-1-10
-		//Maxvar = 65536;
-		Maxvar = 65535;
-	} 
-	else 
-	{
-		//qym 2014-1-10
-		//Maxvar = 10000000;
-		Maxvar = std::numeric_limits<float>::max();
-	}
-	//Raw *s =new Raw(*ret);
-	int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
-	int rs = 0 ;
-	bool flag = false;
-	for (int i = 0;i < temp->getZsize();i++)
-	{
-		for (int j = 0; j < temp->getYsize();j++)
+		Raw *res=new Raw(*temp);
+		float Maxvar;
+		if ( sizeof (PIXTYPE) == 1)
 		{
-			for (int k=0; k < temp->getXsize(); k++)
+			Maxvar = 255;
+		} 
+		else if ( sizeof (PIXTYPE) == 2)
+		{
+			//qym 2014-1-10
+			//Maxvar = 65536;
+			Maxvar = 65535;
+		} 
+		else 
+		{
+			//qym 2014-1-10
+			//Maxvar = 10000000;
+			Maxvar = std::numeric_limits<float>::max();
+		}
+		//Raw *s =new Raw(*ret);
+		int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
+		int rs = 0 ;
+		bool flag = false;
+		for (int i = 0;i < temp->getZsize();i++)
+		{
+			for (int j = 0; j < temp->getYsize();j++)
 			{
-
-				rs ++;
-				if ( rs == interval && ProgressChanged != NULL )
+				for (int k=0; k < temp->getXsize(); k++)
 				{
-					progressStep += interval;
-					rs = 0;
-					ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
-				}
-				if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
-				{
-					double sum = 0;
-					double totalWeight = 0;
-					int intensityCenter = temp->get(k,j,i);
 
-
-					int mMax = i + kernelRadius;
-					int nMax = j + kernelRadius;
-					int lMax = k + kernelRadius;
-
-					double weight;
-
-					for (int m = i-kernelRadius; m < mMax; m++) 
+					rs ++;
+					if ( rs == interval && ProgressChanged != NULL )
 					{
-						for (int n = j-kernelRadius; n < nMax; n++) 
+						progressStep += interval;
+						rs = 0;
+						ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
+					}
+					if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
+					{
+						double sum = 0;
+						double totalWeight = 0;
+						int intensityCenter = temp->get(k,j,i);
+
+
+						int mMax = i + kernelRadius;
+						int nMax = j + kernelRadius;
+						int lMax = k + kernelRadius;
+
+						double weight;
+
+						for (int m = i-kernelRadius; m < mMax; m++) 
 						{
-							for (int l = k-kernelRadius; l < lMax; l++)
+							for (int n = j-kernelRadius; n < nMax; n++) 
 							{
-								if (this->isInsideBoundaries(l, n, m)) 
+								for (int l = k-kernelRadius; l < lMax; l++)
 								{
-									int intensityKernelPos = temp->get(l,n,m);
-									weight = getSpatialWeight(l,n,m,k,j,i) * similarity(intensityKernelPos,intensityCenter);
-									totalWeight += weight;
-									sum += (weight * intensityKernelPos);
+									if (this->isInsideBoundaries(l, n, m)) 
+									{
+										int intensityKernelPos = temp->get(l,n,m);
+										weight = getSpatialWeight(l,n,m,k,j,i) * similarity(intensityKernelPos,intensityCenter);
+										totalWeight += weight;
+										sum += (weight * intensityKernelPos);
+									}
 								}
+
 							}
-
 						}
-					}
-					float newvalue=( float)floor(sum / totalWeight);
-					if ( newvalue <= Maxvar)
-					{
-						ret->put(k,j,i,newvalue);
-					} 
-					else
-					{
-						ret->put(i,j,k,temp->get(i,j,k));
-					}
+						float newvalue=( float)floor(sum / totalWeight);
+						if ( newvalue <= Maxvar)
+						{
+							res->put(k,j,i,newvalue);
+						} 
+						else
+						{
+							res->put(i,j,k,temp->get(i,j,k));
+						}
 
-				}//if..
-			}//i..
+					}//if..
+				}//i..
 
-		}//k..
+			}//k..
 
-	}//j..
-	//src = *temp;
-	//return *temp;
+		}//j..
+		//src = *temp;
+		//return *temp;
+		for ( int i = 0; i < ret->size(); i ++)
+		{
+
+			ret->putXYZ(i , res->getXYZ(i));
+		}
+	}
+
+
 	delete temp;
 
 
@@ -327,7 +590,7 @@ ThreeDim_Bilateral::~ThreeDim_Bilateral( void )
 			delete kernelD[i][j];
 		}
 		delete kernelD[i];
-		
+
 	}
 	delete kernelD;
 	kernelD =NULL;
