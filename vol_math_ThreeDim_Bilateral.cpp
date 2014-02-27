@@ -240,11 +240,11 @@ void ThreeDim_Bilateral::applySipl(int iter)
 					rs = 0;
 					ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
 				}
-				if(i>0 && j>0 && k>0 && i<ret->getXsize() && j< ret->getYsize() && k < ret->getZsize())
+				if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
 				{
 					double sum = 0;
 					double totalWeight = 0;
-					int intensityCenter = temp->get(i,j,k);
+					int intensityCenter = temp->get(k,j,i);
 
 
 					int mMax = i + kernelRadius;
@@ -259,10 +259,10 @@ void ThreeDim_Bilateral::applySipl(int iter)
 						{
 							for (int l = k-kernelRadius; l < lMax; l++)
 							{
-								if (this->isInsideBoundaries(m, n, l)) 
+								if (this->isInsideBoundaries(l, n, m)) 
 								{
-									int intensityKernelPos = temp->get(m,n,l);
-									weight = getSpatialWeight(m,n,l,i,j,k) * similarity(intensityKernelPos,intensityCenter);
+									int intensityKernelPos = temp->get(l,n,m);
+									weight = getSpatialWeight(l,n,m,k,j,i) * similarity(intensityKernelPos,intensityCenter);
 									totalWeight += weight;
 									sum += (weight * intensityKernelPos);
 								}
@@ -273,7 +273,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 					float newvalue=( float)floor(sum / totalWeight);
 					if ( newvalue <= Maxvar)
 					{
-						ret->put(i,j,k,newvalue);
+						ret->put(k,j,i,newvalue);
 					} 
 					else
 					{

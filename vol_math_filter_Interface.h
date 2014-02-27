@@ -295,6 +295,7 @@ extern void * doAnistropicI (Raw *src, Raw *ret, AnistropicII &);
  */
 
 extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para);
+extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*ProgressChanged)(int,int,int,bool &));
 extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
 extern void * doAnistropicI (Process &);
 extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);

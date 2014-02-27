@@ -26,6 +26,7 @@ public:
 	void  Perona_Malik( Raw &src);
 	Raw FourPDiff(Raw &src);
 	void FourPDiff(Raw &src,Raw &ret);
+	void FourPDiff(Raw &src,Raw *ret);
 	void FourPDiffSipl(Raw &src,Raw &ret,int iter);	
 	double funcg(PIXTYPE *array,int dz,int dy,int dx);
 

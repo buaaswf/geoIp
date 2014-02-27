@@ -16,7 +16,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *ret
 //void progress(int type,int total ,int step,bool &cancled)
 //{
 //
-//	//printf(" %f\n",(float)step*100/total);
+//	printf(" %f\n",(float)step*100/total);
 //}
 
 
@@ -54,6 +54,9 @@ bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 	//memcpy((unsigned char*)ret->Data,outdata->getdata(),outdata->size()*sizeof(unsigned char));
 	 return true;
 }
+
+
+
  /**
   \brief	Executes the anistropic fiter interface operation for Y direction
  
@@ -1369,7 +1372,7 @@ void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,v
 	{
 		datasize = 4;
 	}
-	memcpy(ret->getdata(),src->getdata(),src->size()*datasize);
+	memcpy(ret->getdata(),src->getdata(),src->size()*4);
 	int countvar=0;
 	if (threadcount >= 1)
 	{
@@ -2175,4 +2178,10 @@ bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &para,
 {
 	progress =ProgressChanged;
 	return dolowPassI(src,ret,para);
+}
+extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*ProgressChanged)(int,int,int,bool &))
+{
+		progress=ProgressChanged;
+	return doAnistropicI(src,ret,para);
+	
 }

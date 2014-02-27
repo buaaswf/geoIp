@@ -19,11 +19,12 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 989, m = 1241, n =3; 
+	int l = 281, m = 481, n =3; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
-	test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));
+	//test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));//G:\geo\data
+	test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));//G:\geo\data
 	//PIXTYPE **slice =new PIXTYPE *[n];
 	//for (int k = 0; k < n; k++)
 	//{
@@ -42,15 +43,15 @@ ImageVolume * testinterface()
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
 	
-	//AnistropicI anis(3,30,1,4);
-	//doAnistropicI(src,ret,anis);
+	AnistropicI anis(2,30,2,1);
+	doAnistropicI(src,ret,anis);
 	// trilateral 20140211============
 	//TrilateralfilterI tril(15,3);
 	//doTrilateralfilterIY(src,ret,tril);
 	// //=======================
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
-	BilateralFilterI bil(3,3,5);
-	doBilateralIY(src,ret,bil);
+	//BilateralFilterI bil(3,3,5);
+	//doBilateralIY(src,ret,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	//Raw *ret =(Raw*)doAnistropicI(src,anis);
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);zzz
@@ -139,7 +140,8 @@ void testbigdata()
 		
 		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i,n);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
-		test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i,n);
+		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i,n);
+		test.readImagerecursive(indata,"G:\\geo\\data\\mig.vol", l, m,i,n);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i,n);
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
@@ -148,15 +150,15 @@ void testbigdata()
 
 		//GuassFilterI gs(3,20);
 		//doGuassFilterIY(src,ret,gs);
-		//AnistropicI ani(3,30,1,10);
-		//doAnistropicIY(src,ret,ani);
+		AnistropicI ani( 1, 1, 2,1);
+		doAnistropicI(src,ret,ani);
 		//MultiOstuI mutilostu(1,3);
 		//doMultiOstuI(src,ret,mutilostu);
 		
 		//TrilateralfilterI tri(4,1.0,3.0);
 		//doTrilateralfilterIY(src,ret,tri);
 		BilateralFilterI bila(3,3,4);
-		doBilateralIY(src, ret, bila);
+		doBilateralI(src, ret, bila);
 		//lowPassI lowpass(1000);
 		//dolowPassI(src,ret,lowpass);
 
@@ -180,7 +182,7 @@ void Exit()
 int main(int argc, char* argv[])
 {
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	//testinterface();
+	testinterface();
 
 	//_CrtSetBreakAlloc(520);
 	
@@ -189,7 +191,7 @@ int main(int argc, char* argv[])
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
-	 testbigdata();
+	// testbigdata();
 	//testprocess();
 	 _CrtDumpMemoryLeaks();
 	// _CrtDumpMemoryLeaks;
