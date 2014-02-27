@@ -253,12 +253,12 @@ Raw::Raw(ImageVolume &src)
 	this->xsize=src.Width;
 	this->ysize=src.Height;
 	this->zsize=src.Depth;
-	if(this->getdata()!=NULL)
-	{
-		delete [] this->getdata();
-		data=NULL;
+	//if(this->getdata()!=NULL)
+	//{
+	//	delete [] this->getdata();
+	//	data=NULL;
 
-	}
+	//}
 	this->data=new PIXTYPE[size()];
 	
 	memcpy(this->data,(PIXTYPE*)src.Data,sizeof(PIXTYPE)*size());

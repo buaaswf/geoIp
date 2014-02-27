@@ -54,6 +54,12 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC)
 	//=====================================================================================================
 {	
 	globalProgressChanged = src.getZsize();
+	bool flag =false;
+	int rs = 0 ;
+	if (  ProgressChanged != NULL )
+	{
+		ProgressChanged (0, 100,0,flag);
+	}
 	this->src = &src;
 	this->ret = &ret;
 	Raw *pSrcImg;

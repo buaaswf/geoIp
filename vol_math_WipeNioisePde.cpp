@@ -506,9 +506,13 @@ void  WipeNioisePde::Perona_Malik(Raw &src)
 }
 void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 {
-	//size_t progresstotal = src.size()*this->delt;
-	//size_t progressstep = .size();
+	bool flag = false;
 	globalProgressChanged = src.size();//*this->delt;
+	int rs = 0 ;
+	if (  ProgressChanged != NULL )
+	{
+		ProgressChanged (0, 100,0,flag);
+	}
 	float a=1,sum;
 	int z,y,x,K,j,i;
 	//Raw *d=new Raw(src.getXsize(),src.getYsize(),src.getZsize(),src.getdata());
@@ -808,25 +812,33 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 
 	
 }
-Raw gradientlaplace(Raw &src)
+Raw * gradientlaplace(Raw &src)
 {
-	Raw *val= new Raw(src);
+	Raw *val=new Raw(src);
 	for (int i = 2; i < src.getXsize()-2; i++)
 	{
 		for (int j=2; j<src.getYsize()-2; j++)
 		{
 			for (int k = 2; k < src.getZsize()-2; k++)
 			{
-				val->put(i, j, k, (src.get(i+1,j,k) + src.get(i-1,k,k) +
-					src.get(i,j+1,k)+src.get(i,j-1,k)+src.get(i,j,k+1)+src.get(i,j,k-1)-6*src.get(i,j,k)));
+				PIXTYPE temp =src.get(i+1,j,k) + src.get(i-1,k,k) +
+					src.get(i,j+1,k)+src.get(i,j-1,k)+src.get(i,j,k+1)+src.get(i,j,k-1)-6*src.get(i,j,k);
+				temp =temp/(1+temp*temp);
+				val->put(i, j, k, (temp));
 
 			}
 		}
 	}
-	
-	memcpy(src.getdata(),val->getdata(),sizeof(val->size()));
-		delete val;
-	return src;
+	//for (int i=0;i<src.size();i++)
+	//{
+	//	if (src.getXYZ(i)!=val->getXYZ(i));
+	//	{
+	//		cout <<val->getXYZ(i)<<endl;
+	//	}
+	//}
+	//memcpy(src.getdata(),val->getdata(),sizeof(val->size()));
+	//	delete val;
+	return val ;
 }
 Raw gradientlaplace(Raw *src)
 {
@@ -983,57 +995,60 @@ Raw WipeNioisePde::FourPDiff(Raw &src)			//based on Y-K model
 }
 void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 {
+	bool flag = false;
 	globalProgressChanged = src.size()*delt;//*this->delt;
 	int rs = 0 ;
-
+	if (  ProgressChanged != NULL )
+	{
+		ProgressChanged (0, 100,0,flag);
+	}
+	//ProgressChanged (0, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 	PIXTYPE sum;
 	int x,y,z,j;
 	//Raw s;
 	Raw *d=new Raw(src);
 			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diyigeshi0 houmianshi 1
 		
-		bool flag = false;
-		//for ( int i = 0; i < ret->size(); i ++)
-		//{
+		
 
-		//	rs ++;
-		//	if ( rs == interval && ProgressChanged != NULL )
-		//	{
-		//		progressStep += interval;
-		//		rs = 0;
-		//		ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
-		//	}
-
-		//	ret->putXYZ( i, temp->getXYZ(i + ret->getXsize() * ret->getYsize()) );
-		//}
-	for (int j = 0; j < delt; j++)
+	for (int j = 0; j < delt; j++) 
 	{
 		Raw *_ret;
-		_ret = new Raw(gradientlaplace(*d));
-		Raw *temp;
-		//delete _ret;
-		//_ret= new Raw(*ret);
-		temp =new Raw( *_ret**_ret/4+1);
-		//delete _ret;
-		_ret = new Raw(*_ret/(*temp));
-		//delete _ret;
-		_ret =new Raw (gradientlaplace(*_ret));
-			for (int i=0; i < ret->size() ; i++)
+		_ret = gradientlaplace(*d);
+
+		Raw *sum =new Raw(src);
+		for (int i = 2; i < _ret->getXsize()-2; i++)
+		{
+			for (int j=2; j<_ret->getYsize()-2; j++)
+			{
+				for (int k = 2; k < _ret->getZsize()-2; k++)
+				{
+					PIXTYPE var1 =_ret->get(i+1,j,k) + _ret->get(i-1,k,k) +
+						_ret->get(i,j+1,k)+_ret->get(i,j-1,k)+_ret->get(i,j,k+1)+_ret->get(i,j,k-1);
+						PIXTYPE var2=_ret->get(i,j,k)*6;
+						PIXTYPE var = var2- var1;
+					sum->put(i,j,k,var);
+				}
+			}
+		}
+		for (int i=ret->getXsize()*ret->getYsize()*3; i < ret->size()-ret->getXsize()*ret->getYsize()*3 ; i++)
 			{
 				float t=0;
 				rs ++;
 				if ( rs == interval && ProgressChanged != NULL )
 				{
+
 					progressStep += interval;
 					rs = 0;
+					
 					ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 				}
-				if ( t = d->getXYZ(i) - _ret->getXYZ(i)/6 <= 0 )
+				if ( t = d->getXYZ(i) - sum->getXYZ(i)/6 <= 0 )
 				{
 					ret->putXYZ(i,0);// =  *d - *dd/double(6);
 					//*s = 0;
 				} 
-				else if((t = d->getXYZ(i) - _ret->getXYZ(i)/6) < 255)
+				else if((t = d->getXYZ(i) - sum->getXYZ(i)/6) < 255)
 				{
 					ret->putXYZ(i,floor(t+ 0.5) );
 				}
@@ -1041,49 +1056,50 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 				{
 					ret->putXYZ(i,255);
 				}
+				
 			}
 		//ret = d-ret/double(6);
-		d = new Raw(*ret,false); 
+		*d = *ret; 
 		delete _ret;
-		delete temp;
+		//delete sum;
 	}
 //	return s;
 
 }
-void  WipeNioisePde::FourPDiff(Raw &src,Raw &ret)			//based on Y-K model
-{
-
-	PIXTYPE sum;
-	int x,y,z,j;
-	//Raw s;
-	Raw *d=new Raw(src);
-	for (int j = 0; j < delt; j++)
-	{
-		ret = gradientlaplace(*d);
-		Raw *temp;
-		
-		temp =new Raw( ret*ret+1);
-		ret /= *temp;
-		ret = gradientlaplace(ret);
-			for (int i=0; i < ret.size() ; i++)
-			{
-				float t=0;
-				if ( (t = d->getXYZ(i) - ret.getXYZ(i)/6.0) <= 0 )
-				{
-					ret.putXYZ(i,0);// =  *d - *dd/double(6);
-					//*s = 0;
-				} 
-				else
-				{
-					ret.putXYZ(i,t);
-				}
-			}
-		//ret = d-ret/double(6);
-		d = new Raw(ret); 
-	}
-	//return s;
-
-}
+//void  WipeNioisePde::FourPDiff(Raw &src,Raw &ret)			//based on Y-K model
+//{
+//
+//	PIXTYPE sum;
+//	int x,y,z,j;
+//	//Raw s;
+//	Raw *d=new Raw(src);
+//	for (int j = 0; j < delt; j++)
+//	{
+//		ret = gradientlaplace(*d);
+//		Raw *temp;
+//		
+//		temp =new Raw( ret*ret+1);
+//		ret /= *temp;
+//		ret = gradientlaplace(ret);
+//			for (int i=0; i < ret.size() ; i++)
+//			{
+//				float t=0;
+//				if ( (t = d->getXYZ(i) - ret.getXYZ(i)/6.0) <= 0 )
+//				{
+//					ret.putXYZ(i,0);// =  *d - *dd/double(6);
+//					//*s = 0;
+//				} 
+//				else
+//				{
+//					ret.putXYZ(i,t);
+//				}
+//			}
+//		//ret = d-ret/double(6);
+//		d = new Raw(ret); 
+//	}
+//	//return s;
+//
+//}
 void  WipeNioisePde::FourPDiffSipl(Raw &src,Raw &ret,int iter)			//based on Y-K model
 {
 	PIXTYPE sum;

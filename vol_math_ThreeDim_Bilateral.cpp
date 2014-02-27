@@ -158,14 +158,19 @@ void ThreeDim_Bilateral::applySipl(int iter)
 {
 
 	globalProgressChanged = src->size();
-
+		bool flag = false;
+	int rs = 0 ;
+	if (  ProgressChanged != NULL )
+	{
+		ProgressChanged (0, 100,0,flag);
+	}
 
 	//middle slices
 	if (iter !=0 && (iter+1)*ret->getZsize() < src->getZsize())
 	{
-		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 2*kernelRadius,
+		temp = new Raw(src->getXsize(),src->getYsize(),ret->getZsize() + 4,
 			src->getdata()+ ret->getXsize()*ret->getYsize()*ret->getZsize()*iter
-			-(ret->getXsize()*ret->getYsize()*(int)kernelRadius),false);
+			-(ret->getXsize()*ret->getYsize()*2),false);
 		Raw *res=new Raw(*temp);
 		float Maxvar;
 		if ( sizeof (PIXTYPE) == 1)
@@ -202,7 +207,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 						rs = 0;
 						ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
 					}
-					if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
+					if(i>0 && j>0 && k>0 && i<temp->getZsize() && j< ret->getYsize() && k < ret->getXsize())
 					{
 						double sum = 0;
 						double totalWeight = 0;
@@ -253,7 +258,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 		for (int i = 0; i < ret->size();i++ )
 		{
 
-			ret->putXYZ( i, res->getXYZ(i + ret->getXsize()*ret->getYsize()) );
+			ret->putXYZ( i, res->getXYZ(i + ret->getXsize()*ret->getYsize()*2 ));
 		}
 
 	} 
@@ -264,7 +269,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 		
 		if ( iter ==0 )
 		{//first
-			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+kernelRadius,src->getdata(),false);
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),false);
 			Raw *res=new Raw(*temp);
 			float Maxvar;
 			if ( sizeof (PIXTYPE) == 1)
@@ -301,7 +306,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 							rs = 0;
 							ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
 						}
-						if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
+						if(i>0 && j>0 && k>0 && i<temp->getZsize() && j< ret->getYsize() && k < ret->getXsize())
 						{
 							double sum = 0;
 							double totalWeight = 0;
@@ -359,8 +364,8 @@ void ThreeDim_Bilateral::applySipl(int iter)
 		//last slices
 		else //if(((iter+1)*ret->getZsize() ==  src->getZsize()&& iter !=0 ))
 		{
-			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+kernelRadius,
-				src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize()*(int)kernelRadius,false);
+			temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,
+				src->getdata()+iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize(),false);
 			Raw *res=new Raw(*temp);
 			float Maxvar;
 			if ( sizeof (PIXTYPE) == 1)
@@ -397,7 +402,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 							rs = 0;
 							ProgressChanged (1, 100,(int) (long long)( progressStep)*100/(globalProgressChanged ),flag);
 						}
-						if(i>0 && j>0 && k>0 && i<ret->getZsize() && j< ret->getYsize() && k < ret->getXsize())
+						if(i>0 && j>0 && k>0 && i < temp->getZsize() && j< ret->getYsize() && k < ret->getXsize())
 						{
 							double sum = 0;
 							double totalWeight = 0;
@@ -457,6 +462,7 @@ void ThreeDim_Bilateral::applySipl(int iter)
 		//	temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize()+1,src->getdata()+src->size()-ret->getXsize()*ret->getYsize()*(1+ret->getZsize()),true);
 		//}
 	}
+	//only 1thread
 	else 
 	{
 		temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),false);

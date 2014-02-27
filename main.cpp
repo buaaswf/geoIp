@@ -19,12 +19,13 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =5; 
+	int l = 281, m = 481, n =100; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
 	//test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));//G:\geo\data
-	test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));//G:\geo\data
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));
+	//test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));//G:\geo\data
 	//PIXTYPE **slice =new PIXTYPE *[n];
 	//for (int k = 0; k < n; k++)
 	//{
@@ -43,15 +44,15 @@ ImageVolume * testinterface()
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
 	
-	//AnistropicI anis(2,30,2,1);
-	//doAnistropicI(src,ret,anis);
+	AnistropicI anis(2,30,2,1);
+	doAnistropicI(src,ret,anis);
 	// trilateral 20140211============
 	//TrilateralfilterI tril(15,3);
 	//doTrilateralfilterIY(src,ret,tril);
 	// //=======================
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
-	BilateralFilterI bil(3,3,10);
-	doBilateralIY(src,ret,bil);
+	//BilateralFilterI bil(3,3,10);
+	//doBilateralIY(src,ret,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	//Raw *ret =(Raw*)doAnistropicI(src,anis);
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);zzz

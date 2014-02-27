@@ -76,7 +76,14 @@ void puregauss(Raw *temp,int rs,Raw *src,Raw *ret,int halfsize,int sum,int globa
 
 void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (*ProgressChanged)(int,int ,int,bool&))
 {
+	
 	globalProgressChanged = src->size();
+	bool flag = false;
+	int rs = 0 ;
+	if (  ProgressChanged != NULL )
+	{
+		ProgressChanged (0, 100,0,flag);
+	}
 	progressStep =0;
 	ProgressChanged = ProgressChanged;
 
@@ -88,7 +95,7 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 	bool MULTITHREADFIRST = (iter == 0 && (iter+1)*ret->getZsize() !=  src->getZsize());
 	bool MULTITHREADLAST =   ((iter+1)*ret->getZsize() >=  src->getZsize()&& iter !=0 );
 	bool SINGLETHREAD = true ;
-	int rs = 0;
+	//int rs = 0;
 	if (MULTITHREADMIDLESILCES)
 	{
 		//Raw *s = new Raw(ret->getXsize(), ret->getYsize(), ret->getZsize() + 2, src->getdata()+iter*ret->size()-ret->getXsize()*ret->getYsize());
