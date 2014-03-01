@@ -473,7 +473,7 @@ void FourierFilter3::low_Pass3(complex<float>*src,int width,int height,int depth
 			{
 				distance = sqrt(pow(abs((int)(i-orgz)),2.0f)+pow(abs((int)(j-orgy)),2.0f)+pow(abs((int)(k-orgx)),2.0f));
 				if(distance > thresold){
-					src[i*width*height+j*width+k] = 0;
+					src[i*width*height+j*width+k] = 0.0f;
 				}
 			}
 		}
@@ -502,7 +502,6 @@ void FourierFilter2::lowpass_trans(double thresold)
 	delete [] tmpI;
 }
 
-
 void FourierFilter3::lowpass_trans(double thresold,void (*ProgressChanged)(int ,int ,int ,bool &))
 {
 
@@ -519,15 +518,22 @@ void FourierFilter3::lowpass_trans(double thresold,void (*ProgressChanged)(int ,
 		{
 			for (int k = 0; k < x;k++)
 			{
-				charbuf[i*y*x + j*x+ k] = (tmpI[i*p_height*p_width + j*p_width + k].real()*256.0);
+				float c = tmpI[i*p_height*p_width + j*p_width + k].real();
+				if(c<0){
+		//		    cout<<"***************"<<endl;
+                    c = 0.0;
+				}
+                charbuf[i*y*x + j*x+ k] = c*255.0f;
 			}
 		}
 	}
 	fraw = new Raw(x, y, z,charbuf);
-	delete [] charbuf;//修改
+	delete [] charbuf;
 	delete [] tmp;
 	delete [] tmpI;
 }
+
+
 
 /*测试一维填充形式傅立叶变换*/
 /*

@@ -821,10 +821,10 @@ Raw * gradientlaplace(Raw &src)
 		{
 			for (int k = 2; k < src.getZsize()-2; k++)
 			{
-				PIXTYPE temp =src.get(i+1,j,k) + src.get(i-1,k,k) +
+				PIXTYPE temp =src.get(i+1,j,k) + src.get(i-1,j,k) +
 					src.get(i,j+1,k)+src.get(i,j-1,k)+src.get(i,j,k+1)+src.get(i,j,k-1)-6*src.get(i,j,k);
 				temp =temp/(1+temp*temp);
-				val->put(i, j, k, (temp));
+				val->put(i, j, k, (temp*10));
 
 			}
 		}
@@ -849,7 +849,7 @@ Raw gradientlaplace(Raw *src)
 		{
 			for (int k = 2; k < src->getZsize()-2; k++)
 			{
-				val->put(i, j, k, (src->get(i+1,j,k) + src->get(i-1,k,k) +
+				val->put(i, j, k, (src->get(i+1,j,k) + src->get(i-1,j,k) +
 					src->get(i,j+1,k)+src->get(i,j-1,k)+src->get(i,j,k+1)+src->get(i,j,k-1)-6*src->get(i,j,k)));
 
 			}
@@ -867,7 +867,7 @@ void gradientlaplace(Raw &src,Raw &ret)
 		{
 			for (int k=2; k<src.getZsize()-2; k++)
 			{
-				ret.put(i,j,k,(src.get(i+1,j,k)+src.get(i-1,k,k)+src.get(i,j+1,k)+src.get(i,j-1,k)+src.get(i,j,k+1)+src.get(i,j,k-1)-6*src.get(i,j,k)));
+				ret.put(i,j,k,(src.get(i+1,j,k)+src.get(i-1,j,k)+src.get(i,j+1,k)+src.get(i,j-1,k)+src.get(i,j,k+1)+src.get(i,j,k-1)-6*src.get(i,j,k)));
 
 			}
 		}
@@ -1023,15 +1023,16 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 			{
 				for (int k = 2; k < _ret->getZsize()-2; k++)
 				{
-					PIXTYPE var1 =_ret->get(i+1,j,k) + _ret->get(i-1,k,k) +
-						_ret->get(i,j+1,k)+_ret->get(i,j-1,k)+_ret->get(i,j,k+1)+_ret->get(i,j,k-1);
-						PIXTYPE var2=_ret->get(i,j,k)*6;
-						PIXTYPE var = var2- var1;
-					sum->put(i,j,k,var);
+					PIXTYPE var1 =_ret->get(i+1,j,k) + _ret->get(i-1,j,k) +
+					_ret->get(i,j+1,k)+_ret->get(i,j-1,k)+_ret->get(i,j,k+1)+_ret->get(i,j,k-1);
+					PIXTYPE var2=_ret->get(i,j,k)*6;
+					PIXTYPE var = var2- var1;
+					sum->put(i,j,k,var*3);
 				}
 			}
 		}
-		for (int i=ret->getXsize()*ret->getYsize()*3; i < ret->size()-ret->getXsize()*ret->getYsize()*3 ; i++)
+		
+		for (int i=0; i < ret->size(); i++)
 			{
 				float t=0;
 				rs ++;
@@ -1043,22 +1044,51 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 					
 					ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 				}
-				if ( t = d->getXYZ(i) - sum->getXYZ(i)/6 <= 0 )
+				if ( (t = d->getXYZ(i) - sum->getXYZ(i)/6 )<= 0 )
 				{
-					ret->putXYZ(i,0);// =  *d - *dd/double(6);
+					sum->putXYZ(i,0);// =  *d - *dd/double(6);
 					//*s = 0;
 				} 
-				else if((t = d->getXYZ(i) - sum->getXYZ(i)/6) < 255)
+				else if((t = d->getXYZ(i) - sum->getXYZ(i)/6 )< 255)
 				{
-					ret->putXYZ(i,floor(t+ 0.5) );
+					sum->putXYZ(i,floor(t+ 0.5) );
 				}
 				else 
 				{
-					ret->putXYZ(i,255);
+					sum->putXYZ(i,255);
 				}
 				
 			}
-		//ret = d-ret/double(6);
+		/*ret = d-ret/double(6);*/
+		if (j == delt -1)
+		{
+
+			Filter *gauss = new Filter();
+			gauss->guass3DFilterSipl(sum,ret,0,1,NULL);
+			delete gauss;
+			for (int i = 0; i < 2; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					for (int k = 0; k < 2; k++)
+					{
+						ret->put(i,j,k,src.get(i,j,k));
+					}
+				}
+			}
+			for (int i = src.getXsize()-2; i < src.getXsize(); i++)
+			{
+				for (int j = src.getYsize()-2; j < src.getYsize(); j++)
+				{
+					for (int k = src.getZsize()-2; k < src.getZsize(); k++)
+					{
+						ret->put(i,j,k,src.get(i,j,k));
+					}
+				}
+			}
+
+		}
+
 		*d = *ret; 
 		delete _ret;
 		//delete sum;

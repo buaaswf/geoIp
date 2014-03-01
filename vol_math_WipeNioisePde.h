@@ -3,6 +3,7 @@
 #include"vol_math_filter_Interface.h"
 #include"vol_math_RawImage.h"
 //#include "Wipe.h"
+#include "vol_math_GuassFilter.h"
 class WipeNioisePde
 {
 private:

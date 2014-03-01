@@ -1011,7 +1011,8 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 				tmp=0.0;
 				//filter window width is calculated from fTheta
 				//halfsize is half of the filter window width
-				halfSize=(int) fTheta->get(i,j,k); 
+				//halfSize=(int) fTheta->get(i,j,k); 
+				halfSize =1;
 				//halfSize = (int) (pow(2.0f,halfSize)/2);
 				//halfSize=halfSize*halfSize;
 				//halfSize=1.5;
@@ -1026,9 +1027,9 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 
 				for(m = -halfSize; m<= halfSize; m++) {
 					for (n = -halfSize; n <= halfSize; n++) {
-						for(l= -halfSize; l<=halfSize; l++)
-						{
-
+						//for(l= 0; l<=0; l++)
+						//{
+						l=0;
 
 							diff = (float) (m*m+n*n+l*l);
 							//Compute the weight for the domain filter (domainWeight). The domain filter
@@ -1046,27 +1047,27 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 								//is a Gaussian filter defined by the detail signal.
 								if( sigmaRTheta == 0 )
 								{
-									sigmaRTheta=0.1;
+									sigmaRTheta=0.001;
 								}// 1===>0.1
 								rangeWeight = (double) pow(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
 								if(rangeWeight==0) 
-									rangeWeight=0.1;
+									rangeWeight=0.001;
 
 
 								if(domainWeight == 0) 
 
-									domainWeight = 0.1;
+									domainWeight = 0.001;
 								
 								tmp += detail*domainWeight*rangeWeight;
 
 								//Detail Bilateral filter normalized by normFactor 
 								normFactor += domainWeight*rangeWeight;
 							}//if
-						}//l
+						//}//l
 					}//n
 				}//m
 				if(normFactor == 0)
-					normFactor = 0.1;
+					normFactor = 0.001;
 				tmp = tmp / normFactor;
 				//if( tmp != 0)
 				//{
@@ -1086,7 +1087,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 				} 
 				else
 				{
-					dest->put(i, j, k, coeffD);
+					dest->put(i, j, k, Maxvar);
 				}
 				//if(tmp!=0){if(tmp==coeffC)printf("tmp==get(i,j)");}
 				

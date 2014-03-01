@@ -19,7 +19,7 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =100; 
+	int l = 281, m = 481, n =300; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -47,7 +47,7 @@ ImageVolume * testinterface()
 	AnistropicI anis(2,30,2,1);
 	doAnistropicI(src,ret,anis);
 	// trilateral 20140211============
-	//TrilateralfilterI tril(15,3);
+	//TrilateralfilterI tril(4,3);
 	//doTrilateralfilterIY(src,ret,tril);
 	// //=======================
 	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
@@ -130,7 +130,7 @@ void testprocess()
 void testbigdata()
 {
 	//int l = 989, m = 1241, total = 9, n = 3;
-	int l = 281, m = 481, total = 3, n = 3;
+	int l = 281, m = 481, total = 500, n = 3;
 	//int l = 4338, m = 3753, total = 4, n = 3;
 
 	unsigned char * indata = new unsigned char [l*m*n];
@@ -141,8 +141,8 @@ void testbigdata()
 		
 		//test.readImagerecursive(indata,"F:\\3DVdata\\1\\mig100.3dv.raw", l, m,i,n);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\4\\mig.3dv.raw", l, m,i);//F:\lab\VTKproj
-		//test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i,n);
-		test.readImagerecursive(indata,"G:\\geo\\data\\mig.vol", l, m,i,n);
+		test.readImagerecursive(indata,"F:\\lab\\VTKproj\\mig.raw", l, m,i,n);
+		//test.readImagerecursive(indata,"G:\\geo\\data\\mig.vol", l, m,i,n);
 		//test.readImagerecursive(indata,"F:\\3DVdata\\3\\mig8.3dv.raw", l, m,i,n);
 		ImageVolume *src = new ImageVolume(l,m,n,1,indata);
 		ImageVolume *src_bak = new ImageVolume(l,m,n,1,indata);
@@ -151,15 +151,15 @@ void testbigdata()
 
 		//GuassFilterI gs(3,20);
 		//doGuassFilterIY(src,ret,gs);
-		AnistropicI ani( 1, 1, 2,1);
-		doAnistropicI(src,ret,ani);
+		//AnistropicI ani( 1, 1, 2,1);
+		//doAnistropicI(src,ret,ani);
 		//MultiOstuI mutilostu(1,3);
 		//doMultiOstuI(src,ret,mutilostu);
 		
-		//TrilateralfilterI tri(4,1.0,3.0);
-		//doTrilateralfilterIY(src,ret,tri);
-		BilateralFilterI bila(3,3,4);
-		doBilateralI(src, ret, bila);
+		TrilateralfilterI tri(4,1.0,1.0);
+		doTrilateralfilterIY(src,ret,tri);
+		//BilateralFilterI bila(3,3,4);
+		//doBilateralI(src, ret, bila);
 		//lowPassI lowpass(1000);
 		//dolowPassI(src,ret,lowpass);
 

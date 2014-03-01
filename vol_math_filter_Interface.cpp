@@ -1813,18 +1813,37 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 	}
 
 	PIXTYPE * datatp = res->getdata();
-	for (int i = 0; i < src->getYsize(); i++)
+	//for (int i = 0; i < src->getYsize(); i++)
+	//{
+	//	for (int j = 0; j < src->getZsize(); j++)
+	//	{
+	//		for (int k = 0; k < src->getXsize(); k++)
+	//		{
+	//			datatp[k + j*src->getXsize() + i*src->getXsize()*src->getZsize()] =
+	//				src->get(k,i,j); 
+	//			//data++;
+	//		}
+	//	}
+	//}
+
+	int ysize = src->getYsize();
+	int zsize = src->getZsize();
+	int xsize = src->getXsize();
+
+	long long data_index = 0;
+
+	for (int i = 0; i < ysize; i++)
 	{
-		for (int j = 0; j < src->getZsize(); j++)
+		for (int j = 0; j < zsize; j++)
 		{
-			for (int k = 0; k < src->getXsize(); k++)
+			for (int k = 0; k < xsize; k++)
 			{
-				datatp[k + j*src->getXsize() + i*src->getXsize()*src->getZsize()] =
-					src->get(k,i,j); 
-				//data++;
+				datatp[data_index] = src->get(k,i,j);
+				data_index ++;
 			}
 		}
 	}
+
 
 	Raw  *ret = new Raw(src->getXsize(),src->getZsize(),src->getYsize(),datatp);
 	Raw *src_bak =new Raw(*src);
@@ -2061,14 +2080,19 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 	//src = new Raw(*ret);
 	PIXTYPE *outdata =new PIXTYPE [src->size()];
 	//*src = Raw(ret->getXsize(),ret->getZsize(),src->getYsize());
-	
-	for ( int i = 0; i < src->getYsize(); i++)
+
+	int srcy = src->getYsize();
+	int srcz = src->getZsize();
+	int srcx = src->getZsize();
+	long long index = 0;
+	for ( int i = 0; i < srcy; i++)
 	{
-		for ( int j = 0; j < src->getZsize(); j ++)
+		for ( int j = 0; j < srcz; j ++)
 		{
-			for (int k = 0; k < src->getXsize(); k++)
+			for (int k = 0; k < srcx; k++)
 			{
-				outdata[k + j*src->getXsize() + i*src->getXsize()*src->getZsize()] = ret->get(k, i, j);
+				outdata[index] = ret->get(k, i, j);
+				index ++;
 			}
 		}
 	}
