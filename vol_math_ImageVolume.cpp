@@ -170,7 +170,8 @@ Image2D::Image2D(int width,int height,int pixelType,bool createSpace)
 		if(PixelType==1)
 		{
 			unsigned char  * cData=new unsigned char[GetLength()];
-			data = (void *)cData;
+			data =(void*)cData;
+		
 		}
 		if(PixelType==2)
 		{

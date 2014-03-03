@@ -1011,17 +1011,17 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 		
 		
 
-	for (int j = 0; j < delt; j++) 
+	for (int ii = 0; ii < delt; ii++) 
 	{
 		Raw *_ret;
 		_ret = gradientlaplace(*d);
 
 		Raw *sum =new Raw(src);
-		for (int i = 2; i < _ret->getXsize()-2; i++)
+		for (int i = 1; i < _ret->getXsize()-1; i++)
 		{
-			for (int j=2; j<_ret->getYsize()-2; j++)
+			for (int j=1; j<_ret->getYsize()-1; j++)
 			{
-				for (int k = 2; k < _ret->getZsize()-2; k++)
+				for (int k = 1; k < _ret->getZsize()-1; k++)
 				{
 					PIXTYPE var1 =_ret->get(i+1,j,k) + _ret->get(i-1,j,k) +
 					_ret->get(i,j+1,k)+_ret->get(i,j-1,k)+_ret->get(i,j,k+1)+_ret->get(i,j,k-1);
@@ -1060,32 +1060,27 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 				
 			}
 		/*ret = d-ret/double(6);*/
-		if (j == delt -1)
+		if (ii == delt-1 )
 		{
-
+			for (int i = 0; i < src.getXsize() ;i++)
+			{
+				for (int j=0;j< src.getYsize() ;j++ )
+				{
+					for(int k = 0; k <src.getZsize() ;k++)
+					{
+						if (!(i> 2&& i<src.getXsize()-3 && j>2 && j<src.getYsize()-3 && k>2 && k<src.getZsize()-3 ))
+						{
+							sum->put(i,j,k,src.get(i,j,k));
+						}
+					}
+				}
+			}
+			//memcpy(ret->getdata(),src.getdata(),src.size()*4);
 			Filter *gauss = new Filter();
 			gauss->guass3DFilterSipl(sum,ret,0,1,NULL);
 			delete gauss;
-			for (int i = 0; i < 2; i++)
-			{
-				for (int j = 0; j < 2; j++)
-				{
-					for (int k = 0; k < 2; k++)
-					{
-						ret->put(i,j,k,src.get(i,j,k));
-					}
-				}
-			}
-			for (int i = src.getXsize()-2; i < src.getXsize(); i++)
-			{
-				for (int j = src.getYsize()-2; j < src.getYsize(); j++)
-				{
-					for (int k = src.getZsize()-2; k < src.getZsize(); k++)
-					{
-						ret->put(i,j,k,src.get(i,j,k));
-					}
-				}
-			}
+			
+		
 
 		}
 

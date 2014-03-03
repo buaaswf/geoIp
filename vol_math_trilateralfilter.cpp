@@ -245,6 +245,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 	this->ret = &ret;
 	Raw *pSrcImg;
 	int rs =0;
+	//middle slices
 	if (iter !=0 && (iter+1)*ret.getZsize() < src.getZsize())
 	{
 		temp = new Raw(src.getXsize(),src.getYsize(),ret.getZsize() + 2,src.getdata()+ ret.getXsize()*ret.getYsize()*ret.getZsize()*iter-ret.getXsize()*ret.getYsize(),true);
@@ -252,18 +253,17 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| 
 		((iter+1)*ret.getZsize() >=  src.getZsize() && iter !=0 ))
 	{
+		//first slices
 		if ( iter ==0 )
 		{
 			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata(),true);
 		} 
-		else //if(((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ))
+		//last slices
+		else 
 		{
-			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(src.getZsize()/(iter+1))-ret.getXsize()*ret.getYsize(),true);
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+3,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(src.getZsize()/(iter+1))-ret.getXsize()*ret.getYsize()*3,true);
 		}
-		//else if((iter+1) * (src.getZsize()/(iter+1))  >=  src.getZsize())
-		//{
-		//	temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+1,src.getdata()+src.size()-ret.getXsize()*ret.getYsize()*(1+ret.getZsize()),true);
-		//}
+
 	}
 	else 
 	{
@@ -395,7 +395,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 		}
 	} 
 	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ) )
-	{
+	{//fisrt slice
 		if (iter == 0)
 		{
 			for ( int i = 0; i < ret.size(); i++)
@@ -415,11 +415,12 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 				//{
 				//	ProgressChanged (1, 100,100,flag);
 				//}
-				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
+				//ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
 				ret.putXYZ( i, destImg.getXYZ(i));
 
 			}
 		} 
+		//last slice
 		else
 		{
 			for ( int i = 0; i < ret.size(); i++)
@@ -431,7 +432,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 					rs = 0;
 					ProgressChanged (1, 100,(long long)( progressStep*100)/(globalProgressChanged*src.getZsize()/ret.getZsize() ),flag);
 				}
-				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
+				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()*3) );
 
 			}
 		}

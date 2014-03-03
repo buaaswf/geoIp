@@ -9,7 +9,7 @@
 #include <vector>
 #include <pthread.h>
 #include "vol_math_filter_Interface.h"
-#define M_EXP 2.7182818284590452353602874713527
+#define M_EXP 2.718
 class RawArray;
 struct Tri_para 
 {

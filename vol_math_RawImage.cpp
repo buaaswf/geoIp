@@ -608,8 +608,13 @@ void * Raw2D2Image2D(Raw2D &src,long long type)
 		{
 			datSrc[i]=(unsigned char)src.getXY(i);
 		}
-		void * ret= (void *)datSrc;
-		return datSrc;
+		//void * ret= (void *)datSrc;
+		Image2D * ret = new Image2D(src.getXsize(),src.getYsize(),type);
+		memcpy(ret->data,datSrc,ret->GetLength());
+		
+		unsigned char *dat =(unsigned char*)ret->data;
+		void *res =(void *)ret;
+		return res;
 	}
 	else if (type == 2)
 	{
@@ -623,7 +628,7 @@ void * Raw2D2Image2D(Raw2D &src,long long type)
 		void * ret=(void *)datSrc;
 		return datSrc;
 	}
-	else if (type == 3 )
+	else
 	{
 
 
@@ -638,10 +643,6 @@ void * Raw2D2Image2D(Raw2D &src,long long type)
 
 	}
 
-
-	//src.Data=data;
-
-	//return *ret;
 }
 
 

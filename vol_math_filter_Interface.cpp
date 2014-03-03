@@ -515,6 +515,18 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 
 }
 
+bool doWaterSheds2D( Image2D *src,Image2D *ret,WaterShedsI &para)
+{
+	Raw2D indata = Image2D2Raw2D(*src);
+	Raw2D outdata = Image2D2Raw2D(*ret);
+	WatershedIterface(&indata,& outdata);
+	//ret =new Image2D(src->width,src->height,src->PixelType);
+	Image2D *temp = (Image2D*)Raw2D2Image2D(outdata,src->PixelType);
+	memcpy(ret->data,temp->data,src->GetLength());
+	return true;
+
+}
+
 /**
  \brief	Executes the trilateral filter file mode operation.
 
@@ -2083,7 +2095,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 
 	int srcy = src->getYsize();
 	int srcz = src->getZsize();
-	int srcx = src->getZsize();
+	int srcx = src->getXsize();
 	long long index = 0;
 	for ( int i = 0; i < srcy; i++)
 	{
@@ -2209,3 +2221,5 @@ extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para
 	return doAnistropicI(src,ret,para);
 	
 }
+
+

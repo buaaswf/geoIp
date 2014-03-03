@@ -9,7 +9,7 @@
 #define TRUE 1
 #define FALSE 0
 //#define PIXTYPE unsigned char
-#define M_EXP 2.7182818284590452353602874713527
+#define M_EXP 2.718
 class Trilateralfilter2D
 {
 public:
