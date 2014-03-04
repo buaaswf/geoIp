@@ -19,7 +19,7 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =10; 
+	int l = 281, m = 481, n =100; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -44,8 +44,8 @@ ImageVolume * testinterface()
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
 	
-	AnistropicI anis(2,30,2,1);
-	doAnistropicI(src,ret,anis);
+	AnistropicI anis(2,30,1,4);
+	doAnistropicIY(src,ret,anis);
 	// trilateral 20140211============
 	//TrilateralfilterI tril(4,3);
 	//doTrilateralfilterIY(src,ret,tril);
@@ -217,13 +217,13 @@ int main(int argc, char* argv[])
 	//testRaw2D();
 
 	//_CrtSetBreakAlloc(520);
-	//testinterface();
+	testinterface();
 	
 
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;
 	_CrtSetDbgFlag( tmpFlag );
-	testbigdata();
+	//testbigdata();
 	//testprocess();
 	 _CrtDumpMemoryLeaks();
 	// _CrtDumpMemoryLeaks;

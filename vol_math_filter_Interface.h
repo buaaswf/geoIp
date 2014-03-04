@@ -313,7 +313,7 @@ extern void *doGuassFilterI (Process &);
  */
 
 extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
-
+extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
 bool  doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
 bool  doBilateralIY (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);

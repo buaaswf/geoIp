@@ -1925,6 +1925,7 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 				for(int i = 0;i < threadcount;i++)
 				{
 					pthread_join(threads[i], NULL);
+
 				}
 
 
@@ -1970,6 +1971,8 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 					for(int i = 0;i < threadcount;i++)
 					{
 						pthread_join(threads[i], NULL);
+						cout <<"thread i" << i<<endl;
+
 					}
 			}
 

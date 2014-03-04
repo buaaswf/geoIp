@@ -261,7 +261,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 		//last slices
 		else 
 		{
-			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize()+3,src.getdata()+iter*ret.getXsize()*ret.getYsize()*(src.getZsize()/(iter+1))-ret.getXsize()*ret.getYsize()*3,true);
+			temp = new Raw(ret.getXsize(),ret.getYsize(),ret.getZsize() + 1, src.getdata() + iter*ret.getXsize()*ret.getYsize()*(src.getZsize()/(iter+1))-ret.getXsize()*ret.getYsize(),true);
 		}
 
 	}
@@ -394,7 +394,9 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 
 		}
 	} 
-	else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ) )
+	//else if ( (iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| ((iter+1)*ret.getZsize() ==  src.getZsize()&& iter !=0 ) )
+	else if ((iter == 0 && (iter+1)*ret.getZsize() !=  src.getZsize())|| 
+		((iter+1)*ret.getZsize() >=  src.getZsize() && iter !=0 ))
 	{//fisrt slice
 		if (iter == 0)
 		{
@@ -402,9 +404,9 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 			{
 				//if (i < src->getZsize()/iter+1/ret.getXsize()/ret.getYsize())
 				//{
-					rs++;
+				rs++;
 				//}
-				
+
 				if ( rs == interval && ProgressChanged != NULL )
 				{
 					progressStep += interval;
@@ -432,7 +434,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 					rs = 0;
 					ProgressChanged (1, 100,(long long)( progressStep*100)/(globalProgressChanged*src.getZsize()/ret.getZsize() ),flag);
 				}
-				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()*3) );
+				ret.putXYZ( i, destImg.getXYZ(i + ret.getXsize()*ret.getYsize()) );
 
 			}
 		}
@@ -452,7 +454,7 @@ void Trilateralfilter::TrilateralFilter(Raw & src,Raw & ret,float sigmaC,float s
 			ret.putXYZ( i, destImg.getXYZ(i) );
 
 		}
-		
+
 	}
 	delete pSrcImg;
 }
