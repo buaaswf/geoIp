@@ -137,7 +137,7 @@ Mat strel_B(string strings,int n){
 int CompareImage( Raw2D &src1, Raw2D &src2){
 	if (src1.getXsize()!=src2.getXsize() || src1.getYsize()!=src2.getYsize())	return 1;
 	int i,j,col,row;
-	unsigned char value;
+	PIXTYPE value;
 	row=src1.getXsize();
 	col=src1.getYsize();
 	value=0;
@@ -148,7 +148,8 @@ int CompareImage( Raw2D &src1, Raw2D &src2){
 		}
 		if (value!=0) break;
 	}
-	return (int)value;
+	if (value!=0) return 1;
+	else return 0;
 }
 //Gray image copy
 void Copy( Raw2D &src,Raw2D &dest){
@@ -168,12 +169,12 @@ void Copy( Raw2D &src,Raw2D &dest){
 //Gray image reversion
 void Reversion(Raw2D &source){
 	int i,j,row,col;
-	unsigned char val;
+	PIXTYPE val;
 	row=source.getXsize();
 	col=source.getYsize();
 	for (i=0;i<row;i++){
 		for (j=0;j<col;j++){
-			val=(unsigned char)(255 - source.get(i,j));
+			val=(PIXTYPE)(255 - source.get(i,j));
 			source.put(i,j,val);
 		}
 	}
@@ -181,14 +182,14 @@ void Reversion(Raw2D &source){
 //erode
 void Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 	Mat temp=strel_B("disc",n);
-	int i,j,k,l,row,col,x,y,value;
-	unsigned char Minval;
+	int i,j,k,l,row,col,x,y;
+	PIXTYPE Minval,value;
 	col=mask.getYsize();
 	row=mask.getXsize();
 	//marker eroded by temp
 	for(i=0;i<row;i++){
 		for(j=0;j<col;j++){
-			Minval=255;
+			Minval=255.0;
 			for(k=-n;k<=n;k++){
 				x=i+k;
 				x=x<0?0:x;
@@ -198,8 +199,7 @@ void Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 					y=y<0?0:y;
 					y=y>(col-1)?(col-1):y;
 					value=mask.get(x,y);//-(*(temp.data+(k+n)*temp.col+(l+n)));	
-					value=value<0?0:value;
-					if (Minval > value) Minval=(unsigned char)value;
+					if (Minval > value) Minval = value;
 				}	
 			}
 			dest.put(i,j,Minval);
@@ -210,14 +210,14 @@ void Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 //dilate
 void Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 	Mat temp=strel("disc",n);
-	int i,j,k,l,row,col,x,y,value;
-	unsigned char Maxval;
+	int i,j,k,l,row,col,x,y;
+	PIXTYPE Maxval,value;
 	row=mask.getXsize();
 	col=mask.getYsize();
 	//marker eroded by temp
 	for(i=0;i<row;i++){
 		for(j=0;j<col;j++){
-			Maxval=0;
+			Maxval=0.0;
 			for(k=-n;k<=n;k++){
 				x=i+k;
 				x=x<0?0:x;
@@ -227,8 +227,7 @@ void Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 					y=y<0?0:y;
 					y=y>(col-1)?(col-1):y;
 					value=mask.get(x,y);//+(*(temp.data+(k+n)*temp.col+(l+n)));
-					value=value>255?255:value;
-					if (Maxval < value) Maxval=(unsigned char)value;
+					if (Maxval < value) Maxval = value;
 				}	
 			}
 			dest.put(i,j,Maxval);
@@ -239,8 +238,8 @@ void Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 //Morphological erode
 void Morph_Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 	Mat temp=strel_B("disc",n);
-	int i,j,k,l,row,col,x,y,value;
-	unsigned char Minval,Maxval;
+	int i,j,k,l,row,col,x,y;
+	PIXTYPE Minval,Maxval,value;
 	col=mask.getYsize();
 	row=mask.getXsize();
 	//marker eroded by temp
@@ -255,9 +254,8 @@ void Morph_Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 					y=j+l;
 					y=y<0?0:y;
 					y=y>(col-1)?(col-1):y;
-					value=mask.get(x,y)-(*(temp.data+(k+n)*temp.col+(l+n)));
-					value=value<0?0:value;
-					if (Minval > value) Minval=(unsigned char)value;
+					value=mask.get(x,y);//-(*(temp.data+(k+n)*temp.col+(l+n)));
+					if (Minval > value) Minval = value;
 				}	
 			}
 			dest.put(i,j,Minval);
@@ -276,8 +274,8 @@ void Morph_Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 void Morph_Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 	//temp=strel_B("disc",n);
 	Mat temp=strel("disc",n);
-	int i,j,k,l,row,col,x,y,value;
-	unsigned char Maxval,Minval;
+	int i,j,k,l,row,col,x,y;
+	PIXTYPE Maxval,Minval,value;
 	row=mask.getXsize();
 	col=mask.getYsize();	
 	//marker eroded by temp
@@ -292,9 +290,8 @@ void Morph_Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 					y=j+l;
 					y=y<0?0:y;
 					y=y>(col-1)?(col-1):y;
-					value=mask.get(x,y)+(*(temp.data+(k+n)*temp.col+(l+n)));
-					value=value>255?255:value;
-					if (Maxval < value) Maxval=(unsigned char)value;
+					value=mask.get(x,y);//+(*(temp.data+(k+n)*temp.col+(l+n)));
+					if (Maxval < value) Maxval = value;
 				}	
 			}
 			dest.put(i,j,Maxval);
@@ -337,7 +334,7 @@ void  Morph_reconstuct_Gray( Raw2D &mask,Raw2D &dest,string strings,int n){
 int CompareImage( Raw &src1, Raw &src2){
 	if (src1.getXsize()!=src2.getXsize() || src1.getYsize()!=src2.getYsize() || src1.getZsize()!=src2.getZsize())	return 1;
 	int i,j,k,col,row,height;
-	unsigned char value;
+	PIXTYPE value;
 	col=src1.getXsize();
 	row=src1.getYsize();
 	height=src1.getZsize();
@@ -352,7 +349,8 @@ int CompareImage( Raw &src1, Raw &src2){
 		}
 		if (value!=0) break;
 	}
-	return (int)value;
+	if (value!=0) return 1;
+	else return 0;
 }
 //Gray image copy
 void Copy( Raw &src,Raw &dest){
@@ -375,14 +373,14 @@ void Copy( Raw &src,Raw &dest){
 //Gray image reversion
 void Reversion(Raw &image){
 	int i,j,k,row,col,height;
-	unsigned char val;
+	PIXTYPE val;
 	col=image.getXsize();
 	row=image.getYsize();
 	height=image.getZsize();
 	for(k=0;k<height;k++){
 		for (i=0;i<row;i++){
 			for (j=0;j<col;j++){
-				val=(unsigned char)(255 - image.get(j,i,k));
+				val=(PIXTYPE)(255 - image.get(j,i,k));
 				image.put(j,i,k,val);
 			}
 		}
@@ -390,8 +388,8 @@ void Reversion(Raw &image){
 }
 //gray image erode
 void  Erode_Gray( Raw &mask,Raw &dest,int n){
-	int i,j,k,m,p,q,row,col,height,x,y,z,value;
-	unsigned char Minval;
+	int i,j,k,m,p,q,row,col,height,x,y,z;
+	PIXTYPE Minval,value;
 	row=mask.getYsize();
 	col=mask.getXsize();
 	height=mask.getZsize();
@@ -414,8 +412,7 @@ void  Erode_Gray( Raw &mask,Raw &dest,int n){
 							x=x<0?0:x;
 							x=x>(col-1)?(col-1):x;
 							value=mask.get(x,y,z);//-(*(temp.data+(p+n)*temp.col+q+n));
-							value=value<0?0:value;
-						    if (Minval > value) Minval=(unsigned char)value;
+						    if (Minval > value) Minval = value;
 						}
 					}	
 				}
@@ -427,8 +424,8 @@ void  Erode_Gray( Raw &mask,Raw &dest,int n){
 }
 //dilate
 void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
-	int i,j,k,m,p,q,row,col,height,x,y,z,value;
-	unsigned char Maxval;
+	int i,j,k,m,p,q,row,col,height,x,y,z;
+	PIXTYPE Maxval,value;
 	row=mask.getYsize();
 	col=mask.getXsize();
 	height=mask.getZsize();
@@ -451,8 +448,7 @@ void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 							x=x<0?0:x;
 							x=x>(col-1)?(col-1):x;
 							value=mask.get(x,y,z);//+(*(temp.data+(p+n)*temp.col+q+n));
-							value=value>255?255:value;
-						    if (Maxval < value) Maxval=(unsigned char)value;
+						    if (Maxval < value) Maxval = value;
 						}
 					}	
 				}
@@ -465,7 +461,7 @@ void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 //Morphological erode
 //void  Morph_Erode_Gray(const Raw &mask,Raw &dest,int n){//gray image
 //	int i,j,k,m,p,q,row,col,height,x,y,z,value;
-//	unsigned char Minval,Maxval;
+//	PIXTYPE Minval,Maxval;
 //	row=mask.getYsize();
 //	col=mask.getXsize();
 //	height=mask.getZsize();
@@ -489,7 +485,7 @@ void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 //							x=x>(col-1)?(col-1):x;
 //							value=mask.get(x,y,z)-(*(temp.data+(p+n)*temp.col+q+n));
 //							value=value<0?0:value;
-//						    if (Minval > value) Minval=(unsigned char)value;
+//						    if (Minval > value) Minval=(PIXTYPE)value;
 //						}
 //					}	
 //				}
@@ -511,7 +507,7 @@ void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 ////Morphological dilate
 //void Morph_Dilate_Gray(const Raw &mask,Raw &dest,int n){//gray image
 //	int i,j,k,m,p,q,row,col,height,x,y,z,value;
-//	unsigned char Maxval,Minval;;
+//	PIXTYPE Maxval,Minval;;
 //	row=mask.getYsize();
 //	col=mask.getXsize();
 //	height=mask.getZsize();
@@ -535,7 +531,7 @@ void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 //							x=x>(col-1)?col-1:x;
 //							value=mask.get(x,y,z)+(*(temp.data+(p+n)*temp.row+q+n));
 //							value=value>255?255:value;
-//						    if (Maxval < value) Maxval=(unsigned char)value;
+//						    if (Maxval < value) Maxval=(PIXTYPE)value;
 //						}
 //					}	
 //				}

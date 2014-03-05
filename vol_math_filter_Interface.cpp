@@ -1041,7 +1041,7 @@ void * singleAnistropicFilterSipl(void * para)
 	Raw *outdata=(p->ret);
 	//WipeNioisePde *pde =new WipeNioisePde();
 		//pde->ProgressChanged = progress;
-	WipeNioisePde *pde=new WipeNioisePde(indata,outdata,p->iter,p->time,p->val,p->method,progress,p->datatype);//two pointers,one in,one out
+	WipeNioisePde *pde=new WipeNioisePde(indata,outdata,p->iter,p->time,p->val,p->method,NULL,p->datatype);//two pointers,one in,one out
 	
 	delete pde;
 	return NULL;
@@ -2224,5 +2224,119 @@ extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para
 	return doAnistropicI(src,ret,para);
 	
 }
+/************************************************************************/
+/* progress for qt gui                                                                     */
+/************************************************************************/
+ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
+{
+	int znewsize = src->Depth/tastnum;
+	int zleft  = src->Depth % tastnum;
+	ImageVolume *ret;
+	int k=0;
+	i==0?k=0:k=1;
+	switch (src->PixelType)
+	{
+	case 1:
+		if(i < tastnum-1 )
+		{
 
+			unsigned char *srcdata=(unsigned char*)src->Data + (znewsize+2)* i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
+
+		}
+		else if(i == tastnum-1)
+		{
+			unsigned char *srcdata = (unsigned char*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			ret = new ImageVolume(src->Width, src->Height, zleft+znewsize+1, 1, srcdata, false);
+
+
+		}
+		break;
+	case 2:
+		if(i < tastnum-1 )
+		{
+
+			unsigned short *srcdata=(unsigned short*)src->Data + (znewsize+2)* i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
+
+		}
+		else if(i == tastnum-1)
+		{
+			unsigned short *srcdata = (unsigned short*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			ret = new ImageVolume(src->Width, src->Height, zleft+znewsize+1, 1, srcdata, false);
+
+
+		}
+		break;
+	case 3:
+		if(i < tastnum-1 )
+		{
+
+			float *srcdata=(float*)src->Data + (znewsize+2)* i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
+
+		}
+		else if(i == tastnum-1)
+		{
+			float *srcdata = (float*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			ret = new ImageVolume(src->Width, src->Height, zleft+znewsize+1, 1, srcdata, false);
+
+
+		}
+		break;
+	}
+
+	return ret;
+}
+/**
+ \brief	Executes the anistropic i ypro operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+ \param	tastnum				The tastnum.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
+bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para ,int tasknum ,void(*ProgressChanged)(int,int,int,bool &))
+{
+	int znew=src->Depth/tasknum;
+	int zleft =src->Depth%tasknum;
+	int i=0;
+	for (i=0 ;i< tasknum; i++)
+	{
+		bool flag = false;
+		globalProgressChanged = src->GetLength();//*this->delt;
+		ImageVolume * newsrc= dividetask(i,tasknum,src);
+		ImageVolume * newret= dividetask(i,tasknum,ret);
+		//progress=ProgressChanged;
+		doAnistropicIY(newsrc,newret,para);
+		int k=0;
+		i==0?k=0:k=1;
+		switch (src->PixelType)
+		{
+		case 1:
+			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		case 2:
+			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		case 3:
+			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		}
+
+		if (  ProgressChanged != NULL )
+		{
+			ProgressChanged (0, 100,(i+1)*src->Depth/tasknum,flag);
+		}
+
+	}
+	return true;
+
+}
 

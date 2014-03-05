@@ -41,7 +41,7 @@ void RawImage::readImage(unsigned char * buf,char const *file ,long long size)
 		printf("open fail");
 	}
 	//unsigned char * unsignedbuf=new unsigned char[size];
-	fseek(op,281*481*500L,SEEK_SET);
+	fseek(op,281*481*1500L,SEEK_SET);
 	fread(buf,sizeof(unsigned char),size,op);
 
 	fclose(op);

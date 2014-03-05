@@ -39,29 +39,48 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,bool crea
 	}
 }
 
-ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data)
+ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data,bool createspace)
 {
 	this->Width=width;
 	this->Height=height;
 	this->Depth=depth;
 	this->PixelType=pixelType;
+	this->CreateSpace=createspace;
 		if(PixelType==1)
 		{
-			unsigned char  * cData=new unsigned char[GetLength()];
-			this->Data = cData;
-			memcpy(Data,data,sizeof(unsigned char)*GetLength());
+			if (CreateSpace ==true)
+			{
+				unsigned char  * cData=new unsigned char[GetLength()];
+				this->Data =(void*) cData;
+				memcpy(Data,data,sizeof(unsigned char)*GetLength());
+			}
+			else
+				this->Data = data;
+	
+
+
 		}
 		if(PixelType==2)
 		{
-			unsigned short * sData=new unsigned short[GetLength()];
-			Data = (void *)sData;
-			memcpy(Data,data,sizeof(unsigned short)*GetLength());
+			if (CreateSpace ==true)
+			{
+				unsigned short  * cData=new unsigned short[GetLength()];
+				this->Data =(void*) cData;
+				memcpy(Data,data,sizeof(unsigned short)*GetLength());
+			}
+			else
+				this->Data = data;
 		}
 		if(PixelType==3)
 		{
-			float * fData=new float[GetLength()];
-			Data = (void *)fData;
-			memcpy(Data,data,sizeof(float)*GetLength());
+			if (CreateSpace ==true)
+			{
+				float  * cData=new float[GetLength()];
+				this->Data =(void*) cData;
+				memcpy(Data,data,sizeof(float)*GetLength());
+			}
+			else
+				this->Data = data;
 		}
 
 }

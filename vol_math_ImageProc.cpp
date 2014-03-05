@@ -20,10 +20,10 @@ void Smooth(Raw2D &image,int type){
 						n=l+j; 
 						n=n<0?0:n;
 						n=n>(col-1)?(col-1):n;
-						value+=image.get(m,n);
+						value+=(int)(image.get(m,n)+0.5);
 					}
 				}
-				image.put(i,j,(unsigned char)(value/9+0.5));
+				image.put(i,j,(PIXTYPE)(value/9+0.5));
 			}
 		}
         break;
@@ -52,10 +52,10 @@ void Smooth(Raw2D *image,int type){
 						n=l+j; 
 						n=n<0?0:n;
 						n=n>(col-1)?(col-1):n;
-						value+=image->get(m,n);
+						value+=(int)(image->get(m,n)+0.5);
 					}
 				}
-				image->put(i,j,(unsigned char)(value/9+0.5));
+				image->put(i,j,(PIXTYPE)(value/9+0.5));
 			}
 		}
         break;
@@ -69,14 +69,15 @@ void Smooth(Raw2D *image,int type){
 }
 //Noise process
 void NoisePrc(Raw2D &image){
-	int i,j,k,l,m,n,number,value,row,col;
+	int i,j,k,l,m,n,number,row,col;
+	PIXTYPE value;
 	row=image.getXsize();
 	col=image.getYsize();
 	//消除一些面积较小的区域
 	for(i=0;i<row;i++){
 		for(j=0;j<col;j++){
 			number=0;
-			value=(int)image.get(i,j);
+			value=image.get(i,j);
 			for(k=-5;k<6;k++){
 				m=k+i;
 				m=m<0?0:m;
@@ -88,7 +89,7 @@ void NoisePrc(Raw2D &image){
 					if(image.get(m,n)) number++;//记录非零的个数
 				}
 			}
-			if((value && number<40)||(!value && number>60)) image.put(i,j,(unsigned char)(255-value));//消除一些孤立的点
+			if((value && number<40)||(!value && number>60)) image.put(i,j,(PIXTYPE)(255-value));//消除一些孤立的点
 		}
 	}
 
@@ -96,7 +97,7 @@ void NoisePrc(Raw2D &image){
 	for(i=0;i<row;i++){
 		for(j=0;j<col;j++){
 			number=0;
-			value=(int)image.get(i,j);
+			value=image.get(i,j);
 			for(k=-1;k<2;k++){
 				m=k+i;
 				m=m<0?0:m;
@@ -108,7 +109,7 @@ void NoisePrc(Raw2D &image){
 					if(image.get(m,n)) number++;//记录非零的个数
 				}
 			}
-			if((value && number<4)||(!value && number>5)) image.put(i,j,(unsigned char)(255-value));//消除一些孤立的点
+			if((value && number<4)||(!value && number>5)) image.put(i,j,(PIXTYPE)(255-value));//消除一些孤立的点
 		}
 	}
 
@@ -213,11 +214,11 @@ void Smooth3D(Raw &image,int type){
 								x=n+j;
 								x=x<0?0:x;
 								x=x>(col-1)?(col-1):x;
-								value+=image.get(x,y,z);
+								value+=(int)(image.get(x,y,z)+0.5);
 							}
 						}
 					}
-					image.put(j,i,k,(unsigned char)(value/27+0.5));
+					image.put(j,i,k,(PIXTYPE)(value/27+0.5));
 				}
 			}
 		}       
@@ -253,11 +254,11 @@ void Smooth3D(Raw *image,int type){
 								x=n+j;
 								x=x<0?0:x;
 								x=x>(col-1)?(col-1):x;
-								value+=image->get(x,y,z);
+								value+=(int)(image->get(x,y,z)+0.5);
 							}
 						}
 					}
-					image->put(j,i,k,(unsigned char)(value/27+0.5));
+					image->put(j,i,k,(PIXTYPE)(value/27+0.5));
 				}
 			}
 		}       
@@ -272,7 +273,8 @@ void Smooth3D(Raw *image,int type){
 }
 //Noise process gray image
 void NoiseProcess(Raw &image){
-	int i,j,k,l,m,n,x,y,z,row,col,height,number,value;
+	int i,j,k,l,m,n,x,y,z,row,col,height,number;
+	PIXTYPE value;
 	col=image.getXsize();
     row=image.getYsize();
 	height=image.getZsize();
@@ -281,7 +283,7 @@ void NoiseProcess(Raw &image){
 		for(i=0;i<row;i++){	
 			for(j=0;j<col;j++){	
 				number=0;
-				value=(int)image.get(j,i,k);
+				value=image.get(j,i,k);
 				for(l=-3;l<4;l++){		
 					z=k+l;
 					z=z<0?0:z;
@@ -298,7 +300,7 @@ void NoiseProcess(Raw &image){
 						}
 					}
 				}
-				if((value && number<100)||(!value && number>200)) image.put(j,i,k,(unsigned char)(255-value));//消除一些孤立的点
+				if((value && number<100)||(!value && number>200)) image.put(j,i,k,(PIXTYPE)(255-value));//消除一些孤立的点
 			}
 		}
 	}  
@@ -307,7 +309,7 @@ void NoiseProcess(Raw &image){
 		for(i=0;i<row;i++){	
 			for(j=0;j<col;j++){	
 				number=0;
-				value=(int)image.get(j,i,k);
+				value=image.get(j,i,k);
 				for(l=-1;l<2;l++){		
 					z=k+l;
 					z=z<0?0:z;
@@ -324,7 +326,7 @@ void NoiseProcess(Raw &image){
 						}
 					}
 				}
-				if((value && number<10)||(!value && number>20)) image.put(j,i,k,(unsigned char)(255-value));//消除一些孤立的点
+				if((value && number<10)||(!value && number>20)) image.put(j,i,k,(PIXTYPE)(255-value));//消除一些孤立的点
 			}
 		}
 	}  

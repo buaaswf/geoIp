@@ -5,7 +5,7 @@
 #include <queue>
 #include "vol_math_Watersheds.h"
 #include "vol_math_Otsu.h"
-//#include"windef.h"
+#include "vol_math_ImageProc.h"
 using namespace std;
 
 void Zero(int *p,int number){
@@ -97,7 +97,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 				temp.y = j;
 				quetem.push(temp);
 				//当前点标记为已处理
-				LabelImage.put(i,j,(unsigned char)Num);
+				LabelImage.put(i,j,(PIXTYPE)Num);
 				SeedImage.put(i,j,127);//表示已经处理过
 				//让临时种子队列中的种子进行生长直到所有的种子都生长完毕
 				//生长完毕后的队列信息保存在vque中，包括区域号和灰阶，对应点数存储在seedcounts中
@@ -115,7 +115,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y = n;
 							quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 							//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-							LabelImage.put(m-1,n,(unsigned char) Num);
+							LabelImage.put(m-1,n,(PIXTYPE) Num);
 							SeedImage.put(m-1,n,127);
 						}
 						else{//否则上方为不可生长
@@ -128,7 +128,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y=n-1;
 							quetem.push(temp);
 							//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-							LabelImage.put(m-1,n-1,(unsigned char) Num);
+							LabelImage.put(m-1,n-1,(PIXTYPE) Num);
 							SeedImage.put(m-1,n-1,127);
 						}
 						else{//否则左上方为不可生长
@@ -141,7 +141,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y = n+1;						
 							quetem.push(temp);						 
 							//新种子点标记为已淹没区域，而且是当前区域						
-							LabelImage.put(m-1,n+1,(unsigned char) Num);					
+							LabelImage.put(m-1,n+1,(PIXTYPE) Num);					
 							SeedImage.put(m-1,n+1,127);				
 						}		
 						else{//否则右上方为不可生长			 
@@ -154,7 +154,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y = n; 
 							quetem.push(temp);				 
 							//新种子点标记为已淹没区域，而且是当前区域			 
-							LabelImage.put(m+1,n,(unsigned char) Num); 
+							LabelImage.put(m+1,n,(PIXTYPE) Num); 
 							SeedImage.put(m+1,n,127);				 
 						}			 
 						else{//否则下方为不可生长					 
@@ -167,7 +167,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y = n+1;  						 
 							quetem.push(temp);						 
 							//新种子点标记为已淹没区域，而且是当前区域						
-							LabelImage.put(m+1,n+1,(unsigned char) Num);				
+							LabelImage.put(m+1,n+1,(PIXTYPE) Num);				
 							SeedImage.put(m+1,n+1,127);			 
 						}			 
 						else{//否则右下方为不可生长						 
@@ -180,7 +180,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y = n-1;
 							quetem.push(temp);
 							//新种子点标记为已淹没区域
-							LabelImage.put(m+1,n-1,(unsigned char) Num);
+							LabelImage.put(m+1,n-1,(PIXTYPE) Num);
 							SeedImage.put(m+1,n-1,127);
 						}  
 						else{//否则左下方为不可生长
@@ -193,7 +193,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y = n-1;				 
 							quetem.push(temp);					
 							//新种子点标记为已淹没区域						
-							LabelImage.put(m,n-1,(unsigned char) Num);				
+							LabelImage.put(m,n-1,(PIXTYPE) Num);				
 							SeedImage.put(m,n-1,127);		 
 						}
 						else{//否则左方为不可生长
@@ -206,7 +206,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							temp.y = n+1;						
 							quetem.push(temp);						
 							//新种子点标记为已淹没区域，而且是当前区域						 
-							LabelImage.put(m,n+1,(unsigned char) Num);						 
+							LabelImage.put(m,n+1,(PIXTYPE) Num);						 
 							SeedImage.put(m,n+1,127);					
 						}					
 						else{//否则右方为不可生长						 
@@ -223,8 +223,8 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 						//Num是当前的区域号
 						//这样这个二维信息就表示了，某个区域中对应某个灰度级对应的成员点的集合与个数
 						//分别由下面两个量来表达
-						(vque[Num-1][(int)(OriginalImage).get(m,n)]).push(temp);
-						SeedCounts[Num-1][(int)OriginalImage.get(m,n)]++;
+						(vque[Num-1][(int)(OriginalImage.get(m,n))]).push(temp);
+						SeedCounts[Num-1][(int)(OriginalImage.get(m,n))]++;
 					}    
 				}//while结束，扫描到quetem为空而止。也就是对应所有的节点都得到不可生长为止（或者是周围的点要么不可生长，要么已生长）       
 			}//if结束
@@ -277,7 +277,7 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 								}
 								else{//否则加入OriginalImage[m-1][n]对应的灰度级的队列，为什么？
 									vque[i][(int)(OriginalImage.get(m-1,n))].push(temp);
-									SeedCounts[i][(int)OriginalImage.get(m-1,n)]++;
+									SeedCounts[i][(int)(OriginalImage.get(m-1,n))]++;
 								}
 							}
 						}
@@ -285,13 +285,13 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							if(!LabelImage.get(m+1,n)){//下方若未处理
 								temp.x = m+1;
 								temp.y = n;
-								LabelImage.put(m+1,n,(unsigned char)(i+1));//下方点标记为已淹没区域
+								LabelImage.put(m+1,n,(PIXTYPE)(i+1));//下方点标记为已淹没区域
 								if(OriginalImage.get(m+1,n) <= WaterLevel){//下方若为可生长点则加入当前队列
 									vque[i][WaterLevel].push(temp);
 								}
 								else{//否则加入OriginalImage[m+1][n]级队列
-									vque[i][(int)OriginalImage.get(m+1,n)].push(temp);
-									SeedCounts[i][(int)OriginalImage.get(m+1,n)]++;
+									vque[i][(int)(OriginalImage.get(m+1,n))].push(temp);
+									SeedCounts[i][(int)(OriginalImage.get(m+1,n))]++;
 								}
 							}
 						}
@@ -299,13 +299,13 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							if(!LabelImage.get(m,n+1)){//右方若未处理
 								temp.x = m; 
 								temp.y = n+1;      
-								LabelImage.put(m,n+1,(unsigned char)(i+1));//右方点标记为已淹没区域    
+								LabelImage.put(m,n+1,(PIXTYPE)(i+1));//右方点标记为已淹没区域    
 								if(OriginalImage.get(m,n+1) <= WaterLevel){//右方若为可生长点则加入当前队列
 									vque[i][WaterLevel].push(temp);
 								}
 								else{//否则加入OriginalImage[m][n+1]级队列
-									vque[i][(int)OriginalImage.get(m,n+1)].push(temp);
-									SeedCounts[i][(int)OriginalImage.get(m,n+1)]++;
+									vque[i][(int)(OriginalImage.get(m,n+1))].push(temp);
+									SeedCounts[i][(int)(OriginalImage.get(m,n+1))]++;
 								}
 							}
 						}
@@ -313,13 +313,13 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 							if(!LabelImage.get(m,n-1)){//左方若未处理
 								temp.x = m;
 								temp.y = n-1;
-								LabelImage.put(m,n-1,(unsigned char)(i+1));//左方点标记为已淹没区域
+								LabelImage.put(m,n-1,(PIXTYPE)(i+1));//左方点标记为已淹没区域
 								if(OriginalImage.get(m,n-1) <= WaterLevel){//左方若为可生长点则加入当前队列
 									vque[i][WaterLevel].push(temp);
 								}
 								else{//否则加入OriginalImage[m][n-1]级队列
-									vque[i][(int)OriginalImage.get(m,n-1)].push(temp);
-									SeedCounts[i][(int)OriginalImage.get(m,n-1)]++;
+									vque[i][(int)(OriginalImage.get(m,n-1))].push(temp);
+									SeedCounts[i][(int)(OriginalImage.get(m,n-1))]++;
 								}
 							}
 						}
@@ -332,21 +332,21 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 
 	/**********************************/
 	//test whether the origional segmentation num is changed...
-	nonzeronum = Num;
-	for(m=0;m<Num;m++){
-		for(i=0;i<row;i++){
-			for(j=0;j<col;j++){
-				if(LabelImage.get(i,j) == m)	
-					break;
-			}
-			if(LabelImage.get(i,j) == m)
-				break;
-		}
-		if(j == col-1  &&  i == row-1  &&  LabelImage.get(i,j) != m)
-			nonzeronum--;
-	}
-	cout<<"nonzeronum="<<nonzeronum<<endl;
-	*classnum =nonzeronum;
+	//nonzeronum = Num;
+	//for(m=0;m<Num;m++){
+	//	for(i=0;i<row;i++){
+	//		for(j=0;j<col;j++){
+	//			if(LabelImage.get(i,j) == m)	
+	//				break;
+	//		}
+	//		if(LabelImage.get(i,j) == m)
+	//			break;
+	//	}
+	//	if(j == col-1  &&  i == row-1  &&  LabelImage.get(i,j) != m)
+	//		nonzeronum--;
+	//}
+	//cout<<"nonzeronum="<<nonzeronum<<endl;
+	*classnum =Num;
 	//释放pque内存
 	while(!vque.empty()){
 		pque=vque.back();
@@ -364,28 +364,30 @@ void Watersheds( Raw2D &OriginalImage, Raw2D &SeedImage, Raw2D &LabelImage,int* 
 void Gradient( Raw2D &Image,Raw2D &dest){//二维求梯度 
 	int col=Image.getYsize();
 	int row=Image.getXsize();
-	int i,j,dx1,dx2,dx3,dx4,dx5,dx6,dx,dy1,dy2,dy3,dy4,dy5,dy6,dy;
+	int i,j;
+	PIXTYPE dx1,dx2,dx3,dx4,dx5,dx6,dx,dy1,dy2,dy3,dy4,dy5,dy6,dy,val;
 	for(i=0;i<row;i++){
 		for(j=0;j<col;j++){ 
-			if(i==0 || j==0 || i==row-1 || j==col-1) dest.put(i,j,0);
+			if(i==0 || j==0 || i==row-1 || j==col-1) dest.put(i,j,0.0);
 			else{
-				dx1=(int)Image.get(i-1,j+1);
-				dx2=2*(int)Image.get(i,j+1);
-				dx3=(int)Image.get(i+1,j+1);
-				dx4=(int)Image.get(i-1,j-1);
-				dx5=2*(int)Image.get(i,j-1);
-				dx6=(int)Image.get(i+1,j-1);
+				dx1=Image.get(i-1,j+1);
+				dx2=2*Image.get(i,j+1);
+				dx3=Image.get(i+1,j+1);
+				dx4=Image.get(i-1,j-1);
+				dx5=2*Image.get(i,j-1);
+				dx6=Image.get(i+1,j-1);
 				dx=dx1+dx2+dx3-dx4-dx5-dx6;	
 
-				dy1=(int)Image.get(i+1,j-1);
-				dy2=2*(int)Image.get(i+1,j);
-				dy3=(int)Image.get(i+1,j+1);
-				dy4=(int)Image.get(i-1,j-1);
-				dy5=2*(int)Image.get(i-1,j);
-				dy6=(int)Image.get(i-1,j+1);
+				dy1=Image.get(i+1,j-1);
+				dy2=2*Image.get(i+1,j);
+				dy3=Image.get(i+1,j+1);
+				dy4=Image.get(i-1,j-1);
+				dy5=2*Image.get(i-1,j);
+				dy6=Image.get(i-1,j+1);
 
 				dy=dy1+dy2+dy3-dy4-dy5-dy6;
-				dest.put(i,j,(unsigned char)sqrt((float)dx*dx+dy*dy));
+				val=sqrt(dx*dx+dy*dy);
+				dest.put(i,j,val);
 			}	
 		}//for循环结束
 	}//for循环结束
@@ -395,16 +397,30 @@ void WatershedsProcess(Raw2D &OriginalImage){
 	int i,j,row,col,number,size;
 	row=OriginalImage.getXsize();
 	col=OriginalImage.getYsize();
-	number=0;
+	PIXTYPE value,Minval,Maxval;
+	Minval = 255.0;
+	Maxval = 0.0;
 	size=col*row;
-	int space =1;
-	int *classnum = &space;
+	int *classnum = new int[1];
 	string strings="erode";
 	Raw2D raw1(row,col);	
 	Raw2D raw2(row,col);	
-	//OTSU test;
 	//平滑图求梯度
 	Gradient(OriginalImage,raw1);
+	//get M value
+	for(i=0;i<row;i++){
+		for(j=0;j<col;j++){
+			value = raw1.get(i,j);
+			Minval = Minval > value ? value : Minval;
+			Maxval = Maxval < value ? value : Maxval;
+		}
+	}
+	for(i=0;i<row;i++){
+		for(j=0;j<col;j++){
+			value = 255*(raw1.get(i,j)-Minval)/(Maxval-Minval);//将梯度值规划到0-255
+			raw1.put(i,j,value);
+		}
+	}
 	//erode reconstruction
 	Dilate_Gray(OriginalImage,raw2,2);//image dilate
 	Erode_Gray(raw2,OriginalImage,2);//image Erode
@@ -412,27 +428,29 @@ void WatershedsProcess(Raw2D &OriginalImage){
 	////Get Max image
 	MaxValue(raw2);
 	//get seedimage and initialize it
+	number=0;
 	for(i=0;i<row;i++){
 		for(j=0;j<col;j++){
-			if(raw2.get(i,j)) {
+			if(raw2.get(i,j) == 0) raw2.put(i,j,0); 
+			else {
 				raw2.put(i,j,1);
 				number++;
 			}	
-			else  raw2.put(i,j,0);
 		}
 	}
 	cout<<"标记点的个数:"<<number<<endl;
 	////watersheds
 	Watersheds(raw1,raw2,OriginalImage,classnum);
+	number=*classnum;
 	//save image
-	for(i=0;i<row;i++)
-	{
-		for(j=0;j<col;j++)
-		{
-			OriginalImage.put(i,j,OriginalImage.get(i,j)*255/(*classnum));
+	for(i=0;i<row;i++){
+		for(j=0;j<col;j++){
+			OriginalImage.put(i,j,OriginalImage.get(i,j)*255/number);
 		}
 	}
-	//test.SaveImage(OriginalImage);
+	ofstream f("img\\Image.raw", ios::out | ios::binary); 
+	f.write((char*)OriginalImage.getdata(),OriginalImage.size());
+	f.close();//关闭文件
 }
 void WatershedIterface(Raw2D *src,Raw2D *ret)
 {
@@ -491,7 +509,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 				temp.y = j;
 				quetem.push(temp);
 				//当前点标记为已处理
-				LabelImage->put(i,j,(unsigned char)Num);
+				LabelImage->put(i,j,(PIXTYPE)Num);
 				SeedImage->put(i,j,127);//表示已经处理过
 				//让临时种子队列中的种子进行生长直到所有的种子都生长完毕
 				//生长完毕后的队列信息保存在vque中，包括区域号和灰阶，对应点数存储在seedcounts中
@@ -509,7 +527,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n;
 							quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 							//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-							LabelImage->put(m-1,n,(unsigned char) Num);
+							LabelImage->put(m-1,n,(PIXTYPE) Num);
 							SeedImage->put(m-1,n,127);
 						}
 						else{//否则上方为不可生长
@@ -522,7 +540,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n-1;
 							quetem.push(temp);
 							//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-							LabelImage->put(m-1,n-1,(unsigned char) Num);
+							LabelImage->put(m-1,n-1,(PIXTYPE) Num);
 							SeedImage->put(m-1,n-1,127);
 						}
 						else{//否则左上方为不可生长
@@ -535,7 +553,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n+1;						
 							quetem.push(temp);						 
 							//新种子点标记为已淹没区域，而且是当前区域						
-							LabelImage->put(m-1,n+1,(unsigned char) Num);					
+							LabelImage->put(m-1,n+1,(PIXTYPE) Num);					
 							SeedImage->put(m-1,n+1,127);				
 						}		
 						else{//否则右上方为不可生长			 
@@ -548,7 +566,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n; 
 							quetem.push(temp);				 
 							//新种子点标记为已淹没区域，而且是当前区域			 
-							LabelImage->put(m+1,n,(unsigned char) Num); 
+							LabelImage->put(m+1,n,(PIXTYPE) Num); 
 							SeedImage->put(m+1,n,127);				 
 						}			 
 						else{//否则下方为不可生长					 
@@ -561,7 +579,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n+1;  						 
 							quetem.push(temp);						 
 							//新种子点标记为已淹没区域，而且是当前区域						
-							LabelImage->put(m+1,n+1,(unsigned char) Num);				
+							LabelImage->put(m+1,n+1,(PIXTYPE) Num);				
 							SeedImage->put(m+1,n+1,127);			 
 						}			 
 						else{//否则右下方为不可生长						 
@@ -574,7 +592,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n-1;
 							quetem.push(temp);
 							//新种子点标记为已淹没区域
-							LabelImage->put(m+1,n-1,(unsigned char) Num);
+							LabelImage->put(m+1,n-1,(PIXTYPE) Num);
 							SeedImage->put(m+1,n-1,127);
 						}  
 						else{//否则左下方为不可生长
@@ -587,7 +605,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n-1;				 
 							quetem.push(temp);					
 							//新种子点标记为已淹没区域						
-							LabelImage->put(m,n-1,(unsigned char) Num);				
+							LabelImage->put(m,n-1,(PIXTYPE) Num);				
 							SeedImage->put(m,n-1,127);		 
 						}
 						else{//否则左方为不可生长
@@ -600,7 +618,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							temp.y = n+1;						
 							quetem.push(temp);						
 							//新种子点标记为已淹没区域，而且是当前区域						 
-							LabelImage->put(m,n+1,(unsigned char) Num);						 
+							LabelImage->put(m,n+1,(PIXTYPE) Num);						 
 							SeedImage->put(m,n+1,127);					
 						}					
 						else{//否则右方为不可生长						 
@@ -661,7 +679,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 								//本函数中在开头也作过初始化
 								temp.x = m-1;
 								temp.y = n;
-								LabelImage->put(m-1,n,(unsigned char)(i+1));//上方点标记为已淹没区域
+								LabelImage->put(m-1,n,(PIXTYPE)(i+1));//上方点标记为已淹没区域
 								//注意到这个标记是与扫描点的区域号相同，一定在这个标号所属的区域吗？是的
 								//这样在下一轮至少会扫描到这个点，确保不遗漏，但是下一轮的处理会使它合理
 								//归类吗？问题还有这样标记并没有一定将它加入到种子队列。也就是说它
@@ -679,7 +697,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							if(!LabelImage->get(m+1,n)){//下方若未处理
 								temp.x = m+1;
 								temp.y = n;
-								LabelImage->put(m+1,n,(unsigned char)(i+1));//下方点标记为已淹没区域
+								LabelImage->put(m+1,n,(PIXTYPE)(i+1));//下方点标记为已淹没区域
 								if(OriginalImage->get(m+1,n) <= WaterLevel){//下方若为可生长点则加入当前队列
 									vque[i][WaterLevel].push(temp);
 								}
@@ -693,7 +711,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							if(!LabelImage->get(m,n+1)){//右方若未处理
 								temp.x = m; 
 								temp.y = n+1;      
-								LabelImage->put(m,n+1,(unsigned char)(i+1));//右方点标记为已淹没区域    
+								LabelImage->put(m,n+1,(PIXTYPE)(i+1));//右方点标记为已淹没区域    
 								if(OriginalImage->get(m,n+1) <= WaterLevel){//右方若为可生长点则加入当前队列
 									vque[i][WaterLevel].push(temp);
 								}
@@ -707,7 +725,7 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 							if(!LabelImage->get(m,n-1)){//左方若未处理
 								temp.x = m;
 								temp.y = n-1;
-								LabelImage->put(m,n-1,(unsigned char)(i+1));//左方点标记为已淹没区域
+								LabelImage->put(m,n-1,(PIXTYPE)(i+1));//左方点标记为已淹没区域
 								if(OriginalImage->get(m,n-1) <= WaterLevel){//左方若为可生长点则加入当前队列
 									vque[i][WaterLevel].push(temp);
 								}
@@ -757,27 +775,28 @@ void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 void Gradient( Raw2D *Image,Raw2D *dest){//二维求梯度 
 	int col = Image->getYsize();
 	int row = Image->getXsize();
-	int i,j,dx1,dx2,dx3,dx4,dx5,dx6,dx,dy1,dy2,dy3,dy4,dy5,dy6,dy;
+	int i,j;
+	PIXTYPE dx1,dx2,dx3,dx4,dx5,dx6,dx,dy1,dy2,dy3,dy4,dy5,dy6,dy;
 	for(i=1;i<row-1;i++){
 		for(j=1;j<col-1;j++){
-			dx1 = (int)Image->get(i-1,j+1);
-			dx2 = 2*(int)Image->get(i,j+1);
-			dx3 = (int)Image->get(i+1,j+1);
-			dx4 = (int)Image->get(i-1,j-1);
-			dx5 = 2*(int)Image->get(i,j-1);
-			dx6 = (int)Image->get(i+1,j-1);
+			dx1 = Image->get(i-1,j+1);
+			dx2 = 2*Image->get(i,j+1);
+			dx3 = Image->get(i+1,j+1);
+			dx4 = Image->get(i-1,j-1);
+			dx5 = 2*Image->get(i,j-1);
+			dx6 = Image->get(i+1,j-1);
 			dx = dx1+dx2+dx3-dx4-dx5-dx6;
 
 
-			dy1 = (int)Image->get(i+1,j-1);
-			dy2 = 2*(int)Image->get(i+1,j);
-			dy3 = (int)Image->get(i+1,j+1);
-			dy4 = (int)Image->get(i-1,j-1);
-			dy5 = 2*(int)Image->get(i-1,j);
-			dy6 = (int)Image->get(i-1,j+1);
+			dy1 = Image->get(i+1,j-1);
+			dy2 = 2*Image->get(i+1,j);
+			dy3 = Image->get(i+1,j+1);
+			dy4 = Image->get(i-1,j-1);
+			dy5 = 2*Image->get(i-1,j);
+			dy6 = Image->get(i-1,j+1);
 			dy = dy1+dy2+dy3-dy4-dy5-dy6;
 
-			dest->put(i,j,(unsigned char)sqrt((float)dx*dx+dy*dy));
+			dest->put(i,j,sqrt(dx*dx+dy*dy));
 		}//for循环结束
 	}//for循环结束
 }
@@ -852,7 +871,7 @@ col             --图像列数
 //					temp.z = k;
 //					quetem.push(temp);
 //					//当前点标记为已处理
-//					LabelImage.put(j,i,k,(unsigned char)Num);
+//					LabelImage.put(j,i,k,(PIXTYPE)Num);
 //					SeedImage.put(j,i,k,127);//表示已经处理过
 //					//让临时种子队列中的种子进行生长直到所有的种子都生长完毕
 //					//生长完毕后的队列信息保存在vque中，包括区域号和灰阶，对应点数存储在seedcounts中
@@ -877,7 +896,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage.put(x-1,y,z,(unsigned char) Num);
+//								LabelImage.put(x-1,y,z,(PIXTYPE) Num);
 //								SeedImage.put(x-1,y,z,127);
 //							}
 //							else{//否则同层左方为不可生长
@@ -891,7 +910,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage.put(x-1,y-1,z,(unsigned char) Num);
+//								LabelImage.put(x-1,y-1,z,(PIXTYPE) Num);
 //								SeedImage.put(x-1,y-1,z,127);
 //							}
 //							else{//否则同层左上方为不可生长
@@ -905,7 +924,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage.put(x-1,y-1,z-1,(unsigned char) Num);
+//								LabelImage.put(x-1,y-1,z-1,(PIXTYPE) Num);
 //								SeedImage.put(x-1,y-1,z-1,127);
 //							}
 //							else{//否则下层左上方为不可生长
@@ -919,7 +938,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage.put(x-1,y-1,z+1,(unsigned char) Num);
+//								LabelImage.put(x-1,y-1,z+1,(PIXTYPE) Num);
 //								SeedImage.put(x-1,y-1,z+1,127);
 //							}
 //							else{//否则上层左上方为不可生长
@@ -933,7 +952,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x-1,y+1,z,(unsigned char) Num);					
+//								LabelImage.put(x-1,y+1,z,(PIXTYPE) Num);					
 //								SeedImage.put(x-1,y+1,z,127);				
 //							}		
 //							else{//否则同层左下方为不可生长			 
@@ -947,7 +966,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x-1,y+1,z-1,(unsigned char) Num);					
+//								LabelImage.put(x-1,y+1,z-1,(PIXTYPE) Num);					
 //								SeedImage.put(x-1,y+1,z-1,127);				
 //							}		
 //							else{//否则下层左下方为不可生长			 
@@ -961,7 +980,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x-1,y+1,z+1,(unsigned char) Num);					
+//								LabelImage.put(x-1,y+1,z+1,(PIXTYPE) Num);					
 //								SeedImage.put(x-1,y+1,z+1,127);				
 //							}		
 //							else{//否则上层左下方为不可生长			 
@@ -975,7 +994,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x-1,y,z-1,(unsigned char) Num);					
+//								LabelImage.put(x-1,y,z-1,(PIXTYPE) Num);					
 //								SeedImage.put(x-1,y,z-1,127);				
 //							}		
 //							else{//否则下层左方为不可生长			 
@@ -989,7 +1008,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x-1,y,z+1,(unsigned char) Num);					
+//								LabelImage.put(x-1,y,z+1,(PIXTYPE) Num);					
 //								SeedImage.put(x-1,y,z+1,127);				
 //							}		
 //							else{//否则上层左方为不可生长			 
@@ -1003,7 +1022,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage.put(x+1,y,z,(unsigned char) Num);
+//								LabelImage.put(x+1,y,z,(PIXTYPE) Num);
 //								SeedImage.put(x+1,y,z,127);
 //							}
 //							else{//否则同层右方为不可生长
@@ -1017,7 +1036,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage.put(x+1,y-1,z,(unsigned char) Num);
+//								LabelImage.put(x+1,y-1,z,(PIXTYPE) Num);
 //								SeedImage.put(x+1,y-1,z,127);
 //							}
 //							else{//否则同层右上方为不可生长
@@ -1031,7 +1050,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage.put(x+1,y-1,z-1,(unsigned char) Num);
+//								LabelImage.put(x+1,y-1,z-1,(PIXTYPE) Num);
 //								SeedImage.put(x+1,y-1,z-1,127);
 //							}
 //							else{//否则下层右上方为不可生长
@@ -1045,7 +1064,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage.put(x+1,y-1,z+1,(unsigned char) Num);
+//								LabelImage.put(x+1,y-1,z+1,(PIXTYPE) Num);
 //								SeedImage.put(x+1,y-1,z+1,127);
 //							}
 //							else{//否则上层右上方为不可生长
@@ -1059,7 +1078,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x+1,y+1,z,(unsigned char) Num);					
+//								LabelImage.put(x+1,y+1,z,(PIXTYPE) Num);					
 //								SeedImage.put(x+1,y+1,z,127);				
 //							}		
 //							else{//否则同层右下方为不可生长			 
@@ -1073,7 +1092,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x+1,y+1,z-1,(unsigned char) Num);					
+//								LabelImage.put(x+1,y+1,z-1,(PIXTYPE) Num);					
 //								SeedImage.put(x+1,y+1,z-1,127);				
 //							}		
 //							else{//否则下层右下方为不可生长			 
@@ -1087,7 +1106,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x+1,y+1,z+1,(unsigned char) Num);					
+//								LabelImage.put(x+1,y+1,z+1,(PIXTYPE) Num);					
 //								SeedImage.put(x+1,y+1,z+1,127);				
 //							}		
 //							else{//否则上层右下方为不可生长			 
@@ -1101,7 +1120,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x+1,y,z-1,(unsigned char) Num);					
+//								LabelImage.put(x+1,y,z-1,(PIXTYPE) Num);					
 //								SeedImage.put(x+1,y,z-1,127);				
 //							}		
 //							else{//否则下层右方为不可生长			 
@@ -1115,7 +1134,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x+1,y,z+1,(unsigned char) Num);					
+//								LabelImage.put(x+1,y,z+1,(PIXTYPE) Num);					
 //								SeedImage.put(x+1,y,z+1,127);				
 //							}		
 //							else{//否则上层右方为不可生长			 
@@ -1129,7 +1148,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage.put(x,y-1,z,(unsigned char) Num);
+//								LabelImage.put(x,y-1,z,(PIXTYPE) Num);
 //								SeedImage.put(x,y-1,z,127);
 //							}
 //							else{//否则同层上方为不可生长
@@ -1143,7 +1162,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage.put(x,y-1,z-1,(unsigned char) Num);
+//								LabelImage.put(x,y-1,z-1,(PIXTYPE) Num);
 //								SeedImage.put(x,y-1,z-1,127);
 //							}
 //							else{//否则下层上方为不可生长
@@ -1157,7 +1176,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage.put(x,y-1,z+1,(unsigned char) Num);
+//								LabelImage.put(x,y-1,z+1,(PIXTYPE) Num);
 //								SeedImage.put(x,y-1,z+1,127);
 //							}
 //							else{//否则上层上方为不可生长
@@ -1171,7 +1190,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage.put(x,y+1,z,(unsigned char) Num);
+//								LabelImage.put(x,y+1,z,(PIXTYPE) Num);
 //								SeedImage.put(x,y+1,z,127);
 //							}
 //							else{//否则同层下方为不可生长
@@ -1185,7 +1204,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x,y+1,z-1,(unsigned char) Num);					
+//								LabelImage.put(x,y+1,z-1,(PIXTYPE) Num);					
 //								SeedImage.put(x,y+1,z-1,127);				
 //							}		
 //							else{//否则下层下方为不可生长			 
@@ -1199,7 +1218,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x,y+1,z+1,(unsigned char) Num);					
+//								LabelImage.put(x,y+1,z+1,(PIXTYPE) Num);					
 //								SeedImage.put(x,y+1,z+1,127);				
 //							}		
 //							else{//否则上层下方为不可生长			 
@@ -1213,7 +1232,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x,y,z-1,(unsigned char) Num);					
+//								LabelImage.put(x,y,z-1,(PIXTYPE) Num);					
 //								SeedImage.put(x,y,z-1,127);				
 //							}		
 //							else{//否则下层对应点为不可生长			 
@@ -1227,7 +1246,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage.put(x,y,z+1,(unsigned char) Num);					
+//								LabelImage.put(x,y,z+1,(PIXTYPE) Num);					
 //								SeedImage.put(x,y,z+1,127);				
 //							}		
 //							else{//否则上层对应点为不可生长			 
@@ -1295,7 +1314,7 @@ col             --图像列数
 //								temp.x = x-1;
 //								temp.y = y;
 //								temp.z = z;
-//								LabelImage.put(x-1,y,z,(unsigned char)(i+1));//左方点标记为已淹没区域
+//								LabelImage.put(x-1,y,z,(PIXTYPE)(i+1));//左方点标记为已淹没区域
 //								//注意到这个标记是与扫描点的区域号相同，一定在这个标号所属的区域吗？是的
 //								//这样在下一轮至少会扫描到这个点，确保不遗漏，但是下一轮的处理会使它合理
 //								//归类吗？问题还有这样标记并没有一定将它加入到种子队列。也就是说它
@@ -1314,7 +1333,7 @@ col             --图像列数
 //								temp.x = x+1;
 //								temp.y = y;
 //								temp.z = z;
-//								LabelImage.put(x+1,y,z,(unsigned char)(i+1));//右方点标记为已淹没区域
+//								LabelImage.put(x+1,y,z,(PIXTYPE)(i+1));//右方点标记为已淹没区域
 //								if(OriginalImage.get(x+1,y,z) <= WaterLevel){//右方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1329,7 +1348,7 @@ col             --图像列数
 //								temp.x = x; 
 //								temp.y = y-1;
 //								temp.z = z;
-//								LabelImage.put(x,y-1,z,(unsigned char)(i+1));//上方点标记为已淹没区域    
+//								LabelImage.put(x,y-1,z,(PIXTYPE)(i+1));//上方点标记为已淹没区域    
 //								if(OriginalImage.get(x,y-1,z) <= WaterLevel){//上方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1344,7 +1363,7 @@ col             --图像列数
 //								temp.x = x;
 //								temp.y = y+1;
 //								temp.z = z;
-//								LabelImage.put(x,y+1,z,(unsigned char)(i+1));//下方点标记为已淹没区域
+//								LabelImage.put(x,y+1,z,(PIXTYPE)(i+1));//下方点标记为已淹没区域
 //								if(OriginalImage.get(x,y+1,z) <= WaterLevel){//下方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1359,7 +1378,7 @@ col             --图像列数
 //								temp.x = x;
 //								temp.y = y;
 //								temp.z = z-1;
-//								LabelImage.put(x,y,z-1,(unsigned char)(i+1));//前方点标记为已淹没区域
+//								LabelImage.put(x,y,z-1,(PIXTYPE)(i+1));//前方点标记为已淹没区域
 //								if(OriginalImage.get(x,y,z-1) <= WaterLevel){//前方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1374,7 +1393,7 @@ col             --图像列数
 //								temp.x = x;
 //								temp.y = y;
 //								temp.z = z+1;
-//								LabelImage.put(x,y,z+1,(unsigned char)(i+1));//后方点标记为已淹没区域
+//								LabelImage.put(x,y,z+1,(PIXTYPE)(i+1));//后方点标记为已淹没区域
 //								if(OriginalImage.get(x,y,z+1) <= WaterLevel){//后方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1476,7 +1495,7 @@ col             --图像列数
 //					temp.z = k;
 //					quetem.push(temp);
 //					//当前点标记为已处理
-//					LabelImage->put(j,i,k,(unsigned char)Num);
+//					LabelImage->put(j,i,k,(PIXTYPE)Num);
 //					SeedImage->put(j,i,k,127);//表示已经处理过
 //					//让临时种子队列中的种子进行生长直到所有的种子都生长完毕
 //					//生长完毕后的队列信息保存在vque中，包括区域号和灰阶，对应点数存储在seedcounts中
@@ -1501,7 +1520,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage->put(x-1,y,z,(unsigned char) Num);
+//								LabelImage->put(x-1,y,z,(PIXTYPE) Num);
 //								SeedImage->put(x-1,y,z,127);
 //							}
 //							else{//否则同层左方为不可生长
@@ -1515,7 +1534,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage->put(x-1,y-1,z,(unsigned char) Num);
+//								LabelImage->put(x-1,y-1,z,(PIXTYPE) Num);
 //								SeedImage->put(x-1,y-1,z,127);
 //							}
 //							else{//否则同层左上方为不可生长
@@ -1529,7 +1548,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage->put(x-1,y-1,z-1,(unsigned char) Num);
+//								LabelImage->put(x-1,y-1,z-1,(PIXTYPE) Num);
 //								SeedImage->put(x-1,y-1,z-1,127);
 //							}
 //							else{//否则下层左上方为不可生长
@@ -1543,7 +1562,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage->put(x-1,y-1,z+1,(unsigned char) Num);
+//								LabelImage->put(x-1,y-1,z+1,(PIXTYPE) Num);
 //								SeedImage->put(x-1,y-1,z+1,127);
 //							}
 //							else{//否则上层左上方为不可生长
@@ -1557,7 +1576,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x-1,y+1,z,(unsigned char) Num);					
+//								LabelImage->put(x-1,y+1,z,(PIXTYPE) Num);					
 //								SeedImage->put(x-1,y+1,z,127);				
 //							}		
 //							else{//否则同层左下方为不可生长			 
@@ -1571,7 +1590,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x-1,y+1,z-1,(unsigned char) Num);					
+//								LabelImage->put(x-1,y+1,z-1,(PIXTYPE) Num);					
 //								SeedImage->put(x-1,y+1,z-1,127);				
 //							}		
 //							else{//否则下层左下方为不可生长			 
@@ -1585,7 +1604,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x-1,y+1,z+1,(unsigned char) Num);					
+//								LabelImage->put(x-1,y+1,z+1,(PIXTYPE) Num);					
 //								SeedImage->put(x-1,y+1,z+1,127);				
 //							}		
 //							else{//否则上层左下方为不可生长			 
@@ -1599,7 +1618,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x-1,y,z-1,(unsigned char) Num);					
+//								LabelImage->put(x-1,y,z-1,(PIXTYPE) Num);					
 //								SeedImage->put(x-1,y,z-1,127);				
 //							}		
 //							else{//否则下层左方为不可生长			 
@@ -1613,7 +1632,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x-1,y,z+1,(unsigned char) Num);					
+//								LabelImage->put(x-1,y,z+1,(PIXTYPE) Num);					
 //								SeedImage->put(x-1,y,z+1,127);				
 //							}		
 //							else{//否则上层左方为不可生长			 
@@ -1627,7 +1646,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage->put(x+1,y,z,(unsigned char) Num);
+//								LabelImage->put(x+1,y,z,(PIXTYPE) Num);
 //								SeedImage->put(x+1,y,z,127);
 //							}
 //							else{//否则同层右方为不可生长
@@ -1641,7 +1660,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage->put(x+1,y-1,z,(unsigned char) Num);
+//								LabelImage->put(x+1,y-1,z,(PIXTYPE) Num);
 //								SeedImage->put(x+1,y-1,z,127);
 //							}
 //							else{//否则同层右上方为不可生长
@@ -1655,7 +1674,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage->put(x+1,y-1,z-1,(unsigned char) Num);
+//								LabelImage->put(x+1,y-1,z-1,(PIXTYPE) Num);
 //								SeedImage->put(x+1,y-1,z-1,127);
 //							}
 //							else{//否则下层右上方为不可生长
@@ -1669,7 +1688,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage->put(x+1,y-1,z+1,(unsigned char) Num);
+//								LabelImage->put(x+1,y-1,z+1,(PIXTYPE) Num);
 //								SeedImage->put(x+1,y-1,z+1,127);
 //							}
 //							else{//否则上层右上方为不可生长
@@ -1683,7 +1702,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x+1,y+1,z,(unsigned char) Num);					
+//								LabelImage->put(x+1,y+1,z,(PIXTYPE) Num);					
 //								SeedImage->put(x+1,y+1,z,127);				
 //							}		
 //							else{//否则同层右下方为不可生长			 
@@ -1697,7 +1716,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x+1,y+1,z-1,(unsigned char) Num);					
+//								LabelImage->put(x+1,y+1,z-1,(PIXTYPE) Num);					
 //								SeedImage->put(x+1,y+1,z-1,127);				
 //							}		
 //							else{//否则下层右下方为不可生长			 
@@ -1711,7 +1730,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x+1,y+1,z+1,(unsigned char) Num);					
+//								LabelImage->put(x+1,y+1,z+1,(PIXTYPE) Num);					
 //								SeedImage->put(x+1,y+1,z+1,127);				
 //							}		
 //							else{//否则上层右下方为不可生长			 
@@ -1725,7 +1744,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x+1,y,z-1,(unsigned char) Num);					
+//								LabelImage->put(x+1,y,z-1,(PIXTYPE) Num);					
 //								SeedImage->put(x+1,y,z-1,127);				
 //							}		
 //							else{//否则下层右方为不可生长			 
@@ -1739,7 +1758,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x+1,y,z+1,(unsigned char) Num);					
+//								LabelImage->put(x+1,y,z+1,(PIXTYPE) Num);					
 //								SeedImage->put(x+1,y,z+1,127);				
 //							}		
 //							else{//否则上层右方为不可生长			 
@@ -1753,7 +1772,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage->put(x,y-1,z,(unsigned char) Num);
+//								LabelImage->put(x,y-1,z,(PIXTYPE) Num);
 //								SeedImage->put(x,y-1,z,127);
 //							}
 //							else{//否则同层上方为不可生长
@@ -1767,7 +1786,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage->put(x,y-1,z-1,(unsigned char) Num);
+//								LabelImage->put(x,y-1,z-1,(PIXTYPE) Num);
 //								SeedImage->put(x,y-1,z-1,127);
 //							}
 //							else{//否则下层上方为不可生长
@@ -1781,7 +1800,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);//如果这样的话，那么这些标记过的区域将再次在while循环中被扫描到，不会，因为值是127
 //								//新种子点标记为已淹没区域，而且是当前区域，并记录区域号到labelImage
-//								LabelImage->put(x,y-1,z+1,(unsigned char) Num);
+//								LabelImage->put(x,y-1,z+1,(PIXTYPE) Num);
 //								SeedImage->put(x,y-1,z+1,127);
 //							}
 //							else{//否则上层上方为不可生长
@@ -1795,7 +1814,7 @@ col             --图像列数
 //								temp.z = z;
 //								quetem.push(temp);
 //								//新种子点标记为已淹没区域，即下一个循环中以127来标识不再扫描，而且是当前区域
-//								LabelImage->put(x,y+1,z,(unsigned char) Num);
+//								LabelImage->put(x,y+1,z,(PIXTYPE) Num);
 //								SeedImage->put(x,y+1,z,127);
 //							}
 //							else{//否则同层下方为不可生长
@@ -1809,7 +1828,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x,y+1,z-1,(unsigned char) Num);					
+//								LabelImage->put(x,y+1,z-1,(PIXTYPE) Num);					
 //								SeedImage->put(x,y+1,z-1,127);				
 //							}		
 //							else{//否则下层下方为不可生长			 
@@ -1823,7 +1842,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x,y+1,z+1,(unsigned char) Num);					
+//								LabelImage->put(x,y+1,z+1,(PIXTYPE) Num);					
 //								SeedImage->put(x,y+1,z+1,127);				
 //							}		
 //							else{//否则上层下方为不可生长			 
@@ -1837,7 +1856,7 @@ col             --图像列数
 //								temp.z = z-1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x,y,z-1,(unsigned char) Num);					
+//								LabelImage->put(x,y,z-1,(PIXTYPE) Num);					
 //								SeedImage->put(x,y,z-1,127);				
 //							}		
 //							else{//否则下层对应点为不可生长			 
@@ -1851,7 +1870,7 @@ col             --图像列数
 //								temp.z = z+1;
 //								quetem.push(temp);						 
 //								//新种子点标记为已淹没区域，而且是当前区域						
-//								LabelImage->put(x,y,z+1,(unsigned char) Num);					
+//								LabelImage->put(x,y,z+1,(PIXTYPE) Num);					
 //								SeedImage->put(x,y,z+1,127);				
 //							}		
 //							else{//否则上层对应点为不可生长			 
@@ -1919,7 +1938,7 @@ col             --图像列数
 //								temp.x = x-1;
 //								temp.y = y;
 //								temp.z = z;
-//								LabelImage->put(x-1,y,z,(unsigned char)(i+1));//左方点标记为已淹没区域
+//								LabelImage->put(x-1,y,z,(PIXTYPE)(i+1));//左方点标记为已淹没区域
 //								//注意到这个标记是与扫描点的区域号相同，一定在这个标号所属的区域吗？是的
 //								//这样在下一轮至少会扫描到这个点，确保不遗漏，但是下一轮的处理会使它合理
 //								//归类吗？问题还有这样标记并没有一定将它加入到种子队列。也就是说它
@@ -1938,7 +1957,7 @@ col             --图像列数
 //								temp.x = x+1;
 //								temp.y = y;
 //								temp.z = z;
-//								LabelImage->put(x+1,y,z,(unsigned char)(i+1));//右方点标记为已淹没区域
+//								LabelImage->put(x+1,y,z,(PIXTYPE)(i+1));//右方点标记为已淹没区域
 //								if(OriginalImage->get(x+1,y,z) <= WaterLevel){//右方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1953,7 +1972,7 @@ col             --图像列数
 //								temp.x = x; 
 //								temp.y = y-1;
 //								temp.z = z;
-//								LabelImage->put(x,y-1,z,(unsigned char)(i+1));//上方点标记为已淹没区域    
+//								LabelImage->put(x,y-1,z,(PIXTYPE)(i+1));//上方点标记为已淹没区域    
 //								if(OriginalImage->get(x,y-1,z) <= WaterLevel){//上方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1968,7 +1987,7 @@ col             --图像列数
 //								temp.x = x;
 //								temp.y = y+1;
 //								temp.z = z;
-//								LabelImage->put(x,y+1,z,(unsigned char)(i+1));//下方点标记为已淹没区域
+//								LabelImage->put(x,y+1,z,(PIXTYPE)(i+1));//下方点标记为已淹没区域
 //								if(OriginalImage->get(x,y+1,z) <= WaterLevel){//下方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1983,7 +2002,7 @@ col             --图像列数
 //								temp.x = x;
 //								temp.y = y;
 //								temp.z = z-1;
-//								LabelImage->put(x,y,z-1,(unsigned char)(i+1));//前方点标记为已淹没区域
+//								LabelImage->put(x,y,z-1,(PIXTYPE)(i+1));//前方点标记为已淹没区域
 //								if(OriginalImage->get(x,y,z-1) <= WaterLevel){//前方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}
@@ -1998,7 +2017,7 @@ col             --图像列数
 //								temp.x = x;
 //								temp.y = y;
 //								temp.z = z+1;
-//								LabelImage->put(x,y,z+1,(unsigned char)(i+1));//后方点标记为已淹没区域
+//								LabelImage->put(x,y,z+1,(PIXTYPE)(i+1));//后方点标记为已淹没区域
 //								if(OriginalImage->get(x,y,z+1) <= WaterLevel){//后方若为可生长点则加入当前队列
 //									vque[i][WaterLevel].push(temp);
 //								}

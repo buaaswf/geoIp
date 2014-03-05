@@ -39,13 +39,16 @@ ImageVolume * testinterface()
 	//Process para(1,l,m,3,slice,indata,3,3,3,3,2);
 	//Raw  * ret = testinterface1(para);
 	unsigned char * outdata = new unsigned char[l*m*n]; 
-	ImageVolume *src = new ImageVolume(l,m,n,1,indata);
-	ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
+	ImageVolume *src = new ImageVolume(l,m,n,1,indata,false);
+	ImageVolume *ret = new ImageVolume(l,m,n,1,outdata,false);
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
-	
 	AnistropicI anis(2,30,1,4);
-	doAnistropicIY(src,ret,anis);
+	unsigned char * testdata=(unsigned char *)src->Data; 
+	doAnistropicIYproqt(src,ret,anis,3,p);
+	
+	//AnistropicI anis(2,30,1,4);
+	//doAnistropicIY(src,ret,anis);
 	// trilateral 20140211============
 	//TrilateralfilterI tril(4,3);
 	//doTrilateralfilterIY(src,ret,tril);

@@ -16,7 +16,7 @@ typedef struct POINT2D
 {
 	int  x;
 	int  y;
-} POINT2D;
+} ;
 //two Dimensions
 //gray image smooth function
 void Smooth(Raw2D &image,int type);
