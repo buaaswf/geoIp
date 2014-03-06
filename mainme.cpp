@@ -19,7 +19,7 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =100; 
+	int l = 281, m = 481, n =10; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -45,7 +45,7 @@ ImageVolume * testinterface()
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
 	AnistropicI anis(2,30,1,4);
 	unsigned char * testdata=(unsigned char *)src->Data; 
-	doAnistropicIYproqt(src,ret,anis,3,p);
+	doAnistropicIYproqt(src,ret,anis,6,p);
 	
 	//AnistropicI anis(2,30,1,4);
 	//doAnistropicIY(src,ret,anis);

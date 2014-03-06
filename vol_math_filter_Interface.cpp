@@ -2237,17 +2237,19 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 	switch (src->PixelType)
 	{
 	case 1:
-		if(i < tastnum-1 )
+		if(i < tastnum-1 && znewsize != 0)
 		{
 
-			unsigned char *srcdata=(unsigned char*)src->Data + (znewsize+2)* i * (src->Width*src->Height)- k * (src->Width*src->Height);
-			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
+			unsigned char *srcdata=(unsigned char*)src->Data + znewsize* i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			ret=new ImageVolume(src->Width, src->Height, znewsize + 1 + k,1,srcdata,false);
 
 		}
-		else if(i == tastnum-1)
+		else if(i == tastnum-1||znewsize == 0)
 		{
+			int var=0;//for znew ==0
+			tastnum==1? var=0:var=1;
 			unsigned char *srcdata = (unsigned char*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
-			ret = new ImageVolume(src->Width, src->Height, zleft+znewsize+1, 1, srcdata, false);
+			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + var, 1, srcdata, false);
 
 
 		}
@@ -2279,7 +2281,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 		else if(i == tastnum-1)
 		{
 			float *srcdata = (float*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
-			ret = new ImageVolume(src->Width, src->Height, zleft+znewsize+1, 1, srcdata, false);
+			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + 1, 1, srcdata, false);
 
 
 		}
@@ -2301,7 +2303,9 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 
 bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para ,int tasknum ,void(*ProgressChanged)(int,int,int,bool &))
 {
+	
 	int znew=src->Depth/tasknum;
+	znew ==0? tasknum=1:tasknum=tasknum;
 	int zleft =src->Depth%tasknum;
 	int i=0;
 	for (i=0 ;i< tasknum; i++)
@@ -2313,12 +2317,14 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 		//progress=ProgressChanged;
 		doAnistropicIY(newsrc,newret,para);
 		int k=0;
-		i==0?k=0:k=1;
+		(i==0||i==tasknum-1 )?k=1:k=2;
+		int newdatacur= 0;
+		(i==0||tasknum==1)? newdatacur=0:newdatacur=1;
 		switch (src->PixelType)
 		{
 		case 1:
-			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
 			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
@@ -2332,7 +2338,7 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 
 		if (  ProgressChanged != NULL )
 		{
-			ProgressChanged (0, 100,(i+1)*src->Depth/tasknum,flag);
+			ProgressChanged (0, src->Depth,(i+1)*src->Depth/tasknum,flag);
 		}
 
 	}
