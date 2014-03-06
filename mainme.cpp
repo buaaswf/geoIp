@@ -14,12 +14,12 @@
 void p(int type,int total ,int step,bool &cancled)
 {
 
-	printf(" %f\n",(float)step*100/total);
+	printf(" %f\n",(float)step/total);
 }
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =10; 
+	int l = 281, m = 481, n =300; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 

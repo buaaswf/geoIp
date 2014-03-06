@@ -2315,7 +2315,15 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 		ImageVolume * newsrc= dividetask(i,tasknum,src);
 		ImageVolume * newret= dividetask(i,tasknum,ret);
 		//progress=ProgressChanged;
-		doAnistropicIY(newsrc,newret,para);
+		if (para.method==1)
+		{
+			doAnistropicIY(newsrc,newret,para);
+		} 
+		else
+		{
+			doAnistropicI(newsrc,newret,para);
+		}
+	
 		int k=0;
 		(i==0||i==tasknum-1 )?k=1:k=2;
 		int newdatacur= 0;
@@ -2338,7 +2346,7 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 
 		if (  ProgressChanged != NULL )
 		{
-			ProgressChanged (0, src->Depth,(i+1)*src->Depth/tasknum,flag);
+			ProgressChanged (0,1,(i+1)*100/tasknum,flag);
 		}
 
 	}
