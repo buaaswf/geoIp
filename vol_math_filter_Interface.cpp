@@ -514,14 +514,21 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 	 return true;
 
 }
+bool doWaterShedsI(ImageVolume *src,ImageVolume *ret,WaterShedsI &para)
+{
+	Raw *indata=(Raw *)ImageVolume2Raw(src);
+	WatershedsProcess(*indata);
+	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*indata,ret->PixelType);
+	memcpy(ret->Data,res->Data,indata->size()*sizeof(unsigned char));
+	delete res;
+	return true;
+}
 
 bool doWaterSheds2D( Image2D *src,Image2D *ret,WaterShedsI &para)
 {
 	Raw2D indata = Image2D2Raw2D(*src);
-	Raw2D outdata = Image2D2Raw2D(*ret);
-	WatershedIterface(&indata,& outdata);
-	//ret =new Image2D(src->width,src->height,src->PixelType);
-	Image2D *temp = (Image2D*)Raw2D2Image2D(outdata,src->PixelType);
+	WatershedsProcess(indata);
+	Image2D *temp = (Image2D*)Raw2D2Image2D(indata,src->PixelType);
 	memcpy(ret->data,temp->data,src->GetLength());
 	return true;
 
@@ -2354,3 +2361,148 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 
 }
 
+bool  doBilateralproqt(ImageVolume * src, ImageVolume *ret,BilateralFilterI &para ,int tasknum ,void(*ProgressChanged)(int,int,int,bool &))
+{
+	
+	int znew=src->Depth/tasknum;
+	znew ==0? tasknum=1:tasknum=tasknum;
+	int zleft =src->Depth%tasknum;
+	int i=0;
+	for (i=0 ;i< tasknum; i++)
+	{
+		bool flag = false;
+		globalProgressChanged = src->GetLength();//*this->delt;
+		ImageVolume * newsrc= dividetask(i,tasknum,src);
+		ImageVolume * newret= dividetask(i,tasknum,ret);
+		//progress=ProgressChanged;
+		doBilateralIY(newsrc,newret,para);
+		int k=0;
+		(i==0||i==tasknum-1 )?k=1:k=2;
+		int newdatacur= 0;
+		(i==0||tasknum==1)? newdatacur=0:newdatacur=1;
+		switch (src->PixelType)
+		{
+		case 1:
+			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			break;
+		case 2:
+			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		case 3:
+			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		}
+
+		if (  ProgressChanged != NULL )
+		{
+			ProgressChanged (0,1,(i+1)*100/tasknum,flag);
+		}
+
+	}
+	return true;
+
+}
+bool  doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para ,int tasknum ,void(*ProgressChanged)(int,int,int,bool &))
+{
+	
+	int znew=src->Depth/tasknum;
+	znew ==0? tasknum=1:tasknum=tasknum;
+	int zleft =src->Depth%tasknum;
+	int i=0;
+	for (i=0 ;i< tasknum; i++)
+	{
+		bool flag = false;
+		globalProgressChanged = src->GetLength();//*this->delt;
+		ImageVolume * newsrc= dividetask(i,tasknum,src);
+		ImageVolume * newret= dividetask(i,tasknum,ret);
+		//progress=ProgressChanged;
+		doGuassFilterIY(newsrc,newret,para);
+		int k=0;
+		(i==0||i==tasknum-1 )?k=1:k=2;
+		int newdatacur= 0;
+		(i==0||tasknum==1)? newdatacur=0:newdatacur=1;
+		switch (src->PixelType)
+		{
+		case 1:
+			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			break;
+		case 2:
+			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		case 3:
+			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		}
+
+		if (  ProgressChanged != NULL )
+		{
+			ProgressChanged (0,1,(i+1)*100/tasknum,flag);
+		}
+
+	}
+	return true;
+
+}
+
+/**
+ \brief	Executes the trilateralproqt operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	tasknum					   	The tasknum.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
+bool  doTrilateralproqt(ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para ,int tasknum ,void(*ProgressChanged)(int,int,int,bool &))
+{
+	
+	int znew=src->Depth/tasknum;
+	znew ==0? tasknum=1:tasknum=tasknum;
+	int zleft =src->Depth%tasknum;
+	int i=0;
+	for (i=0 ;i< tasknum; i++)
+	{
+		bool flag = false;
+		globalProgressChanged = src->GetLength();//*this->delt;
+		ImageVolume * newsrc= dividetask(i,tasknum,src);
+		ImageVolume * newret= dividetask(i,tasknum,ret);
+		//progress=ProgressChanged;
+		doTrilateralfilterIY(newsrc,newret,para);
+		int k=0;
+		(i==0||i==tasknum-1 )?k=1:k=2;
+		int newdatacur= 0;
+		(i==0||tasknum==1)? newdatacur=0:newdatacur=1;
+		switch (src->PixelType)
+		{
+		case 1:
+			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			break;
+		case 2:
+			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		case 3:
+			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			break;
+		}
+
+		if (  ProgressChanged != NULL )
+		{
+			ProgressChanged (0,1,(i+1)*100/tasknum,flag);
+		}
+
+	}
+	return true;
+
+}

@@ -333,7 +333,8 @@ void  Morph_reconstuct_Gray( Raw2D &mask,Raw2D &dest,string strings,int n){
 //compare
 int CompareImage( Raw &src1, Raw &src2){
 	if (src1.getXsize()!=src2.getXsize() || src1.getYsize()!=src2.getYsize() || src1.getZsize()!=src2.getZsize())	return 1;
-	int i,j,k,col,row,height;
+	int i,j,k;
+	long long col,row,height;
 	PIXTYPE value;
 	col=src1.getXsize();
 	row=src1.getYsize();
@@ -358,7 +359,8 @@ void Copy( Raw &src,Raw &dest){
 		printf("Size no match!");
 		return ;
 	}
-	int i,j,k,col,row,height;
+	int i,j,k;
+	long long col,row,height;
 	col=src.getXsize();
 	row=src.getYsize();
 	height=src.getZsize();
@@ -372,7 +374,8 @@ void Copy( Raw &src,Raw &dest){
 }
 //Gray image reversion
 void Reversion(Raw &image){
-	int i,j,k,row,col,height;
+	int i,j,k;
+	long long row,col,height;
 	PIXTYPE val;
 	col=image.getXsize();
 	row=image.getYsize();
@@ -388,7 +391,8 @@ void Reversion(Raw &image){
 }
 //gray image erode
 void  Erode_Gray( Raw &mask,Raw &dest,int n){
-	int i,j,k,m,p,q,row,col,height,x,y,z;
+	int i,j,k,m,p,q,x,y,z;
+	long long row,col,height;
 	PIXTYPE Minval,value;
 	row=mask.getYsize();
 	col=mask.getXsize();
@@ -424,7 +428,8 @@ void  Erode_Gray( Raw &mask,Raw &dest,int n){
 }
 //dilate
 void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
-	int i,j,k,m,p,q,row,col,height,x,y,z;
+	int i,j,k,m,p,q,x,y,z;
+	long long row,col,height;
 	PIXTYPE Maxval,value;
 	row=mask.getYsize();
 	col=mask.getXsize();
@@ -459,117 +464,119 @@ void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
     CReleaseMat(temp);
 }
 //Morphological erode
-//void  Morph_Erode_Gray(const Raw &mask,Raw &dest,int n){//gray image
-//	int i,j,k,m,p,q,row,col,height,x,y,z,value;
-//	PIXTYPE Minval,Maxval;
-//	row=mask.getYsize();
-//	col=mask.getXsize();
-//	height=mask.getZsize();
-//    Mat temp=strel_B("disc",n);
-//	//marker eroded by temp
-//	for(k=0;k<height;k++){
-//		for(i=0;i<row;i++){
-//			for(j=0;j<col;j++){
-//				Minval=255;
-//				for(m=-n;m<=n;m++){
-//					z=m+k;
-//					z=z<0?0:z;
-//					z=z>(height-1)?(height-1):z;
-//					for(p=-n;p<=n;p++){
-//						y=p+i;
-//						y=y<0?0:y;
-//						y=y>(row-1)?(row-1):y;
-//						for(q=-n;q<=n;q++){
-//							x=q+j;
-//							x=x<0?0:x;
-//							x=x>(col-1)?(col-1):x;
-//							value=mask.get(x,y,z)-(*(temp.data+(p+n)*temp.col+q+n));
-//							value=value<0?0:value;
-//						    if (Minval > value) Minval=(PIXTYPE)value;
-//						}
-//					}	
-//				}
-//				dest.put(j,i,k,Minval);
-//			}
-//		}
-//	}
-//	//Geodedesic erosion
-//	for(k=0;k<height;k++){
-//		for(i=0;i<row;i++){
-//			for(j=0;j<col;j++){
-//				Maxval=dest.get(j,i,k) > mask.get(j,i,k)?dest.get(j,i,k):mask.get(j,i,k);
-//				dest.put(j,i,k,Maxval);
-//			}
-//		}
-//	}
-//	 CReleaseMat(temp);
-//}
-////Morphological dilate
-//void Morph_Dilate_Gray(const Raw &mask,Raw &dest,int n){//gray image
-//	int i,j,k,m,p,q,row,col,height,x,y,z,value;
-//	PIXTYPE Maxval,Minval;;
-//	row=mask.getYsize();
-//	col=mask.getXsize();
-//	height=mask.getZsize();
-//	Mat temp=strel_B("disc",n);
-//	//marker eroded by temp
-//	for(k=0;k<height;k++){
-//		for(i=0;i<row;i++){
-//			for(j=0;j<col;j++){
-//				Maxval=0;
-//				for(m=-n;m<=n;m++){
-//					z=m+k;
-//					z=z<0?0:z;
-//					z=z>(height-1)?height-1:z;
-//					for(p=-n;p<=n;p++){
-//						y=p+i;
-//						y=y<0?0:y;
-//						y=y>(row-1)?row-1:y;
-//						for(q=-n;q<=n;q++){
-//							x=q+j;
-//							x=x<0?0:x;
-//							x=x>(col-1)?col-1:x;
-//							value=mask.get(x,y,z)+(*(temp.data+(p+n)*temp.row+q+n));
-//							value=value>255?255:value;
-//						    if (Maxval < value) Maxval=(PIXTYPE)value;
-//						}
-//					}	
-//				}
-//				dest.put(j,i,k,Maxval);
-//			}
-//		}
-//	}
-//	//Geodedesic dilation
-//	for(k=0;k<height;k++){
-//		for(i=0;i<row;i++){
-//			for(j=0;j<col;j++){
-//				Minval=dest.get(j,i,k) < mask.get(j,i,k)?dest.get(j,i,k):mask.get(j,i,k);
-//				dest.put(j,i,k,Minval);
-//			}
-//		}
-//	}
-//	CReleaseMat(temp);
-//}
-////Morphological reconstruction
-////strings : dilate or erode
-//void Morph_reconstuct_Gray(const Raw &mask,Raw &dest,string strings,int n){//gray image reconstruction
-//	Raw temp(mask.getXsize(),mask.getYsize(),mask.getZsize());
-//	int iterations=200;//control iterations
-//	Copy(mask,dest);
-//	if("dilate"==strings){
-//		Morph_Dilate_Gray(mask,temp,n);
-//		while(iterations && CompareImage(dest,temp)){
-//			Copy(temp,dest);
-//			Morph_Dilate_Gray(dest,temp,n);
-//			iterations--;
-//		}
-//	}
-//	if("erode"==strings){
-//		Morph_Erode_Gray(mask,temp,n);
-//		while(iterations && CompareImage(dest,temp)){  
-//			Copy(temp,dest);
-//			Morph_Erode_Gray(dest,temp,n);
-//			iterations--;
-//		}
-//	}                                                        
-//}
+void  Morph_Erode_Gray( Raw &mask,Raw &dest,int n){//gray image
+	int i,j,k,m,p,q,x,y,z;
+	long long row,col,height;
+	PIXTYPE Minval,Maxval,value;
+	row=mask.getYsize();
+	col=mask.getXsize();
+	height=mask.getZsize();
+    Mat temp=strel_B("disc",n);
+	//marker eroded by temp
+	for(k=0;k<height;k++){
+		for(i=0;i<row;i++){
+			for(j=0;j<col;j++){
+				Minval=255;
+				for(m=-n;m<=n;m++){
+					z=m+k;
+					z=z<0?0:z;
+					z=z>(height-1)?(height-1):z;
+					for(p=-n;p<=n;p++){
+						y=p+i;
+						y=y<0?0:y;
+						y=y>(row-1)?(row-1):y;
+						for(q=-n;q<=n;q++){
+							x=q+j;
+							x=x<0?0:x;
+							x=x>(col-1)?(col-1):x;
+							value=mask.get(x,y,z);//-(*(temp.data+(p+n)*temp.col+q+n));
+							//value=value<0?0:value;
+						    if (Minval > value) Minval = value;
+						}
+					}	
+				}
+				dest.put(j,i,k,Minval);
+			}
+		}
+	}
+	//Geodedesic erosion
+	for(k=0;k<height;k++){
+		for(i=0;i<row;i++){
+			for(j=0;j<col;j++){
+				Maxval=dest.get(j,i,k) > mask.get(j,i,k)?dest.get(j,i,k):mask.get(j,i,k);
+				dest.put(j,i,k,Maxval);
+			}
+		}
+	}
+	 CReleaseMat(temp);
+}
+//Morphological dilate
+void Morph_Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
+	int i,j,k,m,p,q,x,y,z;
+	long long row,col,height;
+	PIXTYPE Maxval,Minval,value;
+	row=mask.getYsize();
+	col=mask.getXsize();
+	height=mask.getZsize();
+	Mat temp=strel_B("disc",n);
+	//marker eroded by temp
+	for(k=0;k<height;k++){
+		for(i=0;i<row;i++){
+			for(j=0;j<col;j++){
+				Maxval=0;
+				for(m=-n;m<=n;m++){
+					z=m+k;
+					z=z<0?0:z;
+					z=z>(height-1)?height-1:z;
+					for(p=-n;p<=n;p++){
+						y=p+i;
+						y=y<0?0:y;
+						y=y>(row-1)?row-1:y;
+						for(q=-n;q<=n;q++){
+							x=q+j;
+							x=x<0?0:x;
+							x=x>(col-1)?col-1:x;
+							value=mask.get(x,y,z);//+(*(temp.data+(p+n)*temp.row+q+n));
+							//value=value>255?255:value;
+						    if (Maxval < value) Maxval = value;
+						}
+					}	
+				}
+				dest.put(j,i,k,Maxval);
+			}
+		}
+	}
+	//Geodedesic dilation
+	for(k=0;k<height;k++){
+		for(i=0;i<row;i++){
+			for(j=0;j<col;j++){
+				Minval=dest.get(j,i,k) < mask.get(j,i,k)?dest.get(j,i,k):mask.get(j,i,k);
+				dest.put(j,i,k,Minval);
+			}
+		}
+	}
+	CReleaseMat(temp);
+}
+//Morphological reconstruction
+//strings : dilate or erode
+void Morph_reconstuct_Gray( Raw &mask,Raw &dest,string strings,int n){//gray image reconstruction
+	Raw temp(mask.getXsize(),mask.getYsize(),mask.getZsize());
+	int iterations=200;//control iterations
+	Copy(mask,dest);
+	if("dilate"==strings){
+		Morph_Dilate_Gray(mask,temp,n);
+		while(iterations && CompareImage(dest,temp)){
+			Copy(temp,dest);
+			Morph_Dilate_Gray(dest,temp,n);
+			iterations--;
+		}
+	}
+	if("erode"==strings){
+		Morph_Erode_Gray(mask,temp,n);
+		while(iterations && CompareImage(dest,temp)){  
+			Copy(temp,dest);
+			Morph_Erode_Gray(dest,temp,n);
+			iterations--;
+		}
+	}                                                        
+}

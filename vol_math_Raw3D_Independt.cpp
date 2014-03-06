@@ -22,8 +22,8 @@ Raw2D::Raw2D()
 
 Raw2D::Raw2D(int xsize,int ysize,PIXTYPE *y)
 {
-	this->xsize=xsize;
-	this->ysize=ysize;
+	this->xsize=ysize;
+	this->ysize=xsize;
 	this->data=y;
 }
 

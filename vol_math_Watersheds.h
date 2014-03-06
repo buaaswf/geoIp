@@ -43,19 +43,18 @@ void Watershed_2D_test(unsigned char **OriginalImage, char** SeedImage, int **La
 输入参数说明：      OriginalImage   --输入图像（灰度图，0~255）
                     SeedImage       --标记图像（二值图，0-非标记，1-标记）
                     LabelImage      --输出图像（1-第一个分割区域，2-第二个分割区域，...）
+					classnum        --输出图像最大值的指针 
                     row             --图像行数
                     col             --图像列数
 返回值说明：        无        
 ====================================================================*/
-
-
-//void Watersheds(const Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage);
-void Watersheds(const Raw &OriginalImage, Raw &LabelImage);
-void Gradient(const Raw &Image,Raw &dest);//三维求梯度 
+void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classnum);
+void Watersheds( Raw &OriginalImage, Raw &LabelImage);
+void Gradient( Raw &src,Raw &dest);//三维求梯度 
+void WatershedsProcess(Raw &OriginalImage);//test watersheds
 
 //void Watersheds(const Raw *OriginalImage, Raw *SeedImage, Raw *LabelImage);
 //void Watersheds(const Raw *OriginalImage, Raw *LabelImage);
 //void Gradient(const Raw *Image,Raw *dest);//三维求梯度 
-
-
+//void WatershedsProcess(Raw *OriginalImage);//test watersheds
 #endif

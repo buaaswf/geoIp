@@ -4,14 +4,15 @@
 
 //image smooth
 void Smooth(Raw2D &image,int type){
-	int i,j,k,l,m,n,col,row,value;
+	int i,j,k,l,m,n,col,row;
+	PIXTYPE value;
 	row=image.getXsize();
 	col=image.getYsize();
 	switch(type){
 	case 0:{
 		for(i=0;i<row;i++){
 			for(j=0;j<col;j++){
-				value=0;
+				value=0.0;
 				for(k=-1;k<2;k++){
 					m=k+i;
 					m=m<0?0:m;
@@ -20,10 +21,10 @@ void Smooth(Raw2D &image,int type){
 						n=l+j; 
 						n=n<0?0:n;
 						n=n>(col-1)?(col-1):n;
-						value+=(int)(image.get(m,n)+0.5);
+						value+=image.get(m,n);
 					}
 				}
-				image.put(i,j,(PIXTYPE)(value/9+0.5));
+				image.put(i,j,value/9.0);
 			}
 		}
         break;
@@ -36,14 +37,15 @@ void Smooth(Raw2D &image,int type){
 	}
 }
 void Smooth(Raw2D *image,int type){
-	int i,j,k,l,m,n,col,row,value;
+	int i,j,k,l,m,n,col,row;
+	PIXTYPE value;
 	row=image->getXsize();
 	col=image->getYsize();
 	switch(type){
 	case 0:{
 		for(i=0;i<row;i++){
 			for(j=0;j<col;j++){
-				value=0;
+				value=0.0;
 				for(k=-1;k<2;k++){
 					m=k+i;
 					m=m<0?0:m;
@@ -52,10 +54,10 @@ void Smooth(Raw2D *image,int type){
 						n=l+j; 
 						n=n<0?0:n;
 						n=n>(col-1)?(col-1):n;
-						value+=(int)(image->get(m,n)+0.5);
+						value+=image->get(m,n);
 					}
 				}
-				image->put(i,j,(PIXTYPE)(value/9+0.5));
+				image->put(i,j,value/9);
 			}
 		}
         break;
@@ -74,24 +76,24 @@ void NoisePrc(Raw2D &image){
 	row=image.getXsize();
 	col=image.getYsize();
 	//消除一些面积较小的区域
-	for(i=0;i<row;i++){
-		for(j=0;j<col;j++){
-			number=0;
-			value=image.get(i,j);
-			for(k=-5;k<6;k++){
-				m=k+i;
-				m=m<0?0:m;
-				m=m>(row-1)?(row-1):m;
-				for(l=-5;l<6;l++){
-					n=l+j;
-					n=n<0?0:n;
-					n=n>(col-1)?(col-1):n;
-					if(image.get(m,n)) number++;//记录非零的个数
-				}
-			}
-			if((value && number<40)||(!value && number>60)) image.put(i,j,(PIXTYPE)(255-value));//消除一些孤立的点
-		}
-	}
+	//for(i=0;i<row;i++){
+	//	for(j=0;j<col;j++){
+	//		number=0;
+	//		value=image.get(i,j);
+	//		for(k=-5;k<6;k++){
+	//			m=k+i;
+	//			m=m<0?0:m;
+	//			m=m>(row-1)?(row-1):m;
+	//			for(l=-5;l<6;l++){
+	//				n=l+j;
+	//				n=n<0?0:n;
+	//				n=n>(col-1)?(col-1):n;
+	//				if(image.get(m,n)) number++;//记录非零的个数
+	//			}
+	//		}
+	//		if((value && number<40)||(!value && number>60)) image.put(i,j,(PIXTYPE)(255-value));//消除一些孤立的点
+	//	}
+	//}
 
 	//取消噪音
 	for(i=0;i<row;i++){
@@ -121,8 +123,10 @@ void MaxValue(Raw2D &image){
 	Raw2D temp(image);
 	row=image.getXsize();
 	col=image.getYsize();
+
+	PIXTYPE value,Minval,Maxval;
 	//图像平滑
-	Smooth(temp,CV_BLUR_NO_SCALE);
+	Smooth(temp,CV_BLUR_NO_SCALE);	
 	//查找最大值并二值化
 	for(i=0;i<row;i++){
 		for(j=0;j<col;j++){
@@ -151,7 +155,7 @@ void MaxValue(Raw2D &image){
 			else image.put(i,j,0);
 		}
 	}
-	NoisePrc(image);//噪音处理
+    NoisePrc(image);//噪音处理
 }
 void MinValue(Raw2D &image){
 	int i,j,k,l,m,n,row,col;
@@ -192,7 +196,9 @@ void MinValue(Raw2D &image){
 //three Dimensions
 //gray image smooth function
 void Smooth3D(Raw &image,int type){
-	int i,j,k,l,m,n,x,y,z,col,row,height,value;
+	int i,j,k,l,m,n,x,y,z;
+	long long col,row,height;
+	PIXTYPE value;
 	row=image.getYsize();
 	col=image.getXsize();
 	height=image.getZsize();
@@ -201,7 +207,7 @@ void Smooth3D(Raw &image,int type){
 		for(k=0;k<height;k++){
 			for(i=0;i<row;i++){
 				for(j=0;j<col;j++){	
-					value=0;
+					value=0.0;
 					for(l=-1;l<2;l++){
 						z=k+l;
 						z=z<0?0:z;
@@ -214,11 +220,11 @@ void Smooth3D(Raw &image,int type){
 								x=n+j;
 								x=x<0?0:x;
 								x=x>(col-1)?(col-1):x;
-								value+=(int)(image.get(x,y,z)+0.5);
+								value+=image.get(x,y,z);
 							}
 						}
 					}
-					image.put(j,i,k,(PIXTYPE)(value/27+0.5));
+					image.put(j,i,k,value/27);
 				}
 			}
 		}       
@@ -232,7 +238,9 @@ void Smooth3D(Raw &image,int type){
 	}
 }
 void Smooth3D(Raw *image,int type){
-	int i,j,k,l,m,n,x,y,z,col,row,height,value;
+	int i,j,k,l,m,n,x,y,z;
+	PIXTYPE value;
+	long long col,row,height;
 	row=image->getYsize();
 	col=image->getXsize();
 	height=image->getZsize();
@@ -241,7 +249,7 @@ void Smooth3D(Raw *image,int type){
 		for(k=0;k<height;k++){
 			for(i=0;i<row;i++){
 				for(j=0;j<col;j++){	
-					value=0;
+					value=0.0;
 					for(l=-1;l<2;l++){
 						z=k+l;
 						z=z<0?0:z;
@@ -254,11 +262,11 @@ void Smooth3D(Raw *image,int type){
 								x=n+j;
 								x=x<0?0:x;
 								x=x>(col-1)?(col-1):x;
-								value+=(int)(image->get(x,y,z)+0.5);
+								value+=image->get(x,y,z);
 							}
 						}
 					}
-					image->put(j,i,k,(PIXTYPE)(value/27+0.5));
+					image->put(j,i,k,value/27);
 				}
 			}
 		}       
@@ -273,7 +281,8 @@ void Smooth3D(Raw *image,int type){
 }
 //Noise process gray image
 void NoiseProcess(Raw &image){
-	int i,j,k,l,m,n,x,y,z,row,col,height,number;
+	int i,j,k,l,m,n,x,y,z,number;
+	long long row,col,height;
 	PIXTYPE value;
 	col=image.getXsize();
     row=image.getYsize();
@@ -330,11 +339,11 @@ void NoiseProcess(Raw &image){
 			}
 		}
 	}  
-
 }
 //Extremum value
 void MaxValue(Raw &image){//极大值函数
-	int i,j,k,l,m,n,x,y,z,row,col,height,number;
+	int i,j,k,l,m,n,x,y,z;
+	long long row,col,height;
 	bool Is_Biger;//查找到更大的标记
 	Raw temp(image);
 	col=image.getXsize();
@@ -346,30 +355,24 @@ void MaxValue(Raw &image){//极大值函数
 	for(k=0;k<height;k++){	
 		for(i=0;i<row;i++){	
 			for(j=0;j<col;j++){	
-				if(temp.get(j,i,k)>80){
+				if(temp.get(j,i,k)>50){
 					Is_Biger=false;
-					for(l=-1;l<2;l++){		
-						z=k+l;
-						z=z<0?0:z;
-						z=(z>(height-1))?(height-1):z;	
-						for(m=-1;m<2;m++){	
-							y=m+i; 
-							y=y<0?0:y;
-							y=(y>(row-1))?(row-1):y;	
-							for(n=-1;n<2;n++){		
-								x=n+j;					
-								x=x<0?0:x;
-								x=(x>(col-1))?(col-1):x;
-								if(temp.get(x,y,z) > temp.get(j,i,k)){
-									Is_Biger=true;
-									break;
-								}	
-							}
-							if(Is_Biger)break;
+					for(m=-1;m<2;m++){	
+						y=m+i; 
+						y=y<0?0:y;
+						y=(y>(row-1))?(row-1):y;	
+						for(n=-1;n<2;n++){		
+							x=n+j;					
+							x=x<0?0:x;
+							x=(x>(col-1))?(col-1):x;
+							if(temp.get(x,y,k) > temp.get(j,i,k)){
+								Is_Biger=true;
+								break;
+							}	
 						}
 						if(Is_Biger)break;
 					}
-					if(Is_Biger) image.put(j,i,k,0);
+					if(Is_Biger)image.put(j,i,k,0);
 					else image.put(j,i,k,255);
 				}//if
 				else image.put(j,i,k,0);
@@ -379,7 +382,8 @@ void MaxValue(Raw &image){//极大值函数
 	NoiseProcess(image);//噪音处理
 }
 void MinValue(Raw &image){//极小值函数
-	int i,j,k,l,m,n,x,y,z,row,col,height,number;
+	int i,j,k,l,m,n,x,y,z;
+	long long row,col,height;
 	bool Is_Smaller;//查找到更小的标记
 	Raw temp(image);
 	col=image.getXsize();
@@ -391,30 +395,24 @@ void MinValue(Raw &image){//极小值函数
 	for(k=0;k<height;k++){	
 		for(i=0;i<row;i++){	
 			for(j=0;j<col;j++){	
-				if(temp.get(j,i,k)<80){
+				if(temp.get(j,i,k)<200){
 					Is_Smaller=false;
-					for(l=-1;l<2;l++){		
-						z=k+l;
-						z=z<0?0:z;
-						z=(z>(height-1))?(height-1):z;	
-						for(m=-1;m<2;m++){	
-							y=m+i; 
-							y=y<0?0:y;
-							y=(y>(row-1))?(row-1):y;	
-							for(n=-1;n<2;n++){		
-								x=n+j;					
-								x=x<0?0:x;
-								x=(x>(col-1))?(col-1):x;
-								if(temp.get(x,y,z) < temp.get(j,i,k)){
-									Is_Smaller=true;
-									break;
-								}	
-							}
-							if(Is_Smaller)break;
+					for(m=-1;m<2;m++){	
+						y=m+i; 
+						y=y<0?0:y;
+						y=(y>(row-1))?(row-1):y;	
+						for(n=-1;n<2;n++){		
+							x=n+j;					
+							x=x<0?0:x;
+							x=(x>(col-1))?(col-1):x;
+							if(temp.get(x,y,k) < temp.get(j,i,k)){
+								Is_Smaller=true;
+								break;
+							}	
 						}
 						if(Is_Smaller)break;
 					}
-					if(Is_Smaller) image.put(j,i,k,0);
+					if(Is_Smaller)image.put(j,i,k,0);
 					else image.put(j,i,k,255);
 				}//if
 				else image.put(j,i,k,0);

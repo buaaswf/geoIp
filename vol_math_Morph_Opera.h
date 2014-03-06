@@ -57,21 +57,21 @@ void Morph_reconstuct_Gray( Raw2D &mask,Raw2D &dest,string strings,int n);//gray
 
 //three Dimensions
 //Gray image compare
-int CompareImage(const Raw &src1,const Raw &src2);
+int CompareImage(Raw &src1, Raw &src2);
 //Gray image copy
-void Copy(const Raw &src,Raw &dest);
+void Copy( Raw &src,Raw &dest);
 //Gray image reversion
 void Reversion(Raw &image);
 //erode
-void Erode_Gray(const Raw &mask,Raw &dest,int n);//gray image
+void Erode_Gray( Raw &mask,Raw &dest,int n);//gray image
 //dilate
-void Dilate_Gray(const Raw &mask,Raw &dest,int n);//gray image
+void Dilate_Gray( Raw &mask,Raw &dest,int n);//gray image
 //Morphological erode
-void Morph_Erode_Gray(const Raw &mask,Raw &dest,int n);//gray image
+void Morph_Erode_Gray( Raw &mask,Raw &dest,int n);//gray image
 //Morphological dilate
-void Morph_Dilate_Gray(const Raw &mask,Raw &dest,int n);//gray image
+void Morph_Dilate_Gray( Raw &mask,Raw &dest,int n);//gray image
 //Morphological reconstruction
 //strings : dilate or erode
-void Morph_reconstuct_Gray(const Raw &mask,Raw &dest,string strings,int n);//gray image reconstruction
+void Morph_reconstuct_Gray( Raw &mask,Raw &dest,string strings,int n);//gray image reconstruction
 
 #endif

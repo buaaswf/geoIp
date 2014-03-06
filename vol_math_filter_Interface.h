@@ -317,13 +317,16 @@ extern bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
 bool  doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
 bool  doBilateralIY (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
+bool  doBilateralproqt(ImageVolume * src, ImageVolume *ret,BilateralFilterI &para,int tasknum,void(*ProgressChanged)(int,int,int,bool &) );
 bool doGuassFilterI (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
 bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype);
+bool doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para,int tasknum,void(*ProgressChanged)(int,int,int,bool &));
 bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype);
 bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype);
 bool doBilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,BilateralFilterI &para,int datatype);  
 bool doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
+bool doTrilateralproqt(ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,int tasknum,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para);
 bool doMWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para);
@@ -336,6 +339,7 @@ bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,void(*ProgressChanged)(int,int,int,bool &));
+bool doWaterShedsI(ImageVolume *src,ImageVolume *ret,WaterShedsI &para);
 bool doWaterSheds2D(Image2D *src,Image2D *ret,WaterShedsI &para);
 bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &,void(*ProgressChanged)(int,int,int,bool &));
