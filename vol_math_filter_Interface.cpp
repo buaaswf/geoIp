@@ -2115,12 +2115,14 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 			{
 				outdata[index] = ret->get(k, i, j);
 				index ++;
+				datatp[index] = outdata[index];
 			}
 		}
 	}
 	cout << countvar <<endl;
-	delete res;
-	res = new Raw (src->getXsize(),src->getZsize(),src->getYsize(),outdata);
+	//delete res;
+	//res = new Raw (src->getXsize(),src->getZsize(),src->getYsize(),outdata);
+	
 	//memcpy(res->getdata(),outdata,src->size());
 	int coutvarfinal = 0;
 

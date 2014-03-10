@@ -19,7 +19,7 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =1000; 
+	int l = 281, m = 481, n =100; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -100,6 +100,7 @@ Raw * testinterface1(Process &src)
 }
 void testprocess()
 {
+
 	int l = 281, m = 481,total =3, n = 3;
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
@@ -224,7 +225,9 @@ int main(int argc, char* argv[])
 {
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	//testRaw2D();
-
+	int a=2;
+	a*=2+3;
+	cout <<a<<endl;
 	//_CrtSetBreakAlloc(520);
 	testinterface();
 	
