@@ -77,15 +77,15 @@ void puregauss(Raw *temp,int rs,Raw *src,Raw *ret,int halfsize,int sum,int globa
 void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (*ProgressChanged)(int,int ,int,bool&))
 {
 	
-	globalProgressChanged = src->size();
+	//globalProgressChanged = src->size();
 	bool flag = false;
 	int rs = 0 ;
-	if (  ProgressChanged != NULL )
-	{
-		ProgressChanged (0, 100,0,flag);
-	}
-	progressStep =0;
-	ProgressChanged = ProgressChanged;
+	//if (  ProgressChanged != NULL )
+	//{
+	//	ProgressChanged (0, 100,0,flag);
+	//}
+	//progressStep =0;
+	//ProgressChanged = ProgressChanged;
 
 	int i=0,j=0,k=0,m=0,n=0,l=0,width=0,depth=0,length=0;
 	float sum = 0;
@@ -120,14 +120,14 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 			{
 				for (k =0; k < width; k++)
 				{
-					rs++;
-					if ( rs == interval && ProgressChanged != NULL )
-					{
-						rs = 0;
-						progressStep += interval;
-						ProgressChanged (1, 100, (long long)( progressStep)*100/(globalProgressChanged + 
-							(src->getZsize()/ret->getZsize()-1)*halfsize*2*ret->getXsize() * ret->getYsize()),flag);
-					}
+					//rs++;
+					//if ( rs == interval && ProgressChanged != NULL )
+					//{
+					//	rs = 0;
+					//	progressStep += interval;
+					//	ProgressChanged (1, 100, (long long)( progressStep)*100/(globalProgressChanged + 
+					//		(src->getZsize()/ret->getZsize()-1)*halfsize*2*ret->getXsize() * ret->getYsize()),flag);
+					//}
 
 					sum=0;
 					float weight=0, total=0;
@@ -198,14 +198,15 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 				{
 					for (k =0; k < width; k++)
 					{
-						rs++;
-						if ( rs == interval && ProgressChanged != NULL )
-						{
-							rs = 0;
-							progressStep += interval;
-							ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged + 
-								(src->getZsize()/ret->getZsize()-1)*halfsize*2*ret->getXsize() * ret->getYsize()),flag);
-						}
+							//delete for qt gui 20140307
+						//rs++;
+						//if ( rs == interval && ProgressChanged != NULL )
+						//{
+						//	rs = 0;
+						//	progressStep += interval;
+						//	ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged + 
+						//		(src->getZsize()/ret->getZsize()-1)*halfsize*2*ret->getXsize() * ret->getYsize()),flag);
+						//}
 
 						sum=0;
 						float weight=0, total=0;
@@ -273,14 +274,15 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 				{
 					for (k =0; k < width; k++)
 					{
-						rs++;
-						if ( rs == interval && ProgressChanged != NULL )
-						{
-							rs = 0;
-							progressStep += interval;
-							ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged + 
-								(src->getZsize()/ret->getZsize()-1)*halfsize*2*ret->getXsize() * ret->getYsize()),flag);
-						}
+						//delete for qt gui
+						//rs++;
+						//if ( rs == interval && ProgressChanged != NULL )
+						//{
+						//	rs = 0;
+						//	progressStep += interval;
+						//	ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged + 
+						//		(src->getZsize()/ret->getZsize()-1)*halfsize*2*ret->getXsize() * ret->getYsize()),flag);
+						//}
 
 						sum=0;
 						float weight=0, total=0;

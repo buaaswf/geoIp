@@ -689,29 +689,29 @@ bool doTrilateralFilterFileMode(void **srco,int width,int height ,int count,void
  }
  bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para)
  {
+	 
+	 Raw *indata=(Raw *)ImageVolume2Raw(src);
+	 Raw *outdata=(Raw *)ImageVolume2Raw(ret);
+	 OTSU *test =new OTSU();
+	 if (para.method==1)
+	 {
+		 test->Otsu_MultiVal(*indata,para.classnum);
+		 test->Output(*indata,*outdata);
+	 } 
+	 else
+	 {
+		 test->Otsu_MultiVal(*indata);
+		 test->Output(*indata,*outdata);
 
-		Raw *indata=(Raw *)ImageVolume2Raw(src);
-		Raw *outdata=(Raw *)ImageVolume2Raw(ret);
-		OTSU *test =new OTSU();
-		if (para.method==1)
-		{
-			test->Otsu_MultiVal(*indata,para.classnum);
-			test->Output(*indata,*outdata);
-		} 
-		else
-		{
-			test->Otsu_MultiVal(*indata);
-			test->Output(*indata,*outdata);
+	 }
 
-		}
-
-		ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
-		memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
-		delete test;
-		delete indata;
-		delete outdata;
-		delete res;
-		return true;
+	 ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
+	 memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
+	 delete test;
+	 delete indata;
+	 delete outdata;
+	 delete res;
+	 return true;
 
 
 
@@ -2240,7 +2240,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 	int zleft  = src->Depth % tastnum;
 	ImageVolume *ret;
 	int k=0;
-	i==0?k=0:k=1;
+	i == 0? k = 0 : k = 1;
 	switch (src->PixelType)
 	{
 	case 1:
@@ -2319,8 +2319,8 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 	{
 		bool flag = false;
 		globalProgressChanged = src->GetLength();//*this->delt;
-		ImageVolume * newsrc= dividetask(i,tasknum,src);
-		ImageVolume * newret= dividetask(i,tasknum,ret);
+		ImageVolume *newsrc = dividetask(i,tasknum,src);
+		ImageVolume *newret = dividetask(i,tasknum,ret);
 		//progress=ProgressChanged;
 		if (para.method==1)
 		{
@@ -2350,6 +2350,7 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
 			break;
 		}
+
 
 		if (  ProgressChanged != NULL )
 		{
@@ -2387,12 +2388,12 @@ bool  doBilateralproqt(ImageVolume * src, ImageVolume *ret,BilateralFilterI &par
 				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
-			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(unsigned short*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 3:
-			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((float *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(float*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		}
 
@@ -2419,7 +2420,15 @@ bool  doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para ,int t
 		ImageVolume * newsrc= dividetask(i,tasknum,src);
 		ImageVolume * newret= dividetask(i,tasknum,ret);
 		//progress=ProgressChanged;
-		doGuassFilterIY(newsrc,newret,para);
+		if (src->Height<znew)
+		{
+			doGuassFilterI(newsrc,newret,para);
+		} 
+		else
+		{
+			doGuassFilterIY(newsrc,newret,para);
+		}
+		
 		int k=0;
 		(i==0||i==tasknum-1 )?k=1:k=2;
 		int newdatacur= 0;
@@ -2431,12 +2440,12 @@ bool  doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para ,int t
 				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
-			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(unsigned short*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 3:
-			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((float *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(float *)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		}
 
@@ -2488,12 +2497,12 @@ bool  doTrilateralproqt(ImageVolume * src, ImageVolume *ret,TrilateralfilterI &p
 				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
-			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(unsigned short*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 3:
-			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((float *)ret->Data+i*newret->Width*newret->Height*znew,				
+				(float*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		}
 

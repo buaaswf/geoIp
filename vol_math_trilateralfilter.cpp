@@ -12,7 +12,7 @@ Trilateralfilter::Trilateralfilter(Raw* img,Raw * ret, int iter,void(*ProgressCh
 	this->src = img;
 	this->ret = ret;
 	this->iter = iter;
-	this->ProgressChanged=ProgressChanged;
+	this->ProgressChanged=NULL;
 	//if ()
 	//{
 	//} 

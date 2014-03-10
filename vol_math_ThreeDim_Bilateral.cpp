@@ -10,7 +10,7 @@ ThreeDim_Bilateral::ThreeDim_Bilateral(Raw *image,Raw &ret,double sigmaD, double
 	this->src=image;
 	this->ret = &ret;
 	int sigmaMax = max(sigmaD, sigmaR);
-	this->ProgressChanged = ProgressChanged;
+	this->ProgressChanged = NULL;
 
 
 

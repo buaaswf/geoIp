@@ -19,7 +19,7 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =3; 
+	int l = 281, m = 481, n =100; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -61,14 +61,20 @@ ImageVolume * testinterface()
 	//BilateralFilterI bil(3,3,10);
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
-	//doAnistropicI(src,ret,anis);
-	//GuassFilterI gs(3,15);
-	//doGaussproqt(src,ret,gs,6,p);
-	WaterShedsI &water=WaterShedsI();
-	doWaterShedsI(src,ret,water);
+	//AnistropicI ani(3,30,1,3);
+	//doAnistropicIYproqt(src,ret,ani,6,p);
+	//TrilateralfilterI tri(3,3);
+	//doTrilateralproqt(src,ret,tri,6,p);
+	//BilateralFilterI bia(1,1,2);
+	//doBilateralproqt(src,ret,bia,3,p);
+	GuassFilterI gs(3,3);
+	doGaussproqt(src,ret,gs,20,p);
+	//WaterShedsI &water=WaterShedsI();
+	//doWaterShedsI(src,ret,water);
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);
 	test.writeImagesesmicarray(ret->Data ,ret->Width,ret->Height,ret->Depth);
+	delete outdata;
 	return ret;
 	
 
