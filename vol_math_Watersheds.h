@@ -48,10 +48,10 @@ void Watershed_2D_test(unsigned char **OriginalImage, char** SeedImage, int **La
                     col             --图像列数
 返回值说明：        无        
 ====================================================================*/
-void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classnum);
+void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classnum,void (*progresschanged)(int,int,int,bool &));
 void Watersheds( Raw &OriginalImage, Raw &LabelImage);
 void Gradient( Raw &src,Raw &dest);//三维求梯度 
-void WatershedsProcess(Raw &OriginalImage);//test watersheds
+void WatershedsProcess(Raw &OriginalImage,void (*progresschanged)(int,int,int,bool &));//test watersheds
 
 //void Watersheds(const Raw *OriginalImage, Raw *SeedImage, Raw *LabelImage);
 //void Watersheds(const Raw *OriginalImage, Raw *LabelImage);

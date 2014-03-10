@@ -208,6 +208,7 @@ int OTSU::Otsu(Raw &image){
     return t;
 }
 void OTSU::Otsu_MultiVal(Raw &image,int t_number){
+	
 	struct Point_3 *ss=new struct Point_3 [t_number];
     double s=0.0,M_s=0.0;//类间方差
 	double u1;//前景的平均灰度
@@ -249,8 +250,18 @@ void OTSU::Otsu_MultiVal(Raw &image,int t_number){
 	for(i=0;i<t_number;i++){//对方差赋初值零
 		(ss+i)->s=0;
 	}
+	int total =t_number;
+	bool flag=false;
 	arrays.clear();//清零
 	do{//多阈值OTSU分割算法
+		//==========================
+		// 
+		if (  ProgressChanged != NULL )
+		{
+			ProgressChanged (0,1,(total-l+1)*100/total,flag);
+		}
+
+
 		//单阈值Otsu算法步骤
 		t=Otsu(image,Min_pix,Max_pix);//计算出分割阈值t
 		//cout<<"t="<<t<<endl;

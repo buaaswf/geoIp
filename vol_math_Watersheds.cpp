@@ -448,12 +448,12 @@ void WatershedsProcess(Raw2D &OriginalImage){
 	delete classnum;
 	classnum = NULL;
 }
-void WatershedIterface(Raw2D *src,Raw2D *ret)
-{
-	//delete ret;
-	memcpy(ret->getdata(),src->getdata(),src->getXsize()*src->getYsize());
-	WatershedsProcess(*ret);
-}
+//void WatershedIterface(Raw2D *src,Raw2D *ret)
+//{
+//	//delete ret;
+//	memcpy(ret->getdata(),src->getdata(),src->getXsize()*src->getYsize());
+//	WatershedsProcess(*ret);
+//}
 void Watersheds( Raw2D *OriginalImage, Raw2D *SeedImage, Raw2D *LabelImage){
 	int Num=0;//标记区域标识号，从1开始
 	vector<int*> SeedCounts;//保存每个队列种子个数的数组
@@ -810,7 +810,7 @@ col             --图像列数
 返回值说明：        无        
 ====================================================================*/
 
-void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classnum){
+void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classnum,void (*progresschanged)(int,int,int,bool &)){
 	int Num=0;//标记区域标识号，从1开始
 	vector<int*> SeedCounts;//保存每个队列种子个数的数组
 	queue<POINT3D> quetem;//临时种子队列
@@ -1289,7 +1289,13 @@ void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classn
 	//}
 	//cout<<"非水盆地的点数:"<<seednum<<endl;
 	//淹没过程开始，水位从零开始上升，水位对应灰度级，采用六连通法
+	bool flag=false;
 	for(WaterLevel=0;WaterLevel<256;WaterLevel++){//第二维。。。
+		//========================================
+		if (  progresschanged != NULL )
+		{
+			progresschanged (0,1,WaterLevel*100/255,flag);
+		}
 		actives = true;//在某一水位处，所有标记的种子生长完的标志 
 		while(actives){//所有的区域生长完全
 			actives = false;
@@ -1475,7 +1481,7 @@ void Gradient( Raw &src,Raw &dest){
 		}
 	}
 }
-void WatershedsProcess(Raw &OriginalImage){
+void WatershedsProcess(Raw &OriginalImage,void (*progresschanged)(int,int,int,bool &)){
 	if(OriginalImage.getdata() == NULL) return ;
 	int number=0;
 	PIXTYPE val,Minval = 255.0,Maxval = 0.0;
@@ -1520,7 +1526,7 @@ void WatershedsProcess(Raw &OriginalImage){
 	}
 	cout<<"标记点的个数："<<number<<endl;
 	//watersheds
-	Watersheds(raw1,raw2,OriginalImage,classnumber);
+	Watersheds(raw1,raw2,OriginalImage,classnumber,progresschanged);
 	number=*classnumber;
 	cout<<number<<endl;
 	for (m=0;m<size;m++){

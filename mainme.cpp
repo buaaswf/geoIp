@@ -19,7 +19,7 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =100; 
+	int l = 281, m = 481, n =2; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -45,7 +45,8 @@ ImageVolume * testinterface()
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
 	//AnistropicI anis(2,30,1,4);
 	//doAnistropicIYproqt(src,ret,anis,6,p);
-	
+	//MultiOstuI mul(1,3);
+	//doMultiOstuI(src,ret,mul,p);
 	//AnistropicI anis(2,30,1,4);
 	//doAnistropicIY(src,ret,anis);
 	// trilateral 20140211============
@@ -67,10 +68,10 @@ ImageVolume * testinterface()
 	//doTrilateralproqt(src,ret,tri,6,p);
 	//BilateralFilterI bia(1,1,2);
 	//doBilateralproqt(src,ret,bia,3,p);
-	GuassFilterI gs(3,3);
-	doGaussproqt(src,ret,gs,20,p);
-	//WaterShedsI &water=WaterShedsI();
-	//doWaterShedsI(src,ret,water);
+	//GuassFilterI gs(3,3);
+	//doGaussproqt(src,ret,gs,20,p);
+	WaterShedsI &water=WaterShedsI();
+	doWaterShedsI(src,ret,water,p);
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);
 	test.writeImagesesmicarray(ret->Data ,ret->Width,ret->Height,ret->Depth);
@@ -225,9 +226,7 @@ int main(int argc, char* argv[])
 {
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	//testRaw2D();
-	int a=2;
-	a*=2+3;
-	cout <<a<<endl;
+
 	//_CrtSetBreakAlloc(520);
 	testinterface();
 	

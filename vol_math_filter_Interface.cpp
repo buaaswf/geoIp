@@ -514,10 +514,10 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 	 return true;
 
 }
-bool doWaterShedsI(ImageVolume *src,ImageVolume *ret,WaterShedsI &para)
+bool doWaterShedsI(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void (*progresschanged)(int,int,int,bool &))
 {
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
-	WatershedsProcess(*indata);
+	WatershedsProcess(*indata,progresschanged);
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*indata,ret->PixelType);
 	memcpy(ret->Data,res->Data,indata->size()*sizeof(unsigned char));
 	delete res;
@@ -716,7 +716,39 @@ bool doTrilateralFilterFileMode(void **srco,int width,int height ,int count,void
 
 
  }
+ bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,void(*ProgressChanged)(int,int,int,bool &))
+ {
 
+	 Raw *indata=(Raw *)ImageVolume2Raw(src);
+	 Raw *outdata=(Raw *)ImageVolume2Raw(ret);
+	 OTSU *test =new OTSU();
+	 if (para.method==1)
+	 {
+		 test->ProgressChanged=ProgressChanged;
+		 test->Otsu_MultiVal(*indata,para.classnum);
+		 test->Output(*indata,*outdata);
+	 } 
+	 else
+	 {
+		 test->Otsu_MultiVal(*indata);
+		 test->Output(*indata,*outdata);
+
+	 }
+	 //if (  ProgressChanged != NULL )
+	 //{
+		// ProgressChanged (0,1,(i+1)*100/tasknum,flag);
+	 //}
+	 ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
+	 memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
+	 delete test;
+	 delete indata;
+	 delete outdata;
+	 delete res;
+	 return true;
+
+
+
+ }
  void *doAnistropicI2D (Image2D &src,AnistropicI & para)
 {
     //qym non-const must be an lvalue
@@ -2210,12 +2242,12 @@ bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para,
 	progress =ProgressChanged;
 	return doBilateralIY(src,ret,para);
 }
-bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,
-	void(*ProgressChanged)(int,int,int,bool &))
-{
-	progress=ProgressChanged;
-	return doMultiOstuI(src,ret,para);
-}
+//bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,
+//	void(*ProgressChanged)(int,int,int,bool &))
+//{
+//	progress=ProgressChanged;
+//	return doMultiOstuI(src,ret,para);
+//}
 //bool doWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,
 //	void(*ProgressChanged)(int,int,int,bool &))
 //{

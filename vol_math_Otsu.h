@@ -31,6 +31,7 @@ struct Points{
 //定义一个类OTSU
 class OTSU{
 public:
+	void(*ProgressChanged)(int,int,int,bool &);//progress function pointer
 	Raw2D image_2D;//二维数据
 	Raw image;//三维数据
 	vector<unsigned char>arrays;//储存阈值
@@ -43,7 +44,7 @@ public:
 	//三维构造函数
 	OTSU(Raw newImage);
 	OTSU(Raw newImage,int newT_number);
-
+	
 	//成员函数：赋值
 	//二维成员函数
 	void setData(Raw2D newImage);
