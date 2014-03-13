@@ -204,6 +204,11 @@ struct WaterShedsI
 {
 	int smoothszie;
 	int threshold;
+	WaterShedsI(int smoothszie,int threshold)
+	{
+		this->smoothszie=smoothszie;
+		this->threshold=threshold;
+	}
 	WaterShedsI()
 	{
 

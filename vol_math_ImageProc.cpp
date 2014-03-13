@@ -195,7 +195,50 @@ void MinValue(Raw2D &image){
 }
 //three Dimensions
 //gray image smooth function
-void Smooth3D(Raw &image,int type){
+void Smooth3D_7(Raw &image,int type){
+	int i,j,k,l,m,n,x,y,z;
+	long long col,row,height;
+	PIXTYPE value;
+	row=image.getYsize();
+	col=image.getXsize();
+	height=image.getZsize();
+	switch(type){
+	case 0:{
+		for(k=0;k<height;k++){
+			for(i=0;i<row;i++){
+				for(j=0;j<col;j++){	
+					value=0.0;
+					for(l=-1;l<2;l++){
+						z=k+l;
+						z=z<0?0:z;
+						z=z>(height-1)?(height-1):z;	
+						for(m=-1;m<2;m++){
+							y=m+i; 
+							y=y<0?0:y;
+							y=y>(row-1)?(row-1):y;
+							for(n=-1;n<2;n++){
+								x=n+j;
+								x=x<0?0:x;
+								x=x>(col-1)?(col-1):x;
+								if((z==k && y==i) || (z==k && x==j) ||(y==i && x==j))
+								value+=image.get(x,y,z);
+							}
+						}
+					}
+					image.put(j,i,k,value/27);
+				}
+			}
+		}       
+		break;
+    }
+	case 1:break;//扩展高斯滤波
+	case 2:break;//中值滤波
+	case 3:break; //对每个象素param1×param2邻域 求和并做尺度变换 
+	case 4:break;//双向滤波
+	case 5:break;//其它
+	}
+}
+void Smooth3D_27(Raw &image,int type){
 	int i,j,k,l,m,n,x,y,z;
 	long long col,row,height;
 	PIXTYPE value;
@@ -224,7 +267,6 @@ void Smooth3D(Raw &image,int type){
 							}
 						}
 					}
-					if((z==k && y==i) || (z==k && x==j) ||(y==i && x==j))
 					image.put(j,i,k,value/27);
 				}
 			}
@@ -342,7 +384,11 @@ void NoiseProcess(Raw &image){
 	}  
 }
 //Extremum value
-void MaxValue(Raw &image){//极大值函数
+void MaxValue(Raw &image,int smoothsize,int threshold){//极大值函数
+	if(threshold>255) {
+		cout<<"The threshold is too big"<<endl;
+		return ;
+	}
 	int i,j,k,l,m,n,x,y,z;
 	long long row,col,height;
 	bool Is_Biger;//查找到更大的标记
@@ -351,12 +397,13 @@ void MaxValue(Raw &image){//极大值函数
 	row=image.getYsize();
 	height=image.getZsize();
 	//图像平滑
-	//Smooth3D(temp,CV_BLUR_NO_SCALE);
+	if(1 == smoothsize) Smooth3D_7(temp,CV_BLUR_NO_SCALE);
+	else  Smooth3D_27(temp,CV_BLUR_NO_SCALE);
 	//查找最大值并二值化
 	for(k=0;k<height;k++){	
 		for(i=0;i<row;i++){	
 			for(j=0;j<col;j++){	
-				if(temp.get(j,i,k)>50){
+				if(temp.get(j,i,k)>threshold){//50
 					Is_Biger=false;
 					for(m=-1;m<2;m++){	
 						y=m+i; 
@@ -382,7 +429,11 @@ void MaxValue(Raw &image){//极大值函数
 	} 
 	NoiseProcess(image);//噪音处理
 }
-void MinValue(Raw &image){//极小值函数
+void MinValue(Raw &image,int smoothsize,int threshold){//极小值函数
+	if(threshold<0) {
+		cout<<"The threshold is too small"<<endl;
+		return ;
+	}
 	int i,j,k,l,m,n,x,y,z;
 	long long row,col,height;
 	bool Is_Smaller;//查找到更小的标记
@@ -391,12 +442,13 @@ void MinValue(Raw &image){//极小值函数
 	row=image.getYsize();
 	height=image.getZsize();
 	//图像平滑
-	Smooth3D(temp,CV_BLUR_NO_SCALE);
+	if(1 == smoothsize) Smooth3D_7(temp,CV_BLUR_NO_SCALE);
+	else  Smooth3D_27(temp,CV_BLUR_NO_SCALE);
 	//查找最大值并二值化
 	for(k=0;k<height;k++){	
 		for(i=0;i<row;i++){	
 			for(j=0;j<col;j++){	
-				if(temp.get(j,i,k)<200){
+				if(temp.get(j,i,k)<threshold){//200
 					Is_Smaller=false;
 					for(m=-1;m<2;m++){	
 						y=m+i; 

@@ -29,12 +29,13 @@ void MinValue(Raw2D &image);//极小值函数
 
 //three Dimensions
 //gray image smooth function
-void Smooth3D(Raw &image,int type);
+void Smooth3D_7(Raw &image,int type);
+void Smooth3D_27(Raw &image,int type);
 void Smooth3D(Raw *image,int type);
 //Noise process gray image
 void NoiseProcess(Raw &image);
 //Extremum value
-void MaxValue(Raw &image);//极大值函数
-void MinValue(Raw &image);//极小值函数
+void MaxValue(Raw &image,int smoothsize,int threshold);//极大值函数
+void MinValue(Raw &image,int smoothsize,int threshold);//极小值函数
 
 #endif

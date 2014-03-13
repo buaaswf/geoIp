@@ -517,7 +517,8 @@ bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,Trilateralfilter
 bool doWaterShedsI(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void (*progresschanged)(int,int,int,bool &))
 {
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
-	WatershedsProcess(*indata,progresschanged);
+	WatershedsPara p(para.smoothszie,para.threshold);
+	WatershedsProcess(*indata,p,progresschanged);
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*indata,ret->PixelType);
 	memcpy(ret->Data,res->Data,indata->size()*sizeof(unsigned char));
 	delete res;

@@ -9,6 +9,16 @@ void Zero(int *p,int number);//¹éÁã
 void Zero_2D(int **p,int row,int col);//¹éÁã
 void Zero_3D(int ***p,int row,int col,int height);//¹éÁã
 
+//define one struct
+struct WatershedsPara{
+	int smoothsizes;
+	int threshold;
+	WatershedsPara(){}
+	WatershedsPara(int sizes,int value){
+		this->smoothsizes = sizes;
+		this->threshold =value;
+	}
+};
 //two Dimensions
 /*====================================================================
 º¯ÊýÃû£º            Watershed
@@ -52,7 +62,7 @@ void Watershed_2D_test(unsigned char **OriginalImage, char** SeedImage, int **La
 void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classnum,void (*progresschanged)(int,int,int,bool &));
 void Watersheds( Raw &OriginalImage, Raw &LabelImage);
 void Gradient( Raw &src,Raw &dest);//ÈýÎ¬ÇóÌÝ¶È 
-void WatershedsProcess(Raw &OriginalImage,void (*progresschanged)(int,int,int,bool &));//test watersheds
+void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progresschanged)(int,int,int,bool &));//test watersheds
 
 //void Watersheds(const Raw *OriginalImage, Raw *SeedImage, Raw *LabelImage);
 //void Watersheds(const Raw *OriginalImage, Raw *LabelImage);

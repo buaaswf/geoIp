@@ -1487,7 +1487,7 @@ void Gradient( Raw &src,Raw &dest){
 		}
 	}
 }
-void WatershedsProcess(Raw &OriginalImage,void (*progresschanged)(int,int,int,bool &)){
+void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progresschanged)(int,int,int,bool &)){
 	if(OriginalImage.getdata() == NULL) return ;
 	int number=0;
 	PIXTYPE val,Minval = 255.0,Maxval = 0.0;
@@ -1517,7 +1517,7 @@ void WatershedsProcess(Raw &OriginalImage,void (*progresschanged)(int,int,int,bo
 	Erode_Gray(raw2,OriginalImage,2);//image Erode
 	Morph_reconstuct_Gray(OriginalImage,raw2,strings,2);
 	//Get Max image
-	MaxValue(raw2);
+	MaxValue(raw2,para.smoothsizes,para.threshold);
 	//get seedimage and initialize it
 	for(k=0;k<height;k++){
 		for(i=0;i<row;i++){
