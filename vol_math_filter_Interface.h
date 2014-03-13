@@ -202,7 +202,8 @@ struct MultiOstuI
 };
 struct WaterShedsI
 {
-
+	int smoothszie;
+	int threshold;
 	WaterShedsI()
 	{
 

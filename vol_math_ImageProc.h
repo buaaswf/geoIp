@@ -8,9 +8,9 @@
 #define CV_BLUR  3  //对每个象素param1×param2邻域 求和并做尺度变换 
 #define CV_BILATERAL 4 //双向滤波
 struct POINT3D{
-    int x;//
-	int y;
-	int z;
+    long long  x;//
+	long long  y;
+	long long z;
 };
 typedef struct POINT2D
 {

@@ -4,6 +4,7 @@
 #include"vol_math_Morph_Opera.h"
 #include"vol_math_ImageProc.h"
 
+void Zero(long long *p,long long number);//น้มใ
 void Zero(int *p,int number);//น้มใ
 void Zero_2D(int **p,int row,int col);//น้มใ
 void Zero_3D(int ***p,int row,int col,int height);//น้มใ

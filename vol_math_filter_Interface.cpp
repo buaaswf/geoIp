@@ -2146,8 +2146,10 @@ void  MultiThreadsYptr(int method,int datatype,int threadcount,Raw *src,Raw *res
 			for (int k = 0; k < srcx; k++)
 			{
 				outdata[index] = ret->get(k, i, j);
-				index ++;
+				
 				datatp[index] = outdata[index];
+
+				index ++;
 			}
 		}
 	}
@@ -2282,7 +2284,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 		if(i < tastnum-1 && znewsize != 0)
 		{
 
-			unsigned char *srcdata=(unsigned char*)src->Data + znewsize* i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			unsigned char *srcdata=(unsigned char*)src->Data + (long long )znewsize* i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
 			ret=new ImageVolume(src->Width, src->Height, znewsize + 1 + k,1,srcdata,false);
 
 		}
@@ -2290,7 +2292,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 		{
 			int var=0;//for znew ==0
 			tastnum==1? var=0:var=1;
-			unsigned char *srcdata = (unsigned char*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			unsigned char *srcdata = (unsigned char*)src->Data + (long long)znewsize * i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
 			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + var, 1, srcdata, false);
 
 
@@ -2300,13 +2302,13 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 		if(i < tastnum-1 )
 		{
 
-			unsigned short *srcdata=(unsigned short*)src->Data + (znewsize+2)* i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			unsigned short *srcdata=(unsigned short*)src->Data +(long long) (znewsize+2)* i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
 			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
 
 		}
 		else if(i == tastnum-1)
 		{
-			unsigned short *srcdata = (unsigned short*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			unsigned short *srcdata = (unsigned short*)src->Data + (long long)znewsize * i * (src->Width*src->Height)- (long long)k * (src->Width*src->Height);
 			ret = new ImageVolume(src->Width, src->Height, zleft+znewsize+1, 1, srcdata, false);
 
 
@@ -2316,13 +2318,13 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 		if(i < tastnum-1 )
 		{
 
-			float *srcdata=(float*)src->Data + (znewsize+2)* i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			float *srcdata=(float*)src->Data + (long long)(znewsize+2)* i * (src->Width*src->Height)- (long long)k * (src->Width*src->Height);
 			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
 
 		}
 		else if(i == tastnum-1)
 		{
-			float *srcdata = (float*)src->Data + znewsize * i * (src->Width*src->Height)- k * (src->Width*src->Height);
+			float *srcdata = (float*)src->Data +(long long) znewsize * i * (src->Width*src->Height)- (long long)k * (src->Width*src->Height);
 			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + 1, 1, srcdata, false);
 
 
@@ -2373,16 +2375,16 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 		switch (src->PixelType)
 		{
 		case 1:
-			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data + (long long) newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
-			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,(long long)newret->Width*newret->Height*(newret->Depth-k));
 			break;
 		case 3:
-			memcpy((float *)ret->Data+i*newret->Width*newret->Height*(newret->Depth-2*k),
-				newret->Data,newret->Width*newret->Height*(newret->Depth-k));
+			memcpy((float *)ret->Data + (long long)i*newret->Width*newret->Height*(newret->Depth-2*k),
+				newret->Data,(long long)newret->Width*newret->Height*(newret->Depth-k));
 			break;
 		}
 
@@ -2419,16 +2421,16 @@ bool  doBilateralproqt(ImageVolume * src, ImageVolume *ret,BilateralFilterI &par
 		switch (src->PixelType)
 		{
 		case 1:
-			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data +(long long)newret->Width*newret->Height*newdatacur,(long long) newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
-			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(unsigned short*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(unsigned short*)newret->Data + (long long)newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 3:
-			memcpy((float *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(float*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((float *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(float*)newret->Data + (long long)newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		}
 
@@ -2468,21 +2470,23 @@ bool  doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para ,int t
 		(i==0||i==tasknum-1 )?k=1:k=2;
 		int newdatacur= 0;
 		(i==0||tasknum==1)? newdatacur=0:newdatacur=1;
+		//unsigned char *test=(unsigned char*) newret->Data;
 		switch (src->PixelType)
 		{
 		case 1:
-			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((unsigned char *)ret->Data +(long long)  i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data + (long long)newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
-			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(unsigned short*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(unsigned short*)newret->Data + (long long)newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 3:
-			memcpy((float *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(float *)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((float *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(float *)newret->Data + (long long)newret->Width*newret->Height*newdatacur,(long long) newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		}
+		//unsigned char*test2=(unsigned char*)ret->Data;
 
 		if (  ProgressChanged != NULL )
 		{
@@ -2528,16 +2532,16 @@ bool  doTrilateralproqt(ImageVolume * src, ImageVolume *ret,TrilateralfilterI &p
 		switch (src->PixelType)
 		{
 		case 1:
-			memcpy((unsigned char *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(unsigned char*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data + (long long)newret->Width*newret->Height*newdatacur,(long long) newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 2:
-			memcpy((unsigned short *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(unsigned short*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(unsigned short*)newret->Data + (long long)newret->Width*newret->Height*newdatacur,(long long) newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		case 3:
-			memcpy((float *)ret->Data+i*newret->Width*newret->Height*znew,				
-				(float*)newret->Data +newret->Width*newret->Height*newdatacur, newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			memcpy((float *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(float*)newret->Data + (long long)newret->Width*newret->Height*newdatacur,(long long) newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		}
 

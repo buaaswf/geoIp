@@ -8,6 +8,12 @@
 #include "vol_math_ImageProc.h"
 using namespace std;
 
+void Zero(long long *p,long long number){
+	int i=0;
+	for(;i<number;i++){
+		*(p+i)=0;
+	}
+}
 void Zero(int *p,int number){
 	int i=0;
 	for(;i<number;i++){
@@ -812,7 +818,7 @@ col             --图像列数
 
 void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classnum,void (*progresschanged)(int,int,int,bool &)){
 	int Num=0;//标记区域标识号，从1开始
-	vector<int*> SeedCounts;//保存每个队列种子个数的数组
+	vector<long long *> SeedCounts;//保存每个队列种子个数的数组
 	queue<POINT3D> quetem;//临时种子队列
 	/**================================================================
 	成员函数
@@ -829,12 +835,12 @@ void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classn
 	POINT3D temp;//种子点 
 	bool actives;//在某一水位处，所有标记的种子生长完的标志
 	int WaterLevel;//
-	int* array;//
+	long long* array;//
 	int i,j,k,m,n,x,y,z;
 	long long row,col,height;//定义一些变量
 	bool z_up,z_down,_up,up,up_,_down,down,down_,_right,right,right_,_left,left,left_,_upleft,upleft,upleft_,
 		_upright,upright, upright_,_downleft,downleft,downleft_,_downright,downright,downright_;//27 directions...
-	int seednum;//种子的数目 
+	long long seednum;//种子的数目 
 	int nonzeronum = 0;//标记区域标识号，从最大开始减少直到为零
 	col = OriginalImage.getXsize();
 	row = OriginalImage.getYsize();
@@ -852,7 +858,7 @@ void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classn
 				if(SeedImage.get(j,i,k) == 1){//如果找到一个标记区域  
 					Num++;//区域的标识号加一
 					//分配数组并初始化为零，表示可有256个灰阶
-					array = new int[256];
+					array = new long long[256];
 					Zero(array,256);//归零处理
 					//种子个数数组进vector，每次扫描则生成一个数组，并用区域标识号来做第一维。灰度级做第二维。
 					//表示某个盆地区域中某灰阶所对应的点的数目。

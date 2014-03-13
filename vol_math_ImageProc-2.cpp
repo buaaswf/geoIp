@@ -224,7 +224,6 @@ void Smooth3D(Raw &image,int type){
 							}
 						}
 					}
-					if((z==k && y==i) || (z==k && x==j) ||(y==i && x==j))
 					image.put(j,i,k,value/27);
 				}
 			}
