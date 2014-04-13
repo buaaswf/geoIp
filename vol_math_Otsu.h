@@ -16,6 +16,10 @@ void order(int *p,int n);//数组大小排序：从小到大
  
 int Max_number(struct Point_3 *p,int n);//寻找最大方差
 
+/**
+ \brief	Points.
+ */
+
 struct Points{
 	float x;
 	float y;
@@ -29,6 +33,11 @@ struct Points{
 };
 
 //定义一个类OTSU
+
+/**
+ \brief	Otsu.
+ */
+
 class OTSU{
 public:
 	void(*ProgressChanged)(int,int,int,bool &);//progress function pointer
@@ -47,7 +56,22 @@ public:
 	
 	//成员函数：赋值
 	//二维成员函数
+
+	/**
+	 \brief	Sets a data.
+	
+	 \param	newImage	The new image.
+	 */
+
 	void setData(Raw2D newImage);
+
+	/**
+	 \brief	Sets a data.
+	
+	 \param	newImage   	The new image.
+	 \param	newT_number	The new t number.
+	 */
+
 	void setData(Raw2D newImage,int newT_number);
     //三维成员函数
 	void setData(Raw newImage);

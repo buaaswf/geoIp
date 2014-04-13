@@ -270,8 +270,8 @@ struct Process
 /**
  \brief	Executes the anistropic i operation.
 
- \param [in,out]	src		  	Source for the.
- \param [in,out]	parameter2	The second parameter.
+ \param	src		  	Source for the.
+ \param	parameter2	The second parameter.
 
  \return	null if it fails, else.
  */
@@ -302,11 +302,71 @@ extern void * doAnistropicI (Raw *src, Raw *ret, AnistropicII &);
  */
 
 extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para);
+
+/**
+ \brief	Executes the anistropic i operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 extern bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the trilateralfilter i operation.
+
+ \param [in,out]	parameter1	The first parameter.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doTrilateralfilterI ( ImageVolume &, TrilateralfilterI &);
+
+/**
+ \brief	Executes the anistropic i operation.
+
+ \param [in,out]	parameter1	The first parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void * doAnistropicI (Process &);
+
+/**
+ \brief	Executes the anistropicykfour difference operation.
+
+ \param [in,out]	src		  	Source for the.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doAnistropicykfour_diff(ImageVolume &src,AnistropicI &);
+
+/**
+ \brief	Executes the guass filter i operation.
+
+ \param [in,out]	parameter1	The first parameter.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doGuassFilterI (ImageVolume &, GuassFilterI &);
+
+/**
+ \brief	Executes the guass filter i operation.
+
+ \param [in,out]	parameter1	The first parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doGuassFilterI (Process &);
 /**
  \brief	Executes the anisotropic interface y operation for y direction .
@@ -319,42 +379,481 @@ extern void *doGuassFilterI (Process &);
  */
 
 extern bool  doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para );
+
+/**
+ \brief	Executes the anistropic i yproqt operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	tasknum					   	The tasknum.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 extern bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para,int tasknum,void(*ProgressChanged)(int,int,int,bool &) );
+
+/**
+ \brief	Executes the bilateral i operation.
+
+ \param [in,out]	parameter1	The first parameter.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void * doBilateralI (ImageVolume &, BilateralFilterI &);
+
+/**
+ \brief	Executes the bilateral i operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool  doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
+
+/**
+ \brief	Executes the bilateral iy operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool  doBilateralIY (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para);
+
+/**
+ \brief	Executes the bilateralproqt operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	tasknum					   	The tasknum.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool  doBilateralproqt(ImageVolume * src, ImageVolume *ret,BilateralFilterI &para,int tasknum,void(*ProgressChanged)(int,int,int,bool &) );
+
+/**
+ \brief	Executes the guass filter i operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGuassFilterI (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
+
+/**
+ \brief	Executes the guass filter iy operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para);
+
+/**
+ \brief	Executes the guass filter file mode operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param	width				The width.
+ \param	height				The height.
+ \param	count				Number of.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+ \param	datatype			The datatype.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype);
+
+/**
+ \brief	Executes the gaussproqt operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	tasknum					   	The tasknum.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para,int tasknum,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the anistropic filter file mode operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param	width				The width.
+ \param	height				The height.
+ \param	count				Number of.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+ \param	datatype			The datatype.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype);
+
+/**
+ \brief	Executes the trilateral filter file mode operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param	width				The width.
+ \param	height				The height.
+ \param	count				Number of.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+ \param	datatype			The datatype.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype);
+
+/**
+ \brief	Executes the bilateral filter file mode operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param	width				The width.
+ \param	height				The height.
+ \param	count				Number of.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+ \param	datatype			The datatype.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doBilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,BilateralFilterI &para,int datatype);  
+
+/**
+ \brief	Executes the trilateralfilter i operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doTrilateralfilterI ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
+
+/**
+ \brief	Executes the trilateralproqt operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	tasknum					   	The tasknum.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doTrilateralproqt(ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,int tasknum,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the trilateralfilter iy operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para);
+
+/**
+ \brief	Executes the multi ostu i operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para);
+
+/**
+ \brief	Executes the m water sheds operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doMWaterSheds(ImageVolume *src,ImageVolume *ret,WaterShedsI &para);
+
+/**
+ \brief	Dolow pass i.
+
+ \param [in,out]	src		  	If non-null, source for the.
+ \param [in,out]	ret		  	If non-null, the ret.
+ \param [in,out]	parameter3	The third parameter.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &);
+
+/**
+ \brief	Executes the guass filter file mode operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param	width					   	The width.
+ \param	height					   	The height.
+ \param	count					   	Number of.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	datatype				   	The datatype.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGuassFilterFileMode(void **src,int width,int height ,int count,void * ret,GuassFilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the anistropic filter file mode operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param	width					   	The width.
+ \param	height					   	The height.
+ \param	count					   	Number of.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	datatype				   	The datatype.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doAnistropicFilterFileMode(void **src,int width,int height ,int count,void * ret,AnistropicI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the trilateral filter file mode operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param	width					   	The width.
+ \param	height					   	The height.
+ \param	count					   	Number of.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	datatype				   	The datatype.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doTrilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,TrilateralfilterI &para,int datatype,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the bilateral filter file mode operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param	width					   	The width.
+ \param	height					   	The height.
+ \param	count					   	Number of.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param	datatype				   	The datatype.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doBilateralFilterFileMode(void **src,int width,int height ,int count,void * ret,BilateralFilterI &para,int datatype, void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the anistropic iy operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the guass filter iy operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doGuassFilterIY (ImageVolume * src, ImageVolume *ret,GuassFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
 bool doTrilateralfilterIY ( ImageVolume * src, ImageVolume *ret,TrilateralfilterI &para,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the multi ostu i operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the water sheds i operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param [in,out]	progresschanged	If non-null, the progresschanged.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doWaterShedsI(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void (*progresschanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the water sheds 2 d operation.
+
+ \param [in,out]	src 	If non-null, source for the.
+ \param [in,out]	ret 	If non-null, the ret.
+ \param [in,out]	para	The para.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doWaterSheds2D(Image2D *src,Image2D *ret,WaterShedsI &para);
+
+/**
+ \brief	Executes the bilateral i operation.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	para		   	The para.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Dolow pass i.
+
+ \param [in,out]	src			   	If non-null, source for the.
+ \param [in,out]	ret			   	If non-null, the ret.
+ \param [in,out]	parameter3	   	The third parameter.
+ \param [in,out]	ProgressChanged	If non-null, the progress changed.
+
+ \return	true if it succeeds, false if it fails.
+ */
+
 bool dolowPassI (ImageVolume *src,ImageVolume * ret,lowPassI &,void(*ProgressChanged)(int,int,int,bool &));
+
+/**
+ \brief	Executes the anistropic i 2 d operation.
+
+ \param [in,out]	src		  	Source for the.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doAnistropicI2D (Image2D &src,AnistropicI &);
+
+/**
+ \brief	Executes the bilateral i 2 d operation.
+
+ \param [in,out]	parameter1	The first parameter.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doBilateralI2D (Image2D&, BilateralFilterI &);
+
+/**
+ \brief	Executes the guass filter i 2 d operation.
+
+ \param [in,out]	parameter1	The first parameter.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doGuassFilterI2D (Image2D &, GuassFilterI &);
+
+/**
+ \brief	Executes the trilateralfilter i 2 d operation.
+
+ \param [in,out]	parameter1	The first parameter.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doTrilateralfilterI2D ( Image2D &, TrilateralfilterI &);
+
+/**
+ \brief	Executes the multi ostu i 2 d operation.
+
+ \param [in,out]	src		  	Source for the.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *doMultiOstuI2D (Image2D &src,MultiOstuI &);
+
+/**
+ \brief	Dolow pass i 2 d.
+
+ \param [in,out]	src		  	Source for the.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
 extern void *dolowPassI2D (Image2D &src,lowPassI &);
+
+/**
+ \brief	Executes the multi ostu i operation.
+
+ \param [in,out]	src		  	Source for the.
+ \param [in,out]	parameter2	The second parameter.
+
+ \return	null if it fails, else.
+ */
+
+
 extern void *doMultiOstuI (Image2D &src,MultiOstuI &);
 //extern void *domultiThread (int medthod,int threadcount);
 /*

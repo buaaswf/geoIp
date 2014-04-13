@@ -47,6 +47,8 @@ bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 	Raw *outdata=(Raw *)ImageVolume2Raw(ret);
 	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
 	//	return ret;
+	if (para.method==2) para.threadcount=1;
+
 	MultiThreadptr(2,src->PixelType,para.threadcount,indata,outdata,(void *)&para);
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
@@ -1481,6 +1483,11 @@ void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,v
 			break;
 		case 2:
 			{
+				AnistropicI *p = (AnistropicI*)para;
+				if (p->method==2) p->threadcount=1;
+
+
+		
 					vector<AnistropicPsipl> parms; 
 					parms.resize(threadcount+1);
 					PIXTYPE *data;
@@ -1493,7 +1500,7 @@ void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,v
 							Raw * d= new Raw(src->getXsize(),src->getYsize(),znewsize,data,true);
 							raw.push_back(d);
 							int pret;
-							AnistropicI *p = (AnistropicI*)para;
+							
 							parms[i] = AnistropicPsipl(src,raw[i],i,p->time,p->val,p->method);
 							pthread_attr_t *attr;
 							pret=pthread_create(&threads[i],NULL,singleAnistropicFilterSipl,(void *)&parms[i]);
@@ -2370,14 +2377,15 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 		}
 	
 		int k=0;
-		(i==0||i==tasknum-1 )?k=1:k=2;
+		(i==0 )?k=1:k=2;
+		//i==tasknum-1?k=
 		int newdatacur= 0;
-		(i==0||tasknum==1)? newdatacur=0:newdatacur=1;
+		(i==0||tasknum==1)? newdatacur=0:newdatacur=1; //swf change newdatacur from 1 to 3 for the slice problem.
 		switch (src->PixelType)
 		{
 		case 1:
 			memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
-				(unsigned char*)newret->Data + (long long) newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+				(unsigned char*)newret->Data + (long long) newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - k));
 			break;
 		case 2:
 			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*(newret->Depth-2*k),
