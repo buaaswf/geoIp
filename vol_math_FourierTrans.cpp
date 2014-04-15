@@ -45,6 +45,17 @@ FourierFilter3::FourierFilter3(Raw & raw)
 	z = raw.getZsize();
 	int length = x*y*z;
 	buf = new float[length];
+	int m = 0;
+	/*
+	for(int i = 0;i<z;i++){
+        for(int j = 0;j<y;j++){
+            for(int k = 0;k<x;k++){
+                m=i*x*y+x*j+k;
+                buf[m] = raw.getXYZ(m)*pow(-1,(float)(i+j+k))/255.0;
+            }
+        }
+	}*/
+
 	for (int i = 0; i < length; i++)
 	{
 		buf[i] = (float)raw.getXYZ(i)/255.0;
@@ -250,7 +261,7 @@ complex<float>* twoDFFT(const float *srcimg, int width, int height)
 		for(size_t m = 0;m<w;m++){
 			fourier[i*w+m] = hfourier[m];
 		}
-		delete hfourier;
+		delete [] hfourier;//[]
 	}
 	/*二维垂直方向*/
 	for(size_t ii = 0;ii<w;ii++){
@@ -261,7 +272,7 @@ complex<float>* twoDFFT(const float *srcimg, int width, int height)
 		for(size_t mm = 0;mm < h;mm++){
 			fourier[mm*w +ii] = vfourier[mm];
 		}
-		delete vfourier;
+		delete [] vfourier;//[]
 	}
 	delete hdirection;
 	delete vdirection;
@@ -291,7 +302,7 @@ complex<float>* twoDIFFT(const complex<float> *fourier,int width,int height)
 		for(size_t mm = 0;mm<width;mm++){
 			ifourier[ii*width+mm] = hifour[mm];
 		}
-		delete hifour;
+		delete [] hifour;//[]
 	}
 	for(size_t i = 0;i<width;i++){
 		for(size_t j = 0;j<height;j++){
@@ -301,7 +312,7 @@ complex<float>* twoDIFFT(const complex<float> *fourier,int width,int height)
 		for(size_t m = 0;m<height;m++){
 			ifourier[m*width+i] = vifour[m];
 		}
-		delete vifour;
+		delete [] vifour;//[]
 	}
 	delete hdirection;
 	delete vdirection;
@@ -353,9 +364,9 @@ complex<float>* threeDFFT(const float* src,int width,int height,int depth,void (
 				threed_fourier[i*p_width*p_height+x*p_width+y] = oneplane[x*p_width+y];
 			}
 		}
+		delete [] oneplane;//++++++++++++++++++++++++++++
 	}
 
-	delete [] oneplane;
 	complex<float> *z_fourier;
 	complex<float> *z_direct_extra = new complex<float>[p_depth];
 	//int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diygieshi0 houmianshi 1
@@ -370,9 +381,11 @@ complex<float>* threeDFFT(const float* src,int width,int height,int depth,void (
 			for(size_t z2 = 0;z2<p_depth;z2++){
 				threed_fourier[z2*p_width*p_height+x*p_width+y] = z_fourier[z2];
 			}
+			delete [] z_fourier;//++++++++++++++++++++++++++++++
 		}
 	}
-
+	delete [] pad_plane;
+    delete [] z_direct_extra;
 	return threed_fourier;
 }
 
@@ -404,8 +417,9 @@ complex<float>* threeDIFFT(const complex<float>* src,int p_width,int p_height,in
 				threed_fourier[i*p_width*p_height+x*p_width+y] = oneplane[x*p_width+y];
 			}
 		}
+		delete [] oneplane;//+++++++++++++++++++++++++++
 	}
-	delete [] oneplane;
+//	delete [] oneplane;
 	complex<float> *z_fourier;
 	complex<float> *z_direct_extra = new complex<float>[p_depth];
 	for(size_t x = 0;x<p_height;x++){
@@ -417,8 +431,10 @@ complex<float>* threeDIFFT(const complex<float>* src,int p_width,int p_height,in
 			for(size_t z2 = 0;z2<p_depth;z2++){
 				threed_fourier[z2*p_width*p_height+x*p_width+y] = z_fourier[z2];
 			}
+			delete [] z_fourier;//++++++++++++++++++++++++++++++
 		}
 	}
+	delete [] z_direct_extra;
 	float total = p_width*p_height*p_depth;
 	return threed_fourier;
 }
@@ -465,16 +481,22 @@ void FourierFilter3::low_Pass3(complex<float>*src,int width,int height,int depth
 	int orgy = height/2;
 	int orgz = depth/2;
 	float distance = 0;
+	thresold = thresold*thresold*thresold;
 	for(int i = 0;i<depth;i++)
 	{
 		for(int j = 0;j<height;j++)
 		{
 			for(int k = 0;k<width;k++)
 			{
+			/*
 				distance = sqrt(pow(abs((int)(i-orgz)),2.0f)+pow(abs((int)(j-orgy)),2.0f)+pow(abs((int)(k-orgx)),2.0f));
 				if(distance > thresold){
 					src[i*width*height+j*width+k] = 0.0f;
 				}
+            */
+                if(i*j*z > thresold){
+                    src[i*width*height+j*width+k] = 0.0f;
+                }
 			}
 		}
 	}
@@ -513,6 +535,8 @@ void FourierFilter3::lowpass_trans(double thresold,void (*ProgressChanged)(int ,
 	low_Pass3(tmp, p_width, p_height, p_depth, thresold);
 	complex<float> * tmpI = threeDIFFT(tmp, p_width, p_height, p_depth,ProgressChanged);
 	float* charbuf = new float[x*y*z];
+	long len = x*y*z;
+//	float max = 0;
 	for (int i = 0; i < z; i++){
 		for (int j = 0; j < y;j++)
 		{
@@ -523,10 +547,22 @@ void FourierFilter3::lowpass_trans(double thresold,void (*ProgressChanged)(int ,
 		//		    cout<<"***************"<<endl;
                     c = 0.0;
 				}
-                charbuf[i*y*x + j*x+ k] = c*255.0f;
+				c=c*255.0f;
+				/*
+                if(max < c){
+                    max = c;
+				}*/
+                charbuf[i*y*x + j*x+ k] = c;
 			}
 		}
 	}
+/*	float gap = 255 - max;
+	for(int i = 0;i<len;i++){
+        charbuf[i]+=gap;
+        if(charbuf[i]>255){
+            charbuf[i] = 255;
+        }
+	}*/
 	fraw = new Raw(x, y, z,charbuf);
 	delete [] charbuf;
 	delete [] tmp;

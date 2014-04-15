@@ -2293,7 +2293,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 		{
 
 			unsigned char *srcdata=(unsigned char*)src->Data + (long long )znewsize* i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
-			ret=new ImageVolume(src->Width, src->Height, znewsize + 1 + k,1,srcdata,false);
+			ret=new ImageVolume(src->Width, src->Height, znewsize + 1 + k,1,srcdata,true);
 
 		}
 		else if(i == tastnum-1||znewsize == 0)
@@ -2301,7 +2301,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 			int var=0;//for znew ==0
 			tastnum==1? var=0:var=1;
 			unsigned char *srcdata = (unsigned char*)src->Data + (long long)znewsize * i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
-			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + var, 1, srcdata, false);
+			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + var, 1, srcdata, true);
 
 
 		}
@@ -2386,6 +2386,11 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 		case 1:
 			memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
 				(unsigned char*)newret->Data + (long long) newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - k));
+			if (i==tasknum-1)
+			{
+				memcpy((unsigned char *)ret->Data + (long long)ret->GetLength()-ret->Width*ret->Height,				
+					(unsigned char*)newret->Data + (long long) newret->GetLength()-ret->Width*ret->Height, (long long)newret->Width * newret->Height );
+			}
 			break;
 		case 2:
 			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*(newret->Depth-2*k),
@@ -2397,6 +2402,8 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 			break;
 		}
 
+		delete newret;
+		delete newsrc;
 
 		if (  ProgressChanged != NULL )
 		{
@@ -2442,7 +2449,8 @@ bool  doBilateralproqt(ImageVolume * src, ImageVolume *ret,BilateralFilterI &par
 				(float*)newret->Data + (long long)newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
 			break;
 		}
-
+		delete newsrc;
+		delete newret;
 		if (  ProgressChanged != NULL )
 		{
 			ProgressChanged (0,1,(i+1)*100/tasknum,flag);
