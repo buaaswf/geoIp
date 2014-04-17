@@ -767,11 +767,11 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 							posDiff=(PIXTYPE) (m*m+n*n+l*l); 
 							//Compute the weight for the domain filter (domainWeight). The domain filter
 							//is a Gaussian low pass filter
-							domainWeight = (float) pow(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC)));
+							domainWeight = (float) powf(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC)));
 							if( (i+m) >= 0 && (i+m) < imax && (j+n) >=0 && (j+n) < jmax && (k+l) >= 0 && (k+l) < kmax ) {
-								g1 = (float) (pow( float (pX->get(i+m,j+n,k+l)),2.0f) + pow(float(pY->get(i+m,j+n,k+l)),2.0f)+pow(float(pZ->get(i+m,j+n,k+l)),2.0f) );
-								g2 = (float) (pow( float(pX->get(i,j,k)),2.0f) + pow(float(pY->get(i,j,k)),2.0f)+pow(float(pZ->get(i,j,k)),2.0f) );
-								//g3 = (PIXTYPE) (pow( float(pX->get(i,j)),2.0f) + pow(float(pY->get(i,j)),2.0f) );
+								g1 = (float) (powf( float (pX->get(i+m,j+n,k+l)),2.0f) + powf(float(pY->get(i+m,j+n,k+l)),2.0f)+powf(float(pZ->get(i+m,j+n,k+l)),2.0f) );
+								g2 = (float) (powf( float(pX->get(i,j,k)),2.0f) + powf(float(pY->get(i,j,k)),2.0f)+powf(float(pZ->get(i,j,k)),2.0f) );
+								//g3 = (PIXTYPE) (powf( float(pX->get(i,j)),2.0f) + powf(float(pY->get(i,j)),2.0f) );
 								//Compute the gradient difference between a pixel and its neighborhood pixel 
 								gradDiff = (float) (sqrt(double(g1)) - sqrt(double(g2)));
 								//if (gradDiff !=0)
@@ -784,7 +784,7 @@ void Trilateralfilter::BilateralGradientFilter(Raw* pX, Raw* pY,Raw*pZ, Raw* pSm
 								{
 									sigmaR=0.1;
 								}
-								rangeWeight = (float) pow(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR)));	
+								rangeWeight = (float) powf(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR)));	
 								tmpX += pX->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
 								tmpY += pY->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
 								tmpZ += pZ->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
@@ -854,11 +854,11 @@ void Trilateralfilter::BilateralGradientFilterSipl(Raw* pX, Raw* pY,Raw*pZ, Raw*
 							posDiff=(PIXTYPE) (m*m+n*n+l*l); 
 							//Compute the weight for the domain filter (domainWeight). The domain filter
 							//is a Gaussian low pass filter
-							domainWeight = (float) pow(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC)));
+							domainWeight = (float) powf(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC)));
 							if( (i+m) >= 0 && (i+m) < imax && (j+n) >=0 && (j+n) < jmax && (k+l) >= 0 && (k+l) < kmax ) {
-								g1 = (float) (pow( float (pX->get(i+m,j+n,k+l)),2.0f) + pow(float(pY->get(i+m,j+n,k+l)),2.0f)+pow(float(pZ->get(i+m,j+n,k+l)),2.0f) );
-								g2 = (float) (pow( float(pX->get(i,j,k)),2.0f) + pow(float(pY->get(i,j,k)),2.0f)+pow(float(pZ->get(i,j,k)),2.0f) );
-								//g3 = (PIXTYPE) (pow( float(pX->get(i,j)),2.0f) + pow(float(pY->get(i,j)),2.0f) );
+								g1 = (float) (powf( float (pX->get(i+m,j+n,k+l)),2.0f) + powf(float(pY->get(i+m,j+n,k+l)),2.0f)+powf(float(pZ->get(i+m,j+n,k+l)),2.0f) );
+								g2 = (float) (powf( float(pX->get(i,j,k)),2.0f) + powf(float(pY->get(i,j,k)),2.0f)+powf(float(pZ->get(i,j,k)),2.0f) );
+								//g3 = (PIXTYPE) (powf( float(pX->get(i,j)),2.0f) + powf(float(pY->get(i,j)),2.0f) );
 								//Compute the gradient difference between a pixel and its neighborhood pixel 
 								gradDiff = (float) (sqrt(double(g1)) - sqrt(double(g2)));
 								//if (gradDiff !=0)
@@ -871,7 +871,7 @@ void Trilateralfilter::BilateralGradientFilterSipl(Raw* pX, Raw* pY,Raw*pZ, Raw*
 								{
 									sigmaR=0.1;
 								}
-								rangeWeight = (float) pow(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR)));	
+								rangeWeight = (float) powf(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR)));	
 								tmpX += pX->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
 								tmpY += pY->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
 								tmpZ += pZ->get(i+m,j+n,k+l)*domainWeight*rangeWeight;
@@ -1016,7 +1016,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 				//halfsize is half of the filter window width
 				//halfSize=(int) fTheta->get(i,j,k); 
 				halfSize =1;
-				//halfSize = (int) (pow(2.0f,halfSize)/2);
+				//halfSize = (int) (powf(2.0f,halfSize)/2);
 				//halfSize=halfSize*halfSize;
 				//halfSize=1.5;
 				if(halfSize>5){halfSize=5;}//halfsize=5
@@ -1037,7 +1037,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 							diff = (float) (m*m+n*n+l*l);
 							//Compute the weight for the domain filter (domainWeight). The domain filter
 							//is a Gaussian lowpass filter
-							domainWeight = (double) pow(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
+							domainWeight = (double) powf(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
 							if( (i+m) >= 0 && (i+m) < imax && (j+n) >= 0 && (j+n) < jmax && (k+l) >= 0 && (k+l)  < kmax)
 							{
 								//Compute the detail signal (detail) based on the difference between a 
@@ -1052,7 +1052,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 								{
 									sigmaRTheta=0.001;
 								}// 1===>0.1
-								rangeWeight = (double) pow(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
+								rangeWeight = (double) powf(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
 								if(rangeWeight==0) 
 									rangeWeight=0.001;
 
@@ -1128,7 +1128,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 					//filter window width is calculated from fTheta
 					//halfsize is half of the filter window width
 					halfSize=(int) fTheta->get(i,j,k); 
-					//halfSize = (int) (pow(2.0f,halfSize)/2);
+					//halfSize = (int) (powf(2.0f,halfSize)/2);
 					//halfSize=halfSize*halfSize;
 					//halfSize=1.5;
 					if(halfSize>2){halfSize=2;}//halfsize=5
@@ -1149,7 +1149,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 								diff = (float) (m*m+n*n+l*l);
 								//Compute the weight for the domain filter (domainWeight). The domain filter
 								//is a Gaussian lowpass filter
-								domainWeight = (double) pow(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
+								domainWeight = (double) powf(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
 								if( (i+m) >= 0 && (i+m) < imax && (j+n) >= 0 && (j+n) < jmax && (k+l) >= 0 && (k+l)  < kmax)
 								{
 									//Compute the detail signal (detail) based on the difference between a 
@@ -1164,7 +1164,7 @@ void Trilateralfilter::DetailBilateralFilter(Raw* srcImg, Raw* pSmoothX, Raw* pS
 									{
 										sigmaRTheta=0.1;
 									}// 1===>0.1
-									rangeWeight = (double) pow(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
+									rangeWeight = (double) powf(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
 									if(rangeWeight==0) 
 										rangeWeight=0.1;
 

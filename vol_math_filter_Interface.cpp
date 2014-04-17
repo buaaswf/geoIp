@@ -46,8 +46,7 @@ bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
     printf("in anistropic YK  ................................\n");
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
 	Raw *outdata=(Raw *)ImageVolume2Raw(ret);
-	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
-	//	return ret;
+
 	if (para.method==2) para.threadcount=1;
 
     printf("before thread ................................\n");
@@ -60,9 +59,9 @@ bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 
 
     //qym 2014-4
-	delete indata;
-	delete outdata;
-	delete res;
+    delete indata;
+    delete outdata;
+    delete res;
 
     printf("out anistropic YK  ................................\n");
 	 return true;
@@ -231,7 +230,7 @@ bool doBilateralI (ImageVolume * src, ImageVolume *ret,BilateralFilterI &para)
 
 	MultiThreadptr(3,src->PixelType,para.threadcount,indata,outdata,(void *)&para);
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
-	memcpy((unsigned char*)ret->Data,outdata->getdata(),outdata->size()*sizeof(unsigned char));
+	memcpy(ret->Data,outdata->getdata(),outdata->size()*sizeof(unsigned char));
 	delete res;
 	delete outdata;
 	 return true;
@@ -1437,7 +1436,10 @@ void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,v
 	{
 		datasize = 4;
 	}
-	memcpy(ret->getdata(),src->getdata(),src->size()*4);
+	
+	//memcpy(ret->getdata(),src->getdata(),src->size()*4);
+	delete ret;
+	ret =new Raw(*src);
 	int countvar=0;
 	if (threadcount >= 1)
 	{
@@ -1575,17 +1577,17 @@ void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,v
 						}
 					}//for..
 
-					for(int i = 0;i <=threadcount;i++)
+					for(int i = 0;i < threadcount;i++)
 					{
 						pthread_join(threads[i], NULL);
 					}
 
 				//}
 
-				for(int i = 0;i < threadcount;i++)
-				{
-					pthread_join(threads[i], NULL);
-				}
+				//for(int i = 0;i < threadcount;i++)
+				//{
+				//	pthread_join(threads[i], NULL);
+				//}
 		
 			}//case 3
 			break;
@@ -2504,6 +2506,11 @@ bool  doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para ,int t
 		case 1:
 			memcpy((unsigned char *)ret->Data +(long long)  i*newret->Width*newret->Height*znew,				
 				(unsigned char*)newret->Data + (long long)newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - 2*k/2));
+			if (i==tasknum-1)
+			{
+				memcpy((unsigned char *)ret->Data + (long long)ret->GetLength()-ret->Width*ret->Height,				
+					(unsigned char*)newret->Data + (long long) newret->GetLength()-ret->Width*ret->Height, (long long)newret->Width * newret->Height );
+			}
 			break;
 		case 2:
 			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				

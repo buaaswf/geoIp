@@ -1,5 +1,6 @@
 //Morph_Opera.cpp
 #include "vol_math_Morph_Opera.h"
+#include <math.h>
 
 void CReleaseMat(Mat &mat){
 	 delete mat.data; 
@@ -46,7 +47,7 @@ Mat strel(string strings,int n){
 		{
 			for (j=0;j<m;j++)
 			{
-				k=pow((float)abs(i-n),2)+pow((float)abs(j-n),2);
+				k=powf((float)abs(i-n),2)+powf((float)abs(j-n),2);
 				if (k>n*n)	*(mat.data+i*m+j)=0;
 				else *(mat.data+i*m+j)=1;	
 			}
@@ -57,8 +58,8 @@ Mat strel(string strings,int n){
 		{
 			for (j=0;j<m;j++)
 			{
-				k=4*(pow((float)abs(i-n),2)+pow((float)abs(j-n),2));
-				if (k>5*pow((float)n,2)-2*n+1)	*(mat.data+i*m+j)=0;
+				k=4*(powf((float)abs(i-n),2)+powf((float)abs(j-n),2));
+				if (k>5*powf((float)n,2)-2*n+1)	*(mat.data+i*m+j)=0;
 				else *(mat.data+i*m+j)=1;	
 			}
 		}
@@ -104,7 +105,7 @@ Mat strel_B(string strings,int n){
 		{
 			for (j=0;j<m;j++)
 			{
-				*(mat.data+i*m+j)=2*sqrt(n*n-pow((float)(i-n),2)-pow((float)(j-n),2))+0.5;
+				*(mat.data+i*m+j)=2*sqrt(n*n-powf((float)(i-n),2)-powf((float)(j-n),2))+0.5;
 			}
 		}
 	}
@@ -113,7 +114,7 @@ Mat strel_B(string strings,int n){
 		{
 			for (j=0;j<m;j++)
 			{
-				*(mat.data+i*m+j)=2*sqrt(n*n-pow((float)(i-n),2)-pow((float)(j-n),2))+0.5;
+				*(mat.data+i*m+j)=2*sqrt(n*n-powf((float)(i-n),2)-powf((float)(j-n),2))+0.5;
 			}
 		}
 	}
@@ -181,7 +182,8 @@ void Reversion(Raw2D &source){
 }
 //erode
 void Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
-	Mat temp=strel_B("disc",n);
+	Mat temp;
+        temp=strel_B("disc",n);
 	int i,j,k,l,row,col,x,y;
 	PIXTYPE Minval,value;
 	col=mask.getYsize();
@@ -209,7 +211,8 @@ void Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 }
 //dilate
 void Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
-	Mat temp=strel("disc",n);
+	Mat temp;
+        temp=strel("disc",n);
 	int i,j,k,l,row,col,x,y;
 	PIXTYPE Maxval,value;
 	row=mask.getXsize();
@@ -237,7 +240,8 @@ void Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 }
 //Morphological erode
 void Morph_Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
-	Mat temp=strel_B("disc",n);
+	Mat temp;
+        temp =strel_B("disc",n);
 	int i,j,k,l,row,col,x,y;
 	PIXTYPE Minval,Maxval,value;
 	col=mask.getYsize();
@@ -273,7 +277,8 @@ void Morph_Erode_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 //Morphological dilate
 void Morph_Dilate_Gray( Raw2D &mask,Raw2D &dest,int n){//gray image
 	//temp=strel_B("disc",n);
-	Mat temp=strel("disc",n);
+	Mat temp;
+        temp=strel("disc",n);
 	int i,j,k,l,row,col,x,y;
 	PIXTYPE Maxval,Minval,value;
 	row=mask.getXsize();
@@ -397,7 +402,8 @@ void  Erode_Gray( Raw &mask,Raw &dest,int n){
 	row=mask.getYsize();
 	col=mask.getXsize();
 	height=mask.getZsize();
-	Mat temp=strel_B("disc",n);
+	Mat temp;
+        temp=strel_B("disc",n);
 	//marker eroded by temp
 	for(k=0;k<height;k++){
 		for(i=0;i<row;i++){
@@ -434,7 +440,8 @@ void  Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 	row=mask.getYsize();
 	col=mask.getXsize();
 	height=mask.getZsize();
-	Mat temp=strel_B("disc",n);
+	Mat temp;
+        temp=strel_B("disc",n);
 	//marker eroded by temp
 	for(k=0;k<height;k++){
 		for(i=0;i<row;i++){
@@ -471,7 +478,8 @@ void  Morph_Erode_Gray( Raw &mask,Raw &dest,int n){//gray image
 	row=mask.getYsize();
 	col=mask.getXsize();
 	height=mask.getZsize();
-    Mat temp=strel_B("disc",n);
+    Mat temp;
+        temp=strel_B("disc",n);
 	//marker eroded by temp
 	for(k=0;k<height;k++){
 		for(i=0;i<row;i++){
@@ -518,7 +526,8 @@ void Morph_Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 	row=mask.getYsize();
 	col=mask.getXsize();
 	height=mask.getZsize();
-	Mat temp=strel_B("disc",n);
+	Mat temp;
+        temp=strel_B("disc",n);
 	//marker eroded by temp
 	for(k=0;k<height;k++){
 		for(i=0;i<row;i++){

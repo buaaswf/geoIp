@@ -4,6 +4,18 @@ ImageVolume::ImageVolume()
 {
 
 }
+//************************************
+// Method:    ImageVolume
+// FullName:  ImageVolume::ImageVolume
+// Access:    public 
+// Returns:   
+// Qualifier:
+// Parameter: int width
+// Parameter: int height
+// Parameter: int depth
+// Parameter: int pixelType
+// Parameter: bool createSpace
+//************************************
 ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,bool createSpace)
 {
 	this->Width=width;
@@ -39,49 +51,78 @@ ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,bool crea
 	}
 }
 
-ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data,bool createspace)
+ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data)
 {
 	this->Width=width;
 	this->Height=height;
 	this->Depth=depth;
 	this->PixelType=pixelType;
-	this->CreateSpace=createspace;
+	
 		if(PixelType==1)
 		{
-			if (CreateSpace ==true)
-			{
-				unsigned char  * cData=new unsigned char[GetLength()];
-				this->Data =(void*) cData;
-				memcpy(Data,data,sizeof(unsigned char)*GetLength());
-			}
-			else
-				this->Data = data;
-	
-
-
+			unsigned char  * cData=new unsigned char[GetLength()];
+			Data = (void *)cData;
+			memcpy(Data,data,sizeof(unsigned char)*GetLength());
 		}
 		if(PixelType==2)
 		{
-			if (CreateSpace ==true)
-			{
-				unsigned short  * cData=new unsigned short[GetLength()];
-				this->Data =(void*) cData;
-				memcpy(Data,data,sizeof(unsigned short)*GetLength());
-			}
-			else
-				this->Data = data;
+			unsigned short * sData=new unsigned short[GetLength()];
+			Data = (void *)sData;
+			memcpy(Data,data,sizeof(unsigned short)*GetLength());
 		}
 		if(PixelType==3)
 		{
-			if (CreateSpace ==true)
-			{
-				float  * cData=new float[GetLength()];
-				this->Data =(void*) cData;
-				memcpy(Data,data,sizeof(float)*GetLength());
-			}
-			else
-				this->Data = data;
+			float * fData=new float[GetLength()];
+			Data = (void *)fData;
+			memcpy(Data,data,sizeof(float)*GetLength());
 		}
+
+}
+//new from filter
+
+ImageVolume::ImageVolume(int width,int height, int depth,int pixelType,void *data,bool createspace)
+{
+        this->Width=width;
+        this->Height=height;
+        this->Depth=depth;
+        this->PixelType=pixelType;
+        this->CreateSpace=createspace;
+                if(PixelType==1)
+                {
+                        if (CreateSpace ==true)
+                        {
+                                unsigned char  * cData=new unsigned char[GetLength()];
+                                this->Data =(void*) cData;
+                                memcpy(Data,data,sizeof(unsigned char)*GetLength());
+                        }
+                        else
+                                this->Data = data;
+
+
+
+                }
+                if(PixelType==2)
+                {
+                        if (CreateSpace ==true)
+                        {
+                                unsigned short  * cData=new unsigned short[GetLength()];
+                                this->Data =(void*) cData;
+                                memcpy(Data,data,sizeof(unsigned short)*GetLength());
+                        }
+                        else
+                                this->Data = data;
+                }
+                if(PixelType==3)
+                {
+                        if (CreateSpace ==true)
+                        {
+                                float  * cData=new float[GetLength()];
+                                this->Data =(void*) cData;
+                                memcpy(Data,data,sizeof(float)*GetLength());
+                        }
+                        else
+                                this->Data = data;
+                }
 
 }
 
@@ -189,8 +230,7 @@ Image2D::Image2D(int width,int height,int pixelType,bool createSpace)
 		if(PixelType==1)
 		{
 			unsigned char  * cData=new unsigned char[GetLength()];
-			data =(void*)cData;
-		
+			data = (void *)cData;
 		}
 		if(PixelType==2)
 		{

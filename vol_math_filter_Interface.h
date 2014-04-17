@@ -17,6 +17,7 @@
 #include "vol_math_Watersheds.h"
 extern size_t globalProgressChanged;
 extern size_t volatile progressStep;
+#if 0
 struct GeoBodyDataStruct
 {
     const char* file_name;
@@ -70,6 +71,7 @@ struct GeoBodyDataStruct
 
     }
 };
+#endif
 	//struct Points
 	//{
 	//	short x;

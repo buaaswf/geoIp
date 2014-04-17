@@ -51,7 +51,7 @@ FourierFilter3::FourierFilter3(Raw & raw)
         for(int j = 0;j<y;j++){
             for(int k = 0;k<x;k++){
                 m=i*x*y+x*j+k;
-                buf[m] = raw.getXYZ(m)*pow(-1,(float)(i+j+k))/255.0;
+                buf[m] = raw.getXYZ(m)*powf(-1,(float)(i+j+k))/255.0;
             }
         }
 	}*/
@@ -92,7 +92,7 @@ complex<float>* FFT(const complex<float> *srcimg,int n)
 		cout <<"the length of srcimg is wrong"<< endl;
 		/*填充成2的指数项*/
 		cout <<"need padding"<<endl;
-		N = pow(2,(float)((int)flag+1));
+		N = powf(2,(float)((int)flag+1));
 		flag = log10((float)N)/log10(2.0);
 	}
 	/*改变成奇偶顺序*/
@@ -110,7 +110,7 @@ complex<float>* FFT(const complex<float> *srcimg,int n)
 	}
  	for(int s =1;s <= flag;s++)
 	{
-		int m = pow(2,(float)s);
+		int m = powf(2,(float)s);
 		complex<float> wm = complex<float>(cos(2*pi/m),sin(2*pi/m));//wm1：从W21开始,周期变换
 		for(int p = 0;p<N;p+=m)
 		{
@@ -138,7 +138,7 @@ complex<float>* FFT(const float *srcimg,int n)
 	float flag = log10((float)n)/log10(2.0);
 	int N = n;
 	if(flag - (int)flag != 0){   //判断是否为2的指数次
-		N = pow(2,(float)((int)flag+1));
+		N = powf(2,(float)((int)flag+1));
 		flag = log10((float)N)/log10(2.0);
 	}
 	/*改变成奇偶顺序*/
@@ -157,7 +157,7 @@ complex<float>* FFT(const float *srcimg,int n)
 	/*基于迭代的蝶形快速傅立叶变换，自底向上*/
  	for(int s =1;s <= flag;s++)
 	{
-		int m = pow(2,(float)s);
+		int m = powf(2,(float)s);
 		complex<float> wm = complex<float>(cos(2*pi/m),sin(2*pi/m));//wm1：从W21开始,周期变换
 		for(int p = 0;p<N;p+=m)
 		{
@@ -190,7 +190,7 @@ complex<float>* IFFT(const complex<float> *fftimg,int n)
 		cout <<"the length of srcimg is wrong"<< endl;
 		/*填充成2的指数项*/
 		cout <<"need padding"<<endl;
-		N = pow(2,(float)((int)flag+1));
+		N = powf(2,(float)((int)flag+1));
 	    flag = log10((float)N)/log10(2.0);
 	}
 	/*改变成奇偶顺序*/
@@ -208,7 +208,7 @@ complex<float>* IFFT(const complex<float> *fftimg,int n)
 
 	for(int s =1;s <= flag;s++)
 	{
-		int m = pow(2,(float)s);
+		int m = powf(2,(float)s);
 		complex<float> wm = complex<float>(cos(-2*pi/m),sin(-2*pi/m));//wm1：从W2(-1)开始
 		for(int p = 0;p<N;p+=m)
 		{
@@ -447,7 +447,7 @@ inline int countPadding(int n)
 	if((lg - (int)lg) == 0){
 		return n;
 	}
-	int N = pow(2.0,((int)lg+1));
+	int N = powf(2.0,((int)lg+1));
 	return N;
 }
 
@@ -468,8 +468,8 @@ void FourierFilter2::guass_low_pass2(complex<float> *src,int width,int height,fl
 	{
 		for(size_t j = 0;j<width;j++)
 		{
-			distence = sqrt(pow(abs((int)(i-orgy)),2.0)+pow(abs((int)(j-orgx)),2.0));
-			src[i*width+j] = src[i*width+j] * (float)exp(-distence/(2*pow(D,2.0f)));
+			distence = sqrt(powf(abs((int)(i-orgy)),2.0)+powf(abs((int)(j-orgx)),2.0));
+			src[i*width+j] = src[i*width+j] * (float)exp(-distence/(2*powf(D,2.0f)));
 
 		}
 	}
@@ -489,7 +489,7 @@ void FourierFilter3::low_Pass3(complex<float>*src,int width,int height,int depth
 			for(int k = 0;k<width;k++)
 			{
 			/*
-				distance = sqrt(pow(abs((int)(i-orgz)),2.0f)+pow(abs((int)(j-orgy)),2.0f)+pow(abs((int)(k-orgx)),2.0f));
+				distance = sqrt(powf(abs((int)(i-orgz)),2.0f)+powf(abs((int)(j-orgy)),2.0f)+powf(abs((int)(k-orgx)),2.0f));
 				if(distance > thresold){
 					src[i*width*height+j*width+k] = 0.0f;
 				}

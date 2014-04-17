@@ -244,16 +244,16 @@ void Raw2D::BilateralGradientFilter(Raw2D* pX, Raw2D* pY, Raw2D* pSmoothX, Raw2D
 					posDiff=(PIXTYPE) (m*m+n*n); 
 					//Compute the weight for the domain filter (domainWeight). The domain filter
 					//is a Gaussian low pass filter
-					domainWeight = (PIXTYPE) pow(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC)));
+					domainWeight = (PIXTYPE) powf(M_EXP, (double) (-posDiff/(2*sigmaC*sigmaC)));
 					if( (i+m) >= 0 && (i+m) <imax && (j+n) >=0 &&(j+n) < jmax) {
-						g1 = (PIXTYPE) (pow( float (pX->get(i+m,j+n)),2.0f) + pow(float(pY->get(i+m,j+n)),2.0f) );
-						g2 = (PIXTYPE) (pow( float(pX->get(i,j)),2.0f) + pow(float(pY->get(i,j)),2.0f) );
+						g1 = (PIXTYPE) (powf( float (pX->get(i+m,j+n)),2.0f) + powf(float(pY->get(i+m,j+n)),2.0f) );
+						g2 = (PIXTYPE) (powf( float(pX->get(i,j)),2.0f) + powf(float(pY->get(i,j)),2.0f) );
 						//Compute the gradient difference between a pixel and its neighborhood pixel 
 						gradDiff = (PIXTYPE) (sqrt(double(g1)) - sqrt(double(g2)));
 						//Compute the weight for the range filter (rangeWeight). The range filter
 						//is a Gaussian filter defined by the difference in gradient magnitude.
 						if(sigmaR==0){sigmaR=1;}
-						rangeWeight = (PIXTYPE) pow(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR)));	
+						rangeWeight = (PIXTYPE) powf(M_EXP, (double) (-(gradDiff*gradDiff)/(2*sigmaR*sigmaR)));	
 						tmpX += pX->get(i+m,j+n)*domainWeight*rangeWeight;
 						tmpY += pY->get(i+m,j+n)*domainWeight*rangeWeight;
 						//Bilateral filter normalized by normFactor (eq. 5, Section 3.1) 
@@ -339,7 +339,7 @@ void Raw2D::DetailBilateralFilter(Raw2D* srcImg, Raw2D* pSmoothX, Raw2D* pSmooth
 			//filter window width is calculated from fTheta
 			//halfsize is half of the filter window width
 			//halfSize=(int) fTheta->get(i,j); 
-			//halfSize = (int) (pow(2.0f,halfSize)/2);
+			//halfSize = (int) (powf(2.0f,halfSize)/2);
 			halfSize=1.5;
 			//Coefficients defining the centerplane (equation6, section 3.1) is calculated
 			//from the smoothed image gradients
@@ -351,7 +351,7 @@ void Raw2D::DetailBilateralFilter(Raw2D* srcImg, Raw2D* pSmoothX, Raw2D* pSmooth
 					diff = (PIXTYPE) (m*m+n*n);
 					//Compute the weight for the domain filter (domainWeight). The domain filter
 					//is a Gaussian lowpass filter
-					domainWeight = (PIXTYPE) pow(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
+					domainWeight = (PIXTYPE) powf(M_EXP, (double) (-diff/(2*sigmaCTheta*sigmaCTheta)));		
 					if( (i+m) >= 0 && (i+m) <imax && (j+n) >=0 && (j+n) < jmax) {
 						//Compute the detail signal (detail) based on the difference between a 
 						//neighborhood pixel and the centerplane passing through the center-pixel 
@@ -360,7 +360,7 @@ void Raw2D::DetailBilateralFilter(Raw2D* srcImg, Raw2D* pSmoothX, Raw2D* pSmooth
 						//Compute the weight for the range filter (rangeWeight). The range filter
 						//is a Gaussian filter defined by the detail signal.
 						if(sigmaRTheta==0){sigmaRTheta=1;}
-						rangeWeight = (PIXTYPE) pow(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
+						rangeWeight = (PIXTYPE) powf(M_EXP, (double) (-(detail*detail)/(2*sigmaRTheta*sigmaRTheta)));	
 						tmp += detail*domainWeight*rangeWeight;
 						//Detail Bilateral filter normalized by normFactor (eq. 9, Section 3.1)
 						normFactor += domainWeight*rangeWeight;
