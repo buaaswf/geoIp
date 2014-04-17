@@ -43,17 +43,28 @@ void * doAnistropicI(ImageVolume & src,AnistropicI & para)
 bool  doAnistropicI(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 {
 	
+    printf("in anistropic YK  ................................\n");
 	Raw *indata=(Raw *)ImageVolume2Raw(src);
 	Raw *outdata=(Raw *)ImageVolume2Raw(ret);
 	//Raw *ret =new Raw( MultiThreadsipl(2,para.threadcount,indata,(void *)&para),true); 
 	//	return ret;
 	if (para.method==2) para.threadcount=1;
 
+    printf("before thread ................................\n");
 	MultiThreadptr(2,src->PixelType,para.threadcount,indata,outdata,(void *)&para);
+    printf("after  thread ................................\n");
 	ImageVolume *res =(ImageVolume*) Raw2ImageVolume(*outdata,ret->PixelType);
 	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char));
 	 //return indata;
 	//memcpy((unsigned char*)ret->Data,outdata->getdata(),outdata->size()*sizeof(unsigned char));
+
+
+    //qym 2014-4
+	delete indata;
+	delete outdata;
+	delete res;
+
+    printf("out anistropic YK  ................................\n");
 	 return true;
 }
 

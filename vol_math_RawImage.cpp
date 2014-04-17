@@ -473,6 +473,7 @@ void *  ImageVolume2Raw(ImageVolume &src)
 
 
 	//src.Data=data;
+	//Raw *ret=new Raw(src.Width,src.Height,src.Depth,data);
 	Raw *ret=new Raw(src.Width,src.Height,src.Depth,data);
 	return ret;
 
@@ -513,11 +514,18 @@ void *  ImageVolume2Raw(ImageVolume *src)
 
 	}
 
-
+#if 0
 	//src->Data=data;
 	Raw *ret=new Raw(src->Width,src->Height,src->Depth,data);
 	delete [] data;
 	data = NULL;
+#else
+    //qym 2014-4 more efficient
+    //share memory true
+	Raw *ret=new Raw(src->Width,src->Height,src->Depth,data,true);
+    //reset share to false ,call delete Raw will also free data
+    ret->set_shared(false);
+#endif
 	return ret;
 
 }
@@ -527,6 +535,7 @@ void *  Raw2ImageVolume(Raw  &src,long long type)
 
 	if (type == 1)
 	{
+#if 0
 		unsigned char *data= new unsigned char[src.size()];
 
 		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
@@ -537,8 +546,22 @@ void *  Raw2ImageVolume(Raw  &src,long long type)
 		//void * ret=(void *)data;
 		ImageVolume * res = new ImageVolume(src.getXsize(),src.getYsize(),src.getZsize());
 		res->Data = data;
-		//delete src;
-		//delete [] data;
+#else
+//qym2014-4
+
+		//PIXTYPE *data= new PIXTYPE[src.GetLength()];
+		//void * ret=(void *)data;
+		ImageVolume * res = new ImageVolume(src.getXsize(),src.getYsize(),src.getZsize());
+       	unsigned char *data= (unsigned char *)res->Data;
+        long long count = src.size();
+		for (long long i = 0; i < count;i++)
+		{
+			data[i] =(unsigned char) datSrc[i];
+		}
+
+		res->Data = data;
+        
+#endif
 		return res;
 	}
 	else if (type == 2 )

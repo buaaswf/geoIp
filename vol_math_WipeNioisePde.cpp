@@ -1006,7 +1006,7 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 	PIXTYPE sum;
 	int x,y,z,j;
 	//Raw s;
-	Raw *d=new Raw(src);
+	Raw *d=new Raw(src); //qym 2014-4 share false , create new space 
 			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diyigeshi0 houmianshi 1
 		
 		
@@ -1016,7 +1016,7 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 		Raw *_ret;
 		_ret = gradientlaplace(*d);
 
-		Raw *sum =new Raw(src);
+		Raw *sum =new Raw(src);//qym 2014-4 share false , create new space
 		for (int i = 1; i < _ret->getXsize()-1; i++)
 		{
 			for (int j=1; j<_ret->getYsize()-1; j++)
@@ -1087,8 +1087,15 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 		*d = *ret; 
 		delete _ret;
 		//delete sum;
+
+    //qym 2014-4
+    delete sum;
+
 	}
 //	return s;
+//
+    //qym 2014-4
+    delete d;
 
 }
 //void  WipeNioisePde::FourPDiff(Raw &src,Raw &ret)			//based on Y-K model

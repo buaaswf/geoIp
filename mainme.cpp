@@ -19,7 +19,7 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 281, m = 481, n =20; 
+	int l = 281, m = 481, n =200; 
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
@@ -63,16 +63,16 @@ ImageVolume * testinterface()
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	// swf 20140415
-	//AnistropicI ani(3,30,1,1);
-	////doAnistropicI(src,ret,ani);
-	//doAnistropicIYproqt(src,ret,ani,6,p);
+	AnistropicI ani(3,30,1,5);
+	doAnistropicI(src,ret,ani);
+	doAnistropicIYproqt(src,ret,ani,6,p);
 	// end 20140415
-	//TrilateralfilterI tri(3,3);
+	//TrilateralfilterI tri(8,5,5);
 	//doTrilateralproqt(src,ret,tri,6,p);
 	//BilateralFilterI bia(1,1,2);
 	//doBilateralproqt(src,ret,bia,3,p);
-	GuassFilterI gs(3,3);
-	doGaussproqt(src,ret,gs,20,p);
+	//GuassFilterI gs(3,3);
+	//doGaussproqt(src,ret,gs,20,p);
 	//WaterShedsI &water=WaterShedsI();
 	//doWaterShedsI(src,ret,water,p);
 	//lowPassI lpass(5000.0);
@@ -130,10 +130,10 @@ void testprocess()
 	//ImageVolume *ret = new ImageVolume(l,m,n,1,outdata);
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
-	//TrilateralfilterI gs(3,3,15);
-	//doTrilateralFilterFileMode(slice1,l,m,n,outdata1,gs,1);
-	BilateralFilterI bila(3,3,4);
-	doBilateralFilterFileMode(slice1,l,m,n,outdata1,bila,1);
+	TrilateralfilterI gs(3,3,15);
+	doTrilateralFilterFileMode(slice1,l,m,n,outdata1,gs,1);
+	//BilateralFilterI bila(3,3,4);
+	//doBilateralFilterFileMode(slice1,l,m,n,outdata1,bila,1);
 	//GuassFilterI gs(3,3);
 	//bool flag=false;
 	//p(1,2,3,flag);
