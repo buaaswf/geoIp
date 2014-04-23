@@ -322,7 +322,7 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 			{
 				rs++;
 
-				ret->putXYZ(i ,  guass->getXYZ(i + ret->getXsize()*ret->getYsize()));//?????
+				ret->putXYZ(i ,  guass->getXYZ(i + ret->getXsize()*ret->getYsize()*halfsize));//?????
 			}
 			delete guass;
 			delete temp;

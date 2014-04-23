@@ -1052,7 +1052,7 @@ void * singleGuassFilterSipl(void * para)
 	Raw *indata = p->src;
 	Raw *outdata = p->ret;
 	Filter *guass=new Filter();
-	guass->guass3DFilterSipl(indata,outdata,p->iter,p->halfsize/2,progress);
+	guass->guass3DFilterSipl(indata,outdata,p->iter,(p->halfsize/2),progress);
 	delete guass;
 	return NULL;
 }
@@ -1438,8 +1438,11 @@ void  MultiThreadptr(int method,int datatype,int threadcount,Raw *src,Raw *ret,v
 	}
 	
 	//memcpy(ret->getdata(),src->getdata(),src->size()*4);
-	delete ret;
-	ret =new Raw(*src);
+	//do not delete ret , or it's original income address will change and return value will error
+	memcpy(ret->getdata(),src->getdata(),src->size()*datasize);
+	ret->set_shared(false);
+	//delete ret;
+	//ret =new Raw(*src);
 	int countvar=0;
 	if (threadcount >= 1)
 	{
@@ -2491,7 +2494,12 @@ bool  doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para ,int t
 		{
 			doGuassFilterI(newsrc,newret,para);
 		} 
-		else
+		else if (newsrc->Depth < para.threadcount+para.halfsize)
+		{
+			para.threadcount = (para.threadcount-para.halfsize)/2;
+			doGuassFilterIY(newsrc,newret,para);
+		}
+		else 
 		{
 			doGuassFilterIY(newsrc,newret,para);
 		}
