@@ -165,8 +165,8 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 	 //the multi thread in the middle
  	if (iter > 0 && ( iter+1 )*ret->getZsize() < src->getZsize())
 	{
-		Raw *s = new Raw(ret->getXsize(), ret->getYsize(), ret->getZsize() + 2, 
-			src->getdata()+iter*ret->getXsize()*ret->getYsize()*(ret->getZsize())-ret->getXsize()*ret->getYsize());
+		Raw *s = new Raw(ret->getXsize(), ret->getYsize(), ret->getZsize() + 2*val, 
+			src->getdata()+iter*ret->getXsize()*ret->getYsize()*(ret->getZsize())-ret->getXsize()*ret->getYsize()*(int)val);
 		temp = new Raw(*s); 
 		//PIXTYPE *around=new PIXTYPE[6];
 		for (i = 0 ;i < delt; i++)
@@ -233,7 +233,7 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 				ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 			}
 
-			ret->putXYZ( i, temp->getXYZ(i + ret->getXsize() * ret->getYsize()) );
+			ret->putXYZ( i, temp->getXYZ(i + ret->getXsize() * ret->getYsize()*val) );
 		}
 		delete s;
 		delete temp;
@@ -255,13 +255,13 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 			//last slice
 			if (iter != 0)
 			{
-				 s= new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize() + 1,
-					src->getdata()+ iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize());
+				 s= new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize() + 1*val,
+					src->getdata()+ iter*ret->getXsize()*ret->getYsize()*(src->getZsize()/(iter+1))-ret->getXsize()*ret->getYsize()*(int)val);
 			} 
 			//first slice
 			else
 			{
-				s = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize() + 1,src->getdata());
+				s = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize() + 1*val,src->getdata());
 			}
 			
 			temp = new Raw (*s);
@@ -361,7 +361,7 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 						rs = 0;
 						ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 					}
-					ret->putXYZ(i ,temp->getXYZ(i + ret->getXsize()*ret->getYsize()));
+					ret->putXYZ(i ,temp->getXYZ(i + ret->getXsize()*ret->getYsize()*val));
 				}
 			}//else ..._if iter =0
 

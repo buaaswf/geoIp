@@ -65,16 +65,16 @@ ImageVolume * testinterface()
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	// swf 20140415
-	//AnistropicI ani(7,30,1,2);
-	//////doAnistropicI(src,ret,ani);
-	//doAnistropicIYproqt(src,ret,ani,6,p);
+	AnistropicI ani(7,30,1,16);
+	////doAnistropicI(src,ret,ani);
+	doAnistropicIYproqt(src,ret,ani,6,p);
 	// end 20140415
 	//TrilateralfilterI tri(8,5,5);
 	//doTrilateralproqt(src,ret,tri,6,p);
 	//BilateralFilterI bia(9,9,5);
 	//doBilateralproqt(src,ret,bia,3,p);
-	GuassFilterI gs(7,15);
-	doGaussproqt(src,ret,gs,20,p);
+	//GuassFilterI gs(7,15);
+	//doGaussproqt(src,ret,gs,20,p);
 	//WaterShedsI &water=WaterShedsI();
 	//doWaterShedsI(src,ret,water,p);
 	//lowPassI lpass(5000.0);

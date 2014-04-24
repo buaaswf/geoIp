@@ -2383,13 +2383,21 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 		ImageVolume *newsrc = dividetask(i,tasknum,src);
 		ImageVolume *newret = dividetask(i,tasknum,ret);
 		//progress=ProgressChanged;
-		if (para.method==1)
-		{
-			doAnistropicIY(newsrc,newret,para);
-		} 
-		else
+		if (para.method==2)
 		{
 			doAnistropicI(newsrc,newret,para);
+		} 
+		else if (newsrc->Depth < para.threadcount+2*para.val)
+		{
+			int thread=0;
+			(para.threadcount-para.val)>0? thread=(para.threadcount-para.val)/2:thread=1;
+			
+			para.threadcount =thread ;
+			doAnistropicIY(newsrc,newret,para);
+		}
+		else
+		{
+			doAnistropicIY(newsrc,newret,para);
 		}
 	
 		int k=0;
