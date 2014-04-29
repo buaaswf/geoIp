@@ -89,7 +89,7 @@ bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char)); 
 	delete res;
 	delete outdata;
-	//delete indata;
+	delete indata;
 	return true;
 }
 bool doAnistropicFilterFileMode(void **srco,int width,int height ,int count,void * reto,AnistropicI &para,int datatype)
@@ -2502,9 +2502,13 @@ bool  doGaussproqt(ImageVolume * src, ImageVolume *ret,GuassFilterI &para ,int t
 		{
 			doGuassFilterI(newsrc,newret,para);
 		} 
-		else if (newsrc->Depth < para.threadcount+para.halfsize)
+		else if (newsrc->Depth < para.threadcount+2*para.halfsize)
 		{
-			para.threadcount = (para.threadcount-para.halfsize)/2;
+			int thread=0;
+			(para.threadcount-para.halfsize)>0? thread=(para.threadcount-para.halfsize)/2:thread=1;
+
+			para.threadcount =thread ;
+			//para.threadcount = (para.threadcount-para.halfsize)/2;
 			doGuassFilterIY(newsrc,newret,para);
 		}
 		else 

@@ -51,7 +51,7 @@ WipeNioisePde::WipeNioisePde(Raw &src,int time,PIXTYPE value, int method)
 	} 
 	else
 	{
-		src=FourPDiff(src);
+		FourPDiff(src);
 	}
 }
 WipeNioisePde::WipeNioisePde()
@@ -814,7 +814,7 @@ void  WipeNioisePde::Perona_MalikSipl( Raw &src,Raw & ret,int iter)
 }
 Raw * gradientlaplace(Raw &src)
 {
-	Raw *val=new Raw(src);
+	Raw *val=new Raw(src);			//create new space
 	for (int i = 2; i < src.getXsize()-2; i++)
 	{
 		for (int j=2; j<src.getYsize()-2; j++)
@@ -1003,20 +1003,21 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 		ProgressChanged (0, 100,0,flag);
 	}
 	//ProgressChanged (0, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
-	PIXTYPE sum;
+	//PIXTYPE sum;
 	int x,y,z,j;
 	//Raw s;
 	Raw *d=new Raw(src); //qym 2014-4 share false , create new space 
-			int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diyigeshi0 houmianshi 1
-		
+	int interval = globalProgressChanged/1000 == 0 ? 1:globalProgressChanged /1000 ;//first call diyigeshi0 houmianshi 1
+	
 		
 
 	for (int ii = 0; ii < delt; ii++) 
 	{
 		Raw *_ret;
 		_ret = gradientlaplace(*d);
-
-		Raw *sum =new Raw(src);//qym 2014-4 share false , create new space
+		Raw *sum =new Raw(src);	
+		memcpy(sum->getdata(),src.getdata(),sum->size()*4);
+		//Raw *sum =new Raw(src);//qym 2014-4 share false , create new space
 		for (int i = 1; i < _ret->getXsize()-1; i++)
 		{
 			for (int j=1; j<_ret->getYsize()-1; j++)
@@ -1075,25 +1076,21 @@ void  WipeNioisePde::FourPDiff(Raw &src,Raw *ret)			//based on Y-K model
 					}
 				}
 			}
-			//memcpy(ret->getdata(),src.getdata(),src.size()*4);
+			//memcpy(ret->getdata(),sum->getdata(),src.size()*4);
+			//gauss is ok swf 20140429
 			Filter *gauss = new Filter();
 			gauss->guass3DFilterSipl(sum,ret,0,1,NULL);
 			delete gauss;
-			
-		
+		}//end.. if
 
-		}
-
-		*d = *ret; 
+		memcpy(d->getdata(),ret->getdata(),d->size()*4);
+		*d = *sum; 
 		delete _ret;
-		//delete sum;
+		 //qym 2014-4
+		 delete sum;
 
-    //qym 2014-4
-    delete sum;
+	}//end for 
 
-	}
-//	return s;
-//
     //qym 2014-4
     delete d;
 

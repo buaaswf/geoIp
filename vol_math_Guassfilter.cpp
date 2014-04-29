@@ -332,7 +332,7 @@ void  Filter::guass3DFilterSipl(Raw* src, Raw *ret,int iter, int halfsize,void (
 
 
 	}
-	else 
+	else //single thread
 	{
 		temp = new Raw(ret->getXsize(),ret->getYsize(),ret->getZsize(),src->getdata(),true);
 		//puregauss(temp,rs,src,ret,halfsize,sum,globalProgressChanged,progressStep,ProgressChanged);
