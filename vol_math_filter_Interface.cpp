@@ -89,7 +89,7 @@ bool doAnistropicIY(ImageVolume * src, ImageVolume *ret,AnistropicI &para )
 	memcpy(ret->Data,res->Data,outdata->size()*sizeof(unsigned char)); 
 	delete res;
 	delete outdata;
-	delete indata;
+	//delete indata;
 	return true;
 }
 bool doAnistropicFilterFileMode(void **srco,int width,int height ,int count,void * reto,AnistropicI &para,int datatype)
@@ -2371,7 +2371,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 
 bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para ,int tasknum ,void(*ProgressChanged)(int,int,int,bool &))
 {
-	
+	assert(tasknum!=0);
 	int znew=src->Depth/tasknum;
 	znew ==0? tasknum=1:tasknum=tasknum;
 	int zleft =src->Depth%tasknum;

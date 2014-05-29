@@ -519,6 +519,7 @@ void  Morph_Erode_Gray( Raw &mask,Raw &dest,int n){//gray image
 	 CReleaseMat(temp);
 }
 //Morphological dilate
+// n halfsize of structure data
 void Morph_Dilate_Gray( Raw &mask,Raw &dest,int n){//gray image
 	int i,j,k,m,p,q,x,y,z;
 	long long row,col,height;

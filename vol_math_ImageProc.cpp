@@ -398,7 +398,11 @@ void MaxValue(Raw &image,int smoothsize,int threshold){//极大值函数
 	height=image.getZsize();
 	//图像平滑
 	if(1 == smoothsize) Smooth3D_7(temp,CV_BLUR_NO_SCALE);
-	else  Smooth3D_27(temp,CV_BLUR_NO_SCALE);
+	else if (2 == smoothsize)
+	{
+		Smooth3D_27(temp,CV_BLUR_NO_SCALE);
+	}
+	 
 	//查找最大值并二值化
 	for(k=0;k<height;k++){	
 		for(i=0;i<row;i++){	

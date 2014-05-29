@@ -65,7 +65,7 @@ ImageVolume * testinterface()
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	// swf 20140415
-	AnistropicI ani(6,30,2,16);
+	AnistropicI ani(50,30,1,1);
 	////doAnistropicI(src,ret,ani);
 	doAnistropicIYproqt(src,ret,ani,10,p);
 	// end 20140415

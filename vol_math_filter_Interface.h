@@ -113,6 +113,15 @@ struct  AnistropicII
 
 
 };
+
+/**
+ \brief	Anistropic i.
+ int time;
+ int val; //val=1
+ int method;
+ int threadcount;
+ */
+
 struct  AnistropicI
 {
 	int time;
@@ -204,7 +213,8 @@ struct MultiOstuI
 };
 struct WaterShedsI
 {
-	int smoothszie;
+	int smoothszie;//1.6 neighbor 2. 26 neighbor 3.h no smooth
+
 	int threshold;
 	WaterShedsI(int smoothszie,int threshold)
 	{
@@ -739,7 +749,6 @@ bool doMultiOstuI (ImageVolume *src,ImageVolume *ret,MultiOstuI &para,void(*Prog
 
  \return	true if it succeeds, false if it fails.
  */
-
 bool doWaterShedsI(ImageVolume *src,ImageVolume *ret,WaterShedsI &para,void (*progresschanged)(int,int,int,bool &));
 
 /**

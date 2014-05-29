@@ -165,7 +165,12 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 	 //the multi thread in the middle
  	if (iter > 0 && ( iter+1 )*ret->getZsize() < src->getZsize())
 	{
-		Raw *s = new Raw(ret->getXsize(), ret->getYsize(), ret->getZsize() + 2*val, 
+		//if (ret->getZsize() + 2*val >ret->getZsize())
+		//{
+		//	cout <<"too few data for filter size,please make the parameter val smaller"<<endl;
+		//}
+		//else 
+/*	{*/		Raw *s = new Raw(ret->getXsize(), ret->getYsize(), ret->getZsize() + 2*val, 
 			src->getdata()+iter*ret->getXsize()*ret->getYsize()*(ret->getZsize())-ret->getXsize()*ret->getYsize()*(int)val);
 		temp = new Raw(*s); 
 		//PIXTYPE *around=new PIXTYPE[6];
@@ -237,7 +242,7 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 		}
 		delete s;
 		delete temp;
-		
+		//}	
 	} 
 	//multi thread >1 the first and last slices
 	//
