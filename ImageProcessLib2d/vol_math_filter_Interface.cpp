@@ -2301,7 +2301,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 	int zleft  = src->Depth % tastnum;
 	ImageVolume *ret;
 	int k=0;
-	(i == 0)? k = 0 : k = 1;
+	i == 0? k = 0 : k = 1;
 	switch (src->PixelType)
 	{
 	case 1:
@@ -2309,7 +2309,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 		{
 
 			unsigned char *srcdata=(unsigned char*)src->Data + (long long )znewsize* i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
-			ret=new ImageVolume(src->Width, src->Height, znewsize + 1 + k,1,srcdata);
+			ret=new ImageVolume(src->Width, src->Height, znewsize + 1 + k,1,srcdata,true);
 
 		}
 		else if(i == tastnum-1||znewsize == 0)
@@ -2317,70 +2317,7 @@ ImageVolume * dividetask(int i,int tastnum,ImageVolume *src)
 			int var=0;//for znew ==0
 			tastnum==1? var=0:var=1;
 			unsigned char *srcdata = (unsigned char*)src->Data + (long long)znewsize * i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
-			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + var, 1, srcdata);
-
-
-		}
-		break;
-	case 2:
-		if(i < tastnum-1 )
-		{
-
-			unsigned short *srcdata=(unsigned short*)src->Data +(long long) (znewsize+2)* i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
-			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
-
-		}
-		else if(i == tastnum-1)
-		{
-			unsigned short *srcdata = (unsigned short*)src->Data + (long long)znewsize * i * (src->Width*src->Height)- (long long)k * (src->Width*src->Height);
-			ret = new ImageVolume(src->Width, src->Height, zleft+znewsize+1, 1, srcdata, false);
-
-
-		}
-		break;
-	case 3:
-		if(i < tastnum-1 )
-		{
-
-			float *srcdata=(float*)src->Data + (long long)(znewsize+2)* i * (src->Width*src->Height)- (long long)k * (src->Width*src->Height);
-			ret=new ImageVolume(src->Width,src->Height,znewsize+2,1,srcdata,false);
-
-		}
-		else if(i == tastnum-1)
-		{
-			float *srcdata = (float*)src->Data +(long long) znewsize * i * (src->Width*src->Height)- (long long)k * (src->Width*src->Height);
-			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + 1, 1, srcdata, false);
-
-
-		}
-		break;
-	}
-
-	return ret;
-}
-ImageVolume * dividetaskiter(int i,int tastnum,ImageVolume *src)
-{
-	int znewsize = src->Depth/tastnum;
-	int zleft  = src->Depth % tastnum;
-	ImageVolume *ret;
-	int k=0;
-	(i == 0)? k = 0 : k = 5;
-	switch (src->PixelType)
-	{
-	case 1:
-		if(i < tastnum-1 && znewsize != 0)
-		{
-
-			unsigned char *srcdata=(unsigned char*)src->Data + (long long )znewsize* i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
-			ret=new ImageVolume(src->Width, src->Height, znewsize + 5 + k,1,srcdata);
-
-		}
-		else if(i == tastnum-1||znewsize == 0)
-		{
-			int var=0;//for znew ==0
-			tastnum==1? var=0:var=5;
-			unsigned char *srcdata = (unsigned char*)src->Data + (long long)znewsize * i * (src->Width*src->Height)-(long long) k * (src->Width*src->Height);
-			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + var, 1, srcdata);
+			ret = new ImageVolume(src->Width, src->Height, zleft + znewsize + var, 1, srcdata, true);
 
 
 		}
@@ -2443,8 +2380,8 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 	{
 		bool flag = false;
 		globalProgressChanged = src->GetLength();//*this->delt;
-		ImageVolume *newsrc = dividetaskiter(i,tasknum,src);
-		ImageVolume *newret = dividetaskiter(i,tasknum,ret);
+		ImageVolume *newsrc = dividetask(i,tasknum,src);
+		ImageVolume *newret = dividetask(i,tasknum,ret);
 		//progress=ProgressChanged;
 		if (para.method==2)
 		{
@@ -2464,23 +2401,22 @@ bool  doAnistropicIYproqt(ImageVolume * src, ImageVolume *ret,AnistropicI &para 
 		}
 	
 		int k=0;
-		(i==0 )?k=0:k=5;//change 2-->3 20140530
+		(i==0 )?k=1:k=1;//change 2-->3 20140530
 		//i==tasknum-1?k=
 		int newdatacur= 0;
-		(i==0)? newdatacur=0:newdatacur=5; //swf change newdatacur from 1 to 3 for the slice problem.
+		(i==0||tasknum==1)? newdatacur=0:newdatacur=1; //swf change newdatacur from 1 to 3 for the slice problem.
 		int j=0;
 		
 		switch (src->PixelType)
 		{
 		case 1:
+			memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
+				(unsigned char*)newret->Data + (long long) newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - k));
 			if (i==tasknum-1)
 			{
 				memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
 					(unsigned char*)newret->Data + (long long) newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - k) );
 			}
-			else memcpy((unsigned char *)ret->Data + (long long)i*newret->Width*newret->Height*znew,				
-				(unsigned char*)newret->Data + (long long) newret->Width*newret->Height*newdatacur, (long long)newret->Width * newret->Height * ( newret->Depth - k));
-
 			break;
 		case 2:
 			memcpy((unsigned short *)ret->Data + (long long)i*newret->Width*newret->Height*(newret->Depth-2*k),
