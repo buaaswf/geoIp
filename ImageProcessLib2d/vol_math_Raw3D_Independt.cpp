@@ -22,8 +22,8 @@ Raw2D::Raw2D()
 
 Raw2D::Raw2D(int xsize,int ysize,PIXTYPE *y)
 {
-	this->xsize=ysize;
-	this->ysize=xsize;
+	this->xsize=xsize;
+	this->ysize=ysize;
 	this->data=y;
 }
 
@@ -182,9 +182,10 @@ void Raw2D::sizer(int ixsize, int iysize) {
 		delete [] this->data;
 
 	data=NULL;
-	this->data = new PIXTYPE[size()];	// & allocate memory.
 	xsize = ixsize;				// set new image size,
 	ysize = iysize;
+	this->data = new PIXTYPE[size()];	// & allocate memory.
+
 }
 
 /**

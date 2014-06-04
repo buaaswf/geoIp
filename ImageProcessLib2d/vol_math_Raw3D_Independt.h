@@ -162,10 +162,10 @@ public:
 	inline void put(int ix, int iy, PIXTYPE val)	// write 'val' at location ix,iy.
 	{
 #ifdef _DEBUG  //only check under debug mode
-		if (iy + ysize*ix < size())
+		if (ix + xsize*iy < size())
 		{
 #endif
-			data[iy + ysize*ix] = val;
+			data[ix + xsize*iy] = val;
 #ifdef _DEBUG
 		}
 		else 
@@ -175,10 +175,10 @@ public:
 
 	inline PIXTYPE get(int ix, int iy) {	// read the value at ix,iy.
 #ifdef _DEBUG
-		if(iy + ysize*ix<=size())
+		if(ix + xsize*iy<=size())
 		{
 #endif
-			return data[iy + ysize*ix]; 
+			return data[ix + xsize*iy]; 
 #ifdef _DEBUG
 		}
 		else 

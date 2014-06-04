@@ -24,21 +24,20 @@ public:
 
 		Raw2D *guass = new Raw2D(width, length);	///< The result of guass filter. 
 
-		for (i=0;i<width;i++)
+		for (j = 0; j < length; j++)
 		{
-			for (j=0;j<length;j++)
+			for (i = 0; i < width; i++)
 			{
 				sum=0;
 				float weight=0, total=0;
-				for( m=i-halfsize; m<=i+halfsize; m++)
+				for( m=j-halfsize; m<=j+halfsize; m++)
 				{
-					for(n=j-halfsize; n<=j+halfsize; n++)
+					for(n=i-halfsize; n<= i+halfsize; n++)
 					{
-						if(m >= 0 && m < width && n>=0 && n < length) 
+						if(m >= 0 && m < length && n>=0 && n < width) 
 						{
-							//weight=1.0f/((m-i)*(m-i)+(n-i)*(n-i)+1);
-							weight=1.0f/exp((float)((m-i)*(m-i)+(n-i)*(n-i)));
-							sum += weight*(src->get(m, n));
+							weight=1.0f/exp((float)((m-j)*(m-j)+(n-i)*(n-i)));
+							sum += weight*(src->get(n, m));
 							total += weight;
 						}
 					}
@@ -51,7 +50,7 @@ public:
 				}
 				else  //should never come here
 				{
-					//cout << "total==0" << endl;
+					guass->put(i,j,src->get(i,j));
 				}
 			}
 		}

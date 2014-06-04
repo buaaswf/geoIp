@@ -19,14 +19,14 @@ void p(int type,int total ,int step,bool &cancled)
 ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
-	int l = 41, m = 41, n = 300; 
-	//int l= 281,m=481,n=20;
+	//int l = 41, m = 41, n = 300; 
+	int l= 281,m=481,n=220;
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
 	//test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));//G:\geo\data
-	//test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));//E:\geo\0000geoimageprov2\data
-	 test.readImage(indata,"E:\\geo\\0000geoimageprov2\\data\\Probe_Amp.probe.raw",l*m*n*sizeof(unsigned char));
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));//E:\geo\0000geoimageprov2\data
+	// test.readImage(indata,"E:\\geo\\0000geoimageprov2\\data\\Probe_Amp.probe.raw",l*m*n*sizeof(unsigned char));
 	//test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));//G:\geo\data
 	//PIXTYPE **slice =new PIXTYPE *[n];
 	//for (int k = 0; k < n; k++)
@@ -75,8 +75,8 @@ ImageVolume * testinterface()
 	//doBilateralproqt(src,ret,bia,3,p);
 	//GuassFilterI gs(7,15);
 	//doGaussproqt(src,ret,gs,20,p);
-	//WaterShedsI &water=WaterShedsI();
-	//doWaterShedsI(src,ret,water,p);
+	WaterShedsI &water=WaterShedsI();
+	doWaterShedsI(src,ret,water,p);
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);
 	test.writeImagesesmicarray((unsigned char*)ret->Data ,ret->Width,ret->Height,ret->Depth);
