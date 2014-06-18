@@ -1509,7 +1509,7 @@ void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progressch
 	}
 	//cout<<"Minval="<<(int)Minval<<"    Maxval="<<(int)Maxval<<endl;
 	for(i=0;i<size;i++){
-			val = 255*(raw1.getXYZ(i)-Minval)/(Maxval-Minval);//将梯度值规划到0-255
+			val = 255*(raw1.getXYZ(i)-Minval)/(Maxval-Minval);//将梯度值规划到0-255 raw1=gradient
 			raw1.putXYZ(i,val);	
 	}
 	//erode reconstruction

@@ -5,7 +5,7 @@
 //#include "CImg.h"
 //#include "test.h"
 #include <assert.h>
-#include "vol_math_filter_interface.h"
+#include "vol_math_2D_filter_interface.h"
 #include <stdio.h>
 #include <tchar.h>
 #define CRTDBG_MAP_ALLOC

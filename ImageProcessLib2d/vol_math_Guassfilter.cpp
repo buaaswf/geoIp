@@ -1,5 +1,5 @@
 #include "vol_math_GuassFilter.h"
-#include "vol_math_filter_Interface.h"
+#include "vol_math_2D_filter_Interface.h"
 
 void puregauss(Raw *temp,int rs,Raw *src,Raw *ret,int halfsize,int sum,int globalProgressChanged,int progressStep,void (*ProgressChanged)(int,int ,int,bool&))
 {

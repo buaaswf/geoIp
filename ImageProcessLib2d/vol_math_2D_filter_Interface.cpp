@@ -1,4 +1,4 @@
-#include "vol_math_filter_Interface.h"
+#include "vol_math_2D_filter_Interface.h"
 
 //qym
 #include "vol_math_RawImage.h"

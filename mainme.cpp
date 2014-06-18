@@ -20,12 +20,19 @@ ImageVolume * testinterface()
 {
 	//int l = 4338, m = 3353, n = 3;
 	//int l = 41, m = 41, n = 300; 
-	int l= 281,m=481,n=220;
+	int l= 281,m=481,n=50;
+	//int l=201,m=201,n=1000;
 	RawImage test;
 	unsigned char * indata = new unsigned char [l*m*n];
+	unsigned char  *result = indata; 
+	//test.readImage(indata,"E:\\geo\\0000geoimageprov2\\newdata\\Probe_fault_Amp.probe .raw",l*m*n*sizeof(unsigned char));
+	//RawImage test;
+	//unsigned char * indata = new unsigned char [l*m*n];
 	//unsigned char  *result = indata; 
 	//test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));//G:\geo\data
-	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));//E:\geo\0000geoimageprov2\data
+	//test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));//E:\geo\0000geoimageprov2\data
+	//test.readImage(indata,"F:\\1385afwatersmooth.raw",l*m*n*sizeof(unsigned char));
+	test.readImage(indata,"F:\\lab\\VTKproj\\migEDT.raw",l*m*n*sizeof(unsigned char));
 	// test.readImage(indata,"E:\\geo\\0000geoimageprov2\\data\\Probe_Amp.probe.raw",l*m*n*sizeof(unsigned char));
 	//test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));//G:\geo\data
 	//PIXTYPE **slice =new PIXTYPE *[n];
@@ -65,7 +72,7 @@ ImageVolume * testinterface()
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	// swf 20140415
-	//AnistropicI ani(50,30,1,1);
+	//AnistropicI ani(10,30,1,1);
 	//////doAnistropicI(src,ret,ani);
 	//doAnistropicIYproqt(src,ret,ani,10,p);
 	// end 20140415
@@ -75,7 +82,7 @@ ImageVolume * testinterface()
 	//doBilateralproqt(src,ret,bia,3,p);
 	//GuassFilterI gs(7,15);
 	//doGaussproqt(src,ret,gs,20,p);
-	WaterShedsI &water=WaterShedsI();
+	WaterShedsI &water=WaterShedsI(1,1);
 	doWaterShedsI(src,ret,water,p);
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);
@@ -83,6 +90,109 @@ ImageVolume * testinterface()
 	delete outdata;
 	return ret;
 	
+
+}
+
+/**
+ \brief	Gets the testlittledata.
+
+ \return	null if it fails, else.
+ */
+
+ImageVolume * testlittledata()
+{
+	//int l = 4338, m = 3353, n = 3;
+	//int l = 41, m = 41, n = 300; 
+	int lbig= 281,mbig=481,nbig=200;
+	int l=50,m=50,n=nbig;
+	//int l=201,m=201,n=1000;
+	RawImage test;
+	unsigned char * indata = new unsigned char [lbig*mbig*nbig];
+	unsigned char  *result = indata; 
+	//test.readImage(indata,"E:\\geo\\0000geoimageprov2\\newdata\\Probe_fault_Amp.probe .raw",l*m*n*sizeof(unsigned char));
+	//RawImage test;
+	//unsigned char * indata = new unsigned char [l*m*n];
+	//unsigned char  *result = indata; 
+	//test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));//G:\geo\data
+	//test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));//E:\geo\0000geoimageprov2\data
+	//test.readImage(indata,"F:\\1385afwatersmooth.raw",l*m*n*sizeof(unsigned char));
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig-enhance.raw",lbig*mbig*nbig*sizeof(unsigned char));
+	Raw *bigdata=new Raw(lbig,mbig,nbig);
+	memcpy(bigdata->getdata(),indata,lbig*mbig*nbig);
+	Raw *littledata=new Raw(l,m,n);
+	for (int i = 0; i < l; i++)
+	{
+		for (int j = 0; j < m; j++)
+		{
+			for (int k = 0; k < n; k++)
+			{
+				littledata->put(i,j,k,bigdata->get(i,j,k));
+			}
+		}
+	}
+	// test.readImage(indata,"E:\\geo\\0000geoimageprov2\\data\\Probe_Amp.probe.raw",l*m*n*sizeof(unsigned char));
+	//test.readImage(indata,"G:\\geo\\data\\mig.vol",l*m*n*sizeof(unsigned char));//G:\geo\data
+	//PIXTYPE **slice =new PIXTYPE *[n];
+	//for (int k = 0; k < n; k++)
+	//{
+	//	slice[k] = new PIXTYPE[l*m];
+	//	memcpy(slice[k],result,l*m);
+	//	//slice++;
+	//	result += l*m;
+	//}
+	//ImageVolume *imagevol=new ImageVolume(l,m,n,1,indata);
+
+	//Process para(1,l,m,3,slice,indata,3,3,3,3,2);
+	//Raw  * ret = testinterface1(para);
+	unsigned char * outdata = new unsigned char[l*m*n]; 
+	ImageVolume *src = new ImageVolume(l,m,n,1,littledata->getdata(),false);
+	ImageVolume *ret = new ImageVolume(l,m,n,1,outdata,false);
+	//testinterface(src,ret);
+	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
+	//AnistropicI anis(2,30,1,4);
+	//doAnistropicIYproqt(src,ret,anis,6,p);
+	//MultiOstuI mul(1,3);
+	//doMultiOstuI(src,ret,mul,p);
+	//AnistropicI anis(2,30,1,4);
+	//doAnistropicIY(src,ret,anis);
+	// trilateral 20140211============
+	//TrilateralfilterI tril(4,3);
+	//doTrilateralfilterIY(src,ret,tril);
+	// //=======================
+	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);
+	//BilateralFilterI bil(3,3,10);
+	//doBilateralIY(src,ret,bil);
+	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
+	//Raw *ret =(Raw*)doAnistropicI(src,anis);
+	//Raw *ret=(Raw *)doTrilateralfilterI(src,tril);zzz
+	//BilateralFilterI bil(3,3,10);
+	//Raw * ret = (Raw *)doBilateralI(src,bil);
+	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
+	// swf 20140415
+	//AnistropicI ani(3,3,1,1);
+	//////doAnistropicI(src,ret,ani);
+	//doAnistropicIYproqt(src,ret,ani,10,p);
+	//for (int i=0;i<ret->GetLength();i++)
+	//{
+	//	unsigned char * data =(unsigned char *)ret->Data;
+	//	data[i]<155? data[i]+=100:data[i]=255;
+	//
+	//}
+	// end 20140415
+	//TrilateralfilterI tri(8,5,5);
+	//doTrilateralproqt(src,ret,tri,6,p);
+	//BilateralFilterI bia(9,9,5);
+	//doBilateralproqt(src,ret,bia,3,p);
+	//GuassFilterI gs(7,15);
+	//doGaussproqt(src,ret,gs,20,p);
+	WaterShedsI &water=WaterShedsI(1,50);
+	doWaterShedsI(src,ret,water,p);
+	//lowPassI lpass(5000.0);
+	//Raw *ret = (Raw *)dolowPassI(src,lpass);
+	test.writeImagesesmicarray((unsigned char*)ret->Data ,ret->Width,ret->Height,ret->Depth);
+	delete outdata;
+	return ret;
+
 
 }
 Raw * testinterface1(Process &src)
@@ -233,8 +343,8 @@ int main(int argc, char* argv[])
 	//testRaw2D();
 
 	//_CrtSetBreakAlloc(520);
-	testinterface();
-	
+	//testinterface();
+	testlittledata();
 
 	int tmpFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 	tmpFlag |= _CRTDBG_LEAK_CHECK_DF;

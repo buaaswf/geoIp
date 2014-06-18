@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "vol_math_filter_Interface.h"
+#include "vol_math_2D_filter_Interface.h"
 #include <assert.h>
 
 #include <stdio.h>

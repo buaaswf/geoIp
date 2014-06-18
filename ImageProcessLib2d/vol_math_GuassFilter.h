@@ -3,7 +3,7 @@
 
 #include "vol_math_Raw3D_Independt.h"
 #include "vol_math_RawImage.h"
-#include "vol_math_filter_Interface.h"
+#include "vol_math_2D_filter_Interface.h"
 //qym
 #include <math.h>
 
