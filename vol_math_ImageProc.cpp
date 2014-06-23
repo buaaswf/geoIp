@@ -409,20 +409,26 @@ void MaxValue(Raw &image,int smoothsize,int threshold){//极大值函数
 			for(j=0;j<col;j++){	
 				if(temp.get(j,i,k)>threshold){//50
 					Is_Biger=false;
-					for(m=-1;m<2;m++){	
-						y=m+i; 
-						y=y<0?0:y;
-						y=(y>(row-1))?(row-1):y;	
-						for(n=-1;n<2;n++){		
-							x=n+j;					
-							x=x<0?0:x;
-							x=(x>(col-1))?(col-1):x;
-							if(temp.get(x,y,k) > temp.get(j,i,k)){
-								Is_Biger=true;
-								break;
-							}	
+					for(l=-1;l<2;l++){
+						z = l+k;
+						z = z<0?0:z;
+						z = (z>(height-1))?(height-1):z;
+						for(m=-1;m<2;m++){	
+							y=m+i; 
+							y=y<0?0:y;
+							y=(y>(row-1))?(row-1):y;	
+							for(n=-1;n<2;n++){		
+								x=n+j;					
+								x=x<0?0:x;
+								x=(x>(col-1))?(col-1):x;
+								if(temp.get(x,y,z) > temp.get(j,i,k)){
+									Is_Biger=true;
+									break;
+								}	
+							}
+							if(Is_Biger)break;
 						}
-						if(Is_Biger)break;
+
 					}
 					if(Is_Biger)image.put(j,i,k,0);
 					else image.put(j,i,k,255);

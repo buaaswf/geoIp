@@ -116,9 +116,15 @@ ImageVolume * testlittledata()
 	//test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));//G:\geo\data
 	//test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));//E:\geo\0000geoimageprov2\data
 	//test.readImage(indata,"F:\\1385afwatersmooth.raw",l*m*n*sizeof(unsigned char));
-	test.readImage(indata,"F:\\lab\\VTKproj\\mig-enhance.raw",lbig*mbig*nbig*sizeof(unsigned char));
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",lbig*mbig*nbig);
 	Raw *bigdata=new Raw(lbig,mbig,nbig);
-	memcpy(bigdata->getdata(),indata,lbig*mbig*nbig);
+	//memcpy(bigdata->getdata(),indata,lbig*mbig*nbig);
+	//
+	for (int i = 0; i < bigdata->size(); i++)
+	{
+		bigdata->putXYZ(i,(PIXTYPE)indata[i]);
+
+	}
 	Raw *littledata=new Raw(l,m,n);
 	for (int i = 0; i < l; i++)
 	{
@@ -145,7 +151,12 @@ ImageVolume * testlittledata()
 	//Process para(1,l,m,3,slice,indata,3,3,3,3,2);
 	//Raw  * ret = testinterface1(para);
 	unsigned char * outdata = new unsigned char[l*m*n]; 
-	ImageVolume *src = new ImageVolume(l,m,n,1,littledata->getdata(),false);
+	unsigned char *indatal=new unsigned char[l*m*n];
+	for (int i=0;i<littledata->size();i++)
+	{
+		indatal[i]=(unsigned char)littledata->getXYZ(i);
+	}
+	ImageVolume *src = new ImageVolume(l,m,n,1,indatal,false);
 	ImageVolume *ret = new ImageVolume(l,m,n,1,outdata,false);
 	//testinterface(src,ret);
 	//unsigned char* data = (unsigned char*)Raw2ImageVolume(*ret,1);
@@ -169,7 +180,7 @@ ImageVolume * testlittledata()
 	//Raw * ret = (Raw *)doBilateralI(src,bil);
 	//Raw *ret=(Raw *)doAnistropicykfour_diff(src,anis);
 	// swf 20140415
-	//AnistropicI ani(3,3,1,1);
+	//AnistropicI ani(3,30,1,1);
 	//////doAnistropicI(src,ret,ani);
 	//doAnistropicIYproqt(src,ret,ani,10,p);
 	//for (int i=0;i<ret->GetLength();i++)
@@ -185,7 +196,7 @@ ImageVolume * testlittledata()
 	//doBilateralproqt(src,ret,bia,3,p);
 	//GuassFilterI gs(7,15);
 	//doGaussproqt(src,ret,gs,20,p);
-	WaterShedsI &water=WaterShedsI(1,50);
+	WaterShedsI &water=WaterShedsI(1,5);
 	doWaterShedsI(src,ret,water,p);
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);

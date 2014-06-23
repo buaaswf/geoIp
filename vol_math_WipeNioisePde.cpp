@@ -238,7 +238,7 @@ void WipeNioisePde::Perona_MalikSipl(Raw *src,Raw *ret,int iter)
 				ProgressChanged (1, 100,(long long)( progressStep)*100/(globalProgressChanged ),flag);
 			}
 
-			ret->putXYZ( i, temp->getXYZ(i + ret->getXsize() * ret->getYsize()*val) );
+			ret->putXYZ( i, temp->getXYZ(i + ret->getXsize() * ret->getYsize()*1) );
 		}
 		delete s;
 		delete temp;

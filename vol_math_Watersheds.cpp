@@ -850,7 +850,7 @@ void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classn
 		for(i=0;i<row;i++)
 			for(j=0;j<col;j++)
 				LabelImage.put(j,i,k,0);
-	//预处理,提取区分每个标记区域，并初始化每个标记的种子队列
+	//预处理,提取区分每个标记区域，并初始化每个标记的种子队列:input maxmum tranfrom
 	//种子是指标记区域边缘的点，他们可以在水位上升时向外淹没（或者说生长）
 	for(k=0;k<height;k++){
 		for(i=0;i<row;i++){
@@ -1452,6 +1452,95 @@ void Watersheds( Raw &OriginalImage, Raw &SeedImage, Raw &LabelImage,int *classn
 		SeedCounts.pop_back();
 	}
 }
+Raw gradientxgc( Raw &g ) 
+{
+	int n=g.getXsize();
+	int m=g.getYsize();
+	int l=g.getZsize();
+	Raw ret(g);
+	int i,j,k,temp1,temp2;
+
+	for(i=0;i<n;i++)
+	{
+		for(j=0;j<m;j++)
+		{
+			for ( k=0;k < l;k++)
+			{
+				if(i>0)
+					temp1=i-1;
+				else
+					temp1=0;
+				if (i<n-1)
+					temp2=i+1;
+				else 
+					temp2=n-1;
+
+				ret.put(i,j,k,(g.get(temp2,j,k)-g.get(temp1,j,k))/2.0);
+				//if (ret.get(i,j,k)!=0)
+				//{
+				//	cout<<"i="<<i<<",j="<<j<<",k="<<k<<ret.get(i,j,k)<<endl;
+				//}
+			}			
+		}
+	}
+	return ret.set_shared(true);
+}
+
+Raw gradientygc( Raw & g ) 
+{
+	int n=g.getXsize();
+	int m=g.getYsize();
+	int l=g.getZsize();
+	Raw ret(n, m,l);
+	int i,j,k,temp1,temp2;
+	for(i=0;i<n;i++)
+	{
+		for(j=0;j<m;j++)
+		{
+			for ( k = 0;k < l;k++)
+			{
+				if(j>0)
+					temp1=j-1;
+				else
+					temp1=0;
+				if (j<n-1)
+					temp2=j+1;
+				else 
+					temp2=m-1;
+				ret.put(i,j,k,0.5*(g.get(i,temp2,k)-g.get(i,temp1,k)));
+			}			
+		}
+	}
+	return ret.set_shared(true);
+
+}
+Raw  gradientzgc( Raw &g ) 
+{
+	int n=g.getXsize();
+	int m=g.getYsize();
+	int l=g.getZsize();
+	Raw ret(n, m,l);
+	int i,j,k,temp1,temp2;
+	for(i=0;i<n;i++)
+	{
+		for(j=0;j<m;j++)
+		{
+			for ( k = 0;k < l;k++)
+			{
+				if(k>0)
+					temp1=k-1;
+				else
+					temp1=0;
+				if (k<l-1)
+					temp2=k+1;
+				else 
+					temp2=l-1;
+				ret.put(i,j,k,0.5*(g.get(i,j,temp2)-g.get(i,j,temp1)));
+			}			
+		}
+	}
+	return ret.set_shared(true);
+}
 void Gradient( Raw &src,Raw &dest){	
 	long long i,j,k,row,col,height;
 	row = src.getYsize();
@@ -1460,32 +1549,72 @@ void Gradient( Raw &src,Raw &dest){
 	PIXTYPE val;
 	PIXTYPE dx1,dx2,dx3,dx4,dx5,dx6,dx;
 	PIXTYPE dy1,dy2,dy3,dy4,dy5,dy6,dy;
-	for(k=0;k<height;k++){
-		for(i=0;i<row;i++){
-			for(j=0;j<col;j++){ 
-				if(j==0 || i==0 ||j==col-1 || i==row-1 ) dest.put(j,i,k,0);
-				else {	
-					dx1=src.get(j+1,i-1,k);
-					dx2=src.get(j+1,i,k);
-					dx3=src.get(j+1,i+1,k);
-					dx4=src.get(j-1,i-1,k);
-					dx5=src.get(j-1,i,k);
-					dx6=src.get(j-1,i+1,k);
-					dx=dx1+2*dx2+dx3-dx4-2*dx5-dx6;
-				
-					dy1=src.get(j-1,i+1,k);
-					dy2=src.get(j,i+1,k);			
-					dy3=src.get(j+1,i+1,k);
-					dy4=src.get(j-1,i-1,k);
-					dy5=src.get(j,i-1,k);				
-					dy6=src.get(j+1,i-1,k);
-					dy=dy1+2*dy2+dy3-dy4-2*dy5-dy6;
-					val=sqrt(dx*dx+dy*dy);
-					dest.put(j,i,k,val);
-				}
+	//for(k=0;k<height;k++){
+	//	for(i=0;i<row;i++){
+	//		for(j=0;j<col;j++){ 
+	//			if(j==0 || i==0 ||j==col-1 || i==row-1 ) dest.put(j,i,k,0);
+	//			else {	
+	//				dx1=src.get(j+1,i-1,k);
+	//				dx2=src.get(j+1,i,k);
+	//				dx3=src.get(j+1,i+1,k);
+	//				dx4=src.get(j-1,i-1,k);
+	//				dx5=src.get(j-1,i,k);
+	//				dx6=src.get(j-1,i+1,k);
+	//				dx=dx1+2*dx2+dx3-dx4-2*dx5-dx6;
+
+	//				dy1=src.get(j-1,i+1,k);
+	//				dy2=src.get(j,i+1,k);			
+	//				dy3=src.get(j+1,i+1,k);
+	//				dy4=src.get(j-1,i-1,k);
+	//				dy5=src.get(j,i-1,k);				
+	//				dy6=src.get(j+1,i-1,k);
+	//				dy=dy1+2*dy2+dy3-dy4-2*dy5-dy6;
+	//				val=sqrt(dx*dx+dy*dy);
+	//				dest.put(j,i,k,val);
+	//			}
+	//		}
+	//	}
+	//}
+	//for(k=0;k<height-2;k++){
+	//	dx3 = k+2;
+	//	for(i=0;i<row-2;i++){
+	//		dx2 = i+2;
+	//		for(j=0;j<col-2;j++){
+	//			dx1 = j+2;
+
+	//			val = (PIXTYPE)pow(0.5*(src.get(j+1,i+1,dx3)-src.get(j+1,i+1,k)),2);
+
+	//			val += (PIXTYPE)pow(0.5*(src.get(j+1,dx2,k+1)-src.get(j+1,i,k+1)),2);
+
+	//			val += (PIXTYPE)pow(0.5*(src.get(dx1,i+1,k+1)-src.get(j,i+1,k+1)),2);
+
+	//			val += (PIXTYPE)pow(0.5*(src.get(dx1,dx2,k+1)-src.get(j,i,k+1)),2);
+
+	//			val += (PIXTYPE)pow(0.5*(src.get(dx1,i+1,dx3)-src.get(j,i+1,k)),2);
+
+	//			val += (PIXTYPE)pow(0.5*(src.get(j+1,dx2,dx3)-src.get(j+1,i,k)),2);
+
+	//			val += (PIXTYPE)pow(0.5*(src.get(dx1,dx2,dx3)-src.get(j,i,k)),2);
+
+	//			val = 1/sqrt(1+val);
+
+	//			dest.put(j+1,i+1,k+1,val);
+	//		}
+	//	}
+	//}
+
+	dest=gradientxgc(src)*gradientxgc(src)+gradientygc(src)*gradientygc(src)+gradientzgc(src)*gradientzgc(src);
+	for (int i=0;i<src.getXsize();i++)
+	{
+		for (int j=0;j<src.getYsize();j++)
+		{
+			for (int k=0;k<src.getZsize();k++)
+			{
+				dest.put(i,j,k,sqrt(dest.get(i,j,k)));
 			}
 		}
 	}
+	
 }
 void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progresschanged)(int,int,int,bool &)){
 	if(OriginalImage.getdata() == NULL) return ;
@@ -1512,10 +1641,15 @@ void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progressch
 			val = 255*(raw1.getXYZ(i)-Minval)/(Maxval-Minval);//将梯度值规划到0-255 raw1=gradient
 			raw1.putXYZ(i,val);	
 	}
+
+
+	//delete[] data;
+	printf("write is ok");
 	//erode reconstruction
 	Dilate_Gray(OriginalImage,raw2,2);//image dilate
 	Erode_Gray(raw2,OriginalImage,2);//image Erode
 	Morph_reconstuct_Gray(OriginalImage,raw2,strings,2);
+
 	//Get Max image
 	MaxValue(raw2,para.smoothsizes,para.threshold);
 	//get seedimage and initialize it
@@ -1531,6 +1665,17 @@ void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progressch
 		}
 	}
 	cout<<"标记点的个数："<<number<<endl;
+	FILE *p;
+	if((p=fopen("F:\\gradient1.raw","wb"))==NULL)  //"ab+"append
+	{
+		printf("cant open the file");
+		exit(0);
+	}
+	//= new unsigned char [l *m*n];
+	//unsigned char *  data =(unsigned char *) src;
+	fwrite(raw1.getdata(), sizeof(float), size, p);
+	fclose(p);
+	fflush(stdout);
 	//watersheds
 	Watersheds(raw1,raw2,OriginalImage,classnumber,progresschanged);
 	number=*classnumber;
