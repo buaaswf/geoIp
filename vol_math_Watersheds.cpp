@@ -1603,17 +1603,43 @@ void Gradient( Raw &src,Raw &dest){
 	//	}
 	//}
 
-	dest=gradientxgc(src)*gradientxgc(src)+gradientygc(src)*gradientygc(src)+gradientzgc(src)*gradientzgc(src);
-	for (int i=0;i<src.getXsize();i++)
+	//dest=gradientxgc(src)*gradientxgc(src)+gradientygc(src)*gradientygc(src)+gradientzgc(src)*gradientzgc(src);
+	//for (int i=0;i<src.getXsize();i++)
+	//{
+	//	for (int j=0;j<src.getYsize();j++)
+	//	{
+	//		for (int k=0;k<src.getZsize();k++)
+	//		{
+	//			dest.put(i,j,k,sqrt(dest.get(i,j,k)));
+	//		}
+	//	}
+	//}
+	for (size_t i = 1; i < src.getXsize()-1; i++)
 	{
-		for (int j=0;j<src.getYsize();j++)
+		for (size_t j = 1; j < src.getYsize()-1; j++)
 		{
-			for (int k=0;k<src.getZsize();k++)
+			for (size_t k = 1; k < src.getZsize()-1; k++)
 			{
-				dest.put(i,j,k,sqrt(dest.get(i,j,k)));
+				if (i>=1&&j>=1&&k>=1&&i<=src.getXsize()-1&&j<src.getYsize()-1&&k<src.getZsize()-1)
+				{
+					PIXTYPE dx = 0.5*(src.get(i - 1, j, k) - src.get(i + 1, j, k));
+					PIXTYPE dy= 0.5*(src.get(i , j-1, k) - src.get(i , j+1, k));
+					PIXTYPE dz = 0.5*(src.get(i, j, k - 1) - src.get(i, j, k + 1));
+					dest.put(i, j, k, sqrt(dx*dx + dy*dy + dz*dz));
+				} 
+				else
+				{
+					dest.put(i,j,k,-100);
+
+				}
+
+
+
 			}
 		}
+
 	}
+	
 	
 }
 void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progresschanged)(int,int,int,bool &)){
@@ -1632,11 +1658,16 @@ void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progressch
 	//平滑图求梯度
 	Gradient(OriginalImage,raw1);	
 	for(i=0;i<size;i++){
-			val = raw1.getXYZ(i);
-			Minval = Minval > val ? val : Minval;
-			Maxval = Maxval < val ? val : Maxval;
+		val = raw1.getXYZ(i);
+			if (val>=0)
+			{
+				Minval = Minval > val ? val : Minval;
+				Maxval = Maxval < val ? val : Maxval;
+			}
+
+
 	}
-	//cout<<"Minval="<<(int)Minval<<"    Maxval="<<(int)Maxval<<endl;
+	cout<<"Minval="<<(int)Minval<<"    Maxval="<<(int)Maxval<<endl;
 	for(i=0;i<size;i++){
 			val = 255*(raw1.getXYZ(i)-Minval)/(Maxval-Minval);//将梯度值规划到0-255 raw1=gradient
 			raw1.putXYZ(i,val);	
@@ -1656,11 +1687,11 @@ void WatershedsProcess(Raw &OriginalImage,WatershedsPara &para,void (*progressch
 	for(k=0;k<height;k++){
 		for(i=0;i<row;i++){
 			for(j=0;j<col;j++){ 
-                if(raw2.get(j,i,k)) {
-				raw2.put(j,i,k,1);
-				number++;
-			}
-			else  raw2.put(j,i,k,0);
+				if(raw2.get(j,i,k)) {
+					raw2.put(j,i,k,1);
+					number++;
+				}
+				else  raw2.put(j,i,k,0);
 			}
 		}
 	}

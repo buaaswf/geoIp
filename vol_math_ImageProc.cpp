@@ -437,7 +437,7 @@ void MaxValue(Raw &image,int smoothsize,int threshold){//极大值函数
 			}
 		}
 	} 
-	NoiseProcess(image);//噪音处理
+	//NoiseProcess(image);//噪音处理
 }
 void MinValue(Raw &image,int smoothsize,int threshold){//极小值函数
 	if(threshold<0) {

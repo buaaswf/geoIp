@@ -116,7 +116,7 @@ ImageVolume * testlittledata()
 	//test.readImage(indata,"F:\\3DVdata\\1\\mig100.3dv.raw",l*m*n*sizeof(unsigned char));//G:\geo\data
 	//test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",l*m*n*sizeof(unsigned char));//E:\geo\0000geoimageprov2\data
 	//test.readImage(indata,"F:\\1385afwatersmooth.raw",l*m*n*sizeof(unsigned char));
-	test.readImage(indata,"F:\\lab\\VTKproj\\mig.raw",lbig*mbig*nbig);
+	test.readImage(indata,"F:\\lab\\VTKproj\\mig1000-1200.raw",lbig*mbig*nbig);
 	Raw *bigdata=new Raw(lbig,mbig,nbig);
 	//memcpy(bigdata->getdata(),indata,lbig*mbig*nbig);
 	//
@@ -196,7 +196,7 @@ ImageVolume * testlittledata()
 	//doBilateralproqt(src,ret,bia,3,p);
 	//GuassFilterI gs(7,15);
 	//doGaussproqt(src,ret,gs,20,p);
-	WaterShedsI &water=WaterShedsI(1,5);
+	WaterShedsI &water=WaterShedsI(1,50);
 	doWaterShedsI(src,ret,water,p);
 	//lowPassI lpass(5000.0);
 	//Raw *ret = (Raw *)dolowPassI(src,lpass);
